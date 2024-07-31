@@ -11,34 +11,41 @@ public final class DriverTableViewCell : UITableViewCell {
     public static let reuseId: String = "DriverTableViewCell";
     private var wrap: UIView = UIView();
     
-    private var label: UILabel = UILabel();
+    private var positionNumberLabel: UILabel = UILabel();
+    private var driversInitialsLabel: UILabel = UILabel();
+    
     
     private func configureUI() {
-        self.addSubview(wrap)
-        
-
+        self.addSubview(wrap);
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configureUI()
+        super.init(style: style, reuseIdentifier: reuseIdentifier);
+        configureUI();
     }
     
     
     @available(*, unavailable)
     required init? (coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented");
     }
     
     func configure(with driver: DriverData) {
-//        self.titleView.text = film.title
-//        self.overviewView.text = film.overview
-//        self.posterView.image = film.poster
-        wrap.backgroundColor = .systemPink;
-        wrap.addSubview(label);
+        self.addSubview(wrap);
         wrap.pin(to: self);
         
-        label.text = "cum";
-        label.pinCenter(to: wrap);
+        wrap.addSubview(positionNumberLabel);
+        positionNumberLabel.text = driver.getPosition()
+        positionNumberLabel.textColor = .white;
+        positionNumberLabel.pinTop(to: wrap.topAnchor);
+        positionNumberLabel.pinBottom(to: wrap.bottomAnchor);
+        positionNumberLabel.pinLeft(to: wrap.leadingAnchor, 10);
+        
+        wrap.addSubview(driversInitialsLabel);
+        driversInitialsLabel.text = driver.dirverInitials;
+        driversInitialsLabel.textColor = .white;
+        driversInitialsLabel.pinTop(to: wrap.topAnchor);
+        driversInitialsLabel.pinBottom(to: wrap.bottomAnchor);
+        driversInitialsLabel.pinLeft(to: positionNumberLabel.trailingAnchor)
     }
 }

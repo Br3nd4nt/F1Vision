@@ -15,4 +15,12 @@ struct DriverData {
     var time: Int;
     var deltaTime: Int;
     
+    func getPosition() -> String {
+        return position.formatted() + "\t"
+//        if position < 10 {
+//            return " " + position.formatted()
+//        } else {
+//            return position.formatted()
+//        }
+    }
 }
