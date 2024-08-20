@@ -65,6 +65,8 @@ class MainViewController: UIViewController {
         table.pinRight(to: view.safeAreaLayoutGuide.centerXAnchor, 10);
         table.register(DriverTableViewCell.self, forCellReuseIdentifier: DriverTableViewCell.reuseId);
     }
+    
+    
 }
 
 extension MainViewController: UITableViewDelegate {}
