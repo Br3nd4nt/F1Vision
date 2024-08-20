@@ -13,6 +13,11 @@ class TrackView: UIView {
     
     private let viewModel: TrackViewModel = TrackViewModel()
     
+    private var bp = UIBezierPath()
+    private let shapeLayer = CAShapeLayer()
+    
+    public var trackGP: String = ""
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         print("in frame")
@@ -32,11 +37,14 @@ class TrackView: UIView {
         textView.font = .systemFont(ofSize: 20)
         textView.text = "TEST"
         
+        self.layer.addSublayer(shapeLayer)
+        shapeLayer.isHidden = true
+        textView.isHidden = false
     }
     
     func connectToServer() {
         print("connection to socket")
-        
+        viewModel.trackGP = self.trackGP
         viewModel.connect(completion: {model in
             print("got the model!")
             print("number of sectors: \(String(describing: model?.sectors.count))")
@@ -61,29 +69,33 @@ class TrackView: UIView {
             maxY = max(maxY, max(sector[1], sector[3]))
         }
         
-        let bp = UIBezierPath()
+
         bp.lineWidth = 10
-//        bp.move(to: CGPoint(x:0, y:0))
-//        bp.addLine(to: CGPoint(x:self.bounds.width, y:0))
-//        bp.addLine(to: CGPoint(x:self.bounds.width, y: self.bounds.height))
         let width: CGFloat = self.bounds.width
         let height: CGFloat = self.bounds.height
         let scale: CGFloat = 0.9
+        
         bp.move(to: translatePoint(x: model.sectors[0][0], y: model.sectors[0][1], minX: minX, maxX: maxX, minY: minY, maxY: maxY, width: width, height: height, scale: scale))
-        for sector in model.sectors {
-            bp.addLine(to: translatePoint(x: sector[2], y: sector[3], minX: minX, maxX: maxX, minY: minY, maxY: maxY, width: width, height: height, scale: scale))
-        }
+        for sector in model.sectors {bp.addLine(to: translatePoint(x: sector[2], y: sector[3], minX: minX, maxX: maxX, minY: minY, maxY: maxY, width: width, height: height, scale: scale))}
         bp.addLine(to: translatePoint(x: model.sectors[0][0], y: model.sectors[0][1], minX: minX, maxX: maxX, minY: minY, maxY: maxY, width: width, height: height, scale: scale))
-//        bp.addLine(to: translatePoint(x: model.sectors.last![2], y: model.sectors.last![3], minX: minX, maxX: maxX, minY: minY, maxY: maxY, width: width, height: height, scale: scale))
-            
-        let shapeLayer = CAShapeLayer()
+        
         shapeLayer.strokeColor = UIColor.white.cgColor
         shapeLayer.path = bp.cgPath
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.borderWidth = 10
         shapeLayer.lineWidth = 20
-        self.layer.addSublayer(shapeLayer)
+
         textView.isHidden = true
+        shapeLayer.isHidden = false
+    }
+    
+    func reset() {
+        shapeLayer.isHidden = true
+        textView.isHidden = false
+        bp = UIBezierPath()
+        self.trackGP = ""
+        viewModel.trackGP = ""
+        viewModel.trackSectors = TrackModel(sectors: [])
     }
     
     private func translatePoint(x: Int, y: Int, minX: Int, maxX: Int, minY: Int, maxY: Int, width: CGFloat, height: CGFloat, scale: CGFloat) -> CGPoint {

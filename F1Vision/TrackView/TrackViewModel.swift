@@ -19,12 +19,14 @@ class TrackViewModel: ObservableObject {
     private var manager = SocketManager(socketURL: URL(string: "ws://\(host):\(port)")!, config: [.log(false), .compress])
     let socket: SocketIOClient
     
+    public var trackGP: String = ""
+    
     init() {
         self.socket = manager.defaultSocket
         
         socket.on(clientEvent: .connect){(data, ack) in
             print("Connected to: \(self.manager.socketURL.relativeString)")
-            self.socket.emit("request_track_data", "request_track_data")
+            self.socket.emit("request_track_data", self.trackGP)
         }
         
         socket.on("track_data") {[weak self] (data, ack) in
@@ -36,18 +38,35 @@ class TrackViewModel: ObservableObject {
     
     func parseJSON(rawData: String) -> TrackModel {
         if let data = rawData.data(using: .utf8) {
-            print("trying to convert from JSON")
-            let jsonData = try! JSONDecoder().decode([[Int]].self, from: data)
-            print("Converted!")
-            return TrackModel(sectors: jsonData)
+            do {
+                print("trying to convert from JSON")
+                let jsonData = try JSONDecoder().decode([[Int]].self, from: data)
+                print("Converted!")
+                return TrackModel(sectors: jsonData)
+            } catch {
+                print()
+                print("======")
+                print("ERROR!")
+                print("======")
+                print()
+                print("JSON is empty?")
+                print("data:")
+                print(data)
+                print("raw data:")
+                print(rawData)
+                print("disconnecting the socket")
+                self.socket.disconnect()
+            }
         }
         return TrackModel(sectors: [])
     }
     
     func connect(completion: @escaping (TrackModel?) -> Void) {
-        self.socket.connect()
-        self.socket.on(clientEvent: .disconnect) { data, ack in
-            completion(self.trackSectors) // ?????
+        if !self.trackGP.isEmpty {
+            self.socket.connect()
+            self.socket.on(clientEvent: .disconnect) { data, ack in
+                completion(self.trackSectors) // ?????
+            }
         }
     }
 }

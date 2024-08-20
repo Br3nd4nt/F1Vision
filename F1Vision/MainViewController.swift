@@ -13,6 +13,10 @@ class MainViewController: UIViewController {
     
     private let trackView: TrackView = TrackView();
     
+    // search bar for testing
+    private let textField: UITextField = UITextField()
+    private let searchButton: UIButton = UIButton();
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .darkGray
@@ -22,24 +26,57 @@ class MainViewController: UIViewController {
         configureUI();
     }
     
-    override var prefersHomeIndicatorAutoHidden: Bool {
-        return true
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
-        self.trackView.connectToServer()
+        self.onButtonPressed()
     }
     
     func configureUI() {
         configureTable();
         
+        configureTestSearch()
+        
+        
         view.addSubview(trackView)
         trackView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
-        trackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+//        trackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        trackView.pinTop(to: textField.bottomAnchor)
         trackView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         trackView.pinLeft(to: table.trailingAnchor)
         
+        
     }
+    
+    func configureTestSearch() {
+        view.addSubview(searchButton)
+        searchButton.setTitle("   Search   ", for: .normal)
+        searchButton.backgroundColor = .systemMint
+        searchButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        searchButton.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+        searchButton.addTarget(self, action: #selector(onButtonPressed), for: .touchUpInside)
+        
+        
+        view.addSubview(textField)
+        textField.backgroundColor = UIColor(white: 0.3, alpha: 1)
+        textField.placeholder = "   Search for track..."
+        textField.text = "Spa"
+        textField.pinLeft(to: table.trailingAnchor)
+        textField.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        textField.pinRight(to: searchButton.leadingAnchor)
+        textField.font = .systemFont(ofSize: 30)
+        
+        
+    }
+    
+    @objc
+    func onButtonPressed() {
+        self.trackView.reset()
+        if textField.hasText{
+            self.trackView.trackGP = textField.text!
+            self.trackView.connectToServer()
+        }
+    }
+    
+    
     
     func createTestDriverData() {
         drivers.append(DriverData (number:  1, dirverInitials: "VER", tyreData: 0, position:  1, time: 0, deltaTime: 0))
@@ -81,7 +118,11 @@ class MainViewController: UIViewController {
     
 }
 
-extension MainViewController: UITableViewDelegate {}
+extension MainViewController: UITableViewDelegate {
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        return true
+    }
+}
 
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
