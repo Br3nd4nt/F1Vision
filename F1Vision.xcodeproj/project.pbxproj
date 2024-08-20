@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		063F89322C748D0D00B3BCB7 /* SocketHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F89312C748D0D00B3BCB7 /* SocketHelper.swift */; };
+		063F89372C7492C400B3BCB7 /* TrackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F89362C7492C400B3BCB7 /* TrackViewModel.swift */; };
+		063F89392C7492E300B3BCB7 /* TrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F89382C7492E300B3BCB7 /* TrackView.swift */; };
+		063F893C2C749E0600B3BCB7 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 063F893B2C749E0600B3BCB7 /* SocketIO */; };
+		063F893E2C74B40000B3BCB7 /* TrackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F893D2C74B40000B3BCB7 /* TrackModel.swift */; };
 		06624BF22C1789E900769392 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06624BF12C1789E900769392 /* AppDelegate.swift */; };
 		06624BF42C1789E900769392 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06624BF32C1789E900769392 /* SceneDelegate.swift */; };
 		06624BF62C1789E900769392 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06624BF52C1789E900769392 /* MainViewController.swift */; };
@@ -18,6 +23,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		063F89312C748D0D00B3BCB7 /* SocketHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketHelper.swift; sourceTree = "<group>"; };
+		063F89362C7492C400B3BCB7 /* TrackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewModel.swift; sourceTree = "<group>"; };
+		063F89382C7492E300B3BCB7 /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
+		063F893D2C74B40000B3BCB7 /* TrackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackModel.swift; sourceTree = "<group>"; };
 		06624BEE2C1789E900769392 /* F1Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = F1Vision.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		06624BF12C1789E900769392 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		06624BF32C1789E900769392 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -35,12 +44,31 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				063F893C2C749E0600B3BCB7 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		063F89302C748CFC00B3BCB7 /* Socket */ = {
+			isa = PBXGroup;
+			children = (
+				063F89312C748D0D00B3BCB7 /* SocketHelper.swift */,
+			);
+			path = Socket;
+			sourceTree = "<group>";
+		};
+		063F89352C74926300B3BCB7 /* TrackView */ = {
+			isa = PBXGroup;
+			children = (
+				063F89362C7492C400B3BCB7 /* TrackViewModel.swift */,
+				063F89382C7492E300B3BCB7 /* TrackView.swift */,
+				063F893D2C74B40000B3BCB7 /* TrackModel.swift */,
+			);
+			path = TrackView;
+			sourceTree = "<group>";
+		};
 		06624BE52C1789E800769392 = {
 			isa = PBXGroup;
 			children = (
@@ -61,6 +89,8 @@
 		06624BF02C1789E900769392 /* F1Vision */ = {
 			isa = PBXGroup;
 			children = (
+				063F89352C74926300B3BCB7 /* TrackView */,
+				063F89302C748CFC00B3BCB7 /* Socket */,
 				06624C052C178AB600769392 /* DriversTable */,
 				06624BF12C1789E900769392 /* AppDelegate.swift */,
 				06624BF32C1789E900769392 /* SceneDelegate.swift */,
@@ -97,6 +127,9 @@
 			dependencies = (
 			);
 			name = F1Vision;
+			packageProductDependencies = (
+				063F893B2C749E0600B3BCB7 /* SocketIO */,
+			);
 			productName = F1Vision;
 			productReference = 06624BEE2C1789E900769392 /* F1Vision.app */;
 			productType = "com.apple.product-type.application";
@@ -125,6 +158,9 @@
 				Base,
 			);
 			mainGroup = 06624BE52C1789E800769392;
+			packageReferences = (
+				063F893A2C749E0600B3BCB7 /* XCRemoteSwiftPackageReference "socket" */,
+			);
 			productRefGroup = 06624BEF2C1789E900769392 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -153,10 +189,14 @@
 			files = (
 				06624C092C178B6500769392 /* DriverTableViewCell.swift in Sources */,
 				06624C0B2C178D0600769392 /* DriverData.swift in Sources */,
+				063F89392C7492E300B3BCB7 /* TrackView.swift in Sources */,
+				063F893E2C74B40000B3BCB7 /* TrackModel.swift in Sources */,
 				06624BF62C1789E900769392 /* MainViewController.swift in Sources */,
 				06624BF22C1789E900769392 /* AppDelegate.swift in Sources */,
 				06624C0D2C17A5CC00769392 /* UIView+pin.swift in Sources */,
 				06624BF42C1789E900769392 /* SceneDelegate.swift in Sources */,
+				063F89322C748D0D00B3BCB7 /* SocketHelper.swift in Sources */,
+				063F89372C7492C400B3BCB7 /* TrackViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +421,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		063F893A2C749E0600B3BCB7 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		063F893B2C749E0600B3BCB7 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 063F893A2C749E0600B3BCB7 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 06624BE62C1789E800769392 /* Project object */;
 }

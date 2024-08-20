@@ -9,14 +9,16 @@ import UIKit
 
 class MainViewController: UIViewController {
     private let table: UITableView = UITableView();
-    private let testView: UIView = UIView();
     private var drivers: [DriverData] = [];
+    
+    private let trackView: TrackView = TrackView();
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .darkGray
-
+        
         createTestDriverData()
+        
         configureUI();
     }
     
@@ -24,9 +26,19 @@ class MainViewController: UIViewController {
         return true
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        self.trackView.connectToServer()
+    }
+    
     func configureUI() {
-        view.addSubview(testView)
         configureTable();
+        
+        view.addSubview(trackView)
+        trackView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+        trackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        trackView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
+        trackView.pinLeft(to: table.trailingAnchor)
+        
     }
     
     func createTestDriverData() {
