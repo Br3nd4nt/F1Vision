@@ -26,7 +26,7 @@ class TrackViewModel: ObservableObject {
         
         socket.on(clientEvent: .connect){(data, ack) in
             print("Connected to: \(self.manager.socketURL.relativeString)")
-            self.socket.emit("request_track_data", self.trackGP)
+            self.socket.emit("request_track_data", "\(self.trackGP)")
         }
         
         socket.on("track_data") {[weak self] (data, ack) in

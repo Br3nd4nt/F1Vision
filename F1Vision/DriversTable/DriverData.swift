@@ -14,6 +14,7 @@ struct DriverData {
     var position: Int;
     var time: Int;
     var deltaTime: Int;
+    var coordinates: CGPoint
     
     func getPosition() -> String {
         return position.formatted() + "\t"
