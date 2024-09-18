@@ -46,4 +46,5 @@ fastlane/test_output
 
 # python testing
 python_test_with_FastF1/
-
+./p
+./run

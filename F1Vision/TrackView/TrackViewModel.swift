@@ -11,10 +11,12 @@ import SocketIO
 import Foundation
 
 class TrackViewModel: ObservableObject {
-    static private let host: String = "192.168.1.9"
+//    static private let host: String = "192.168.1.9"
+    static private let host: String = "127.0.0.1"
     static private let port: UInt32 = 6969
     
     var trackSectors: TrackModel = TrackModel(sectors: [])
+    var targetRatio: CGFloat = 0;
     
     private var manager = SocketManager(socketURL: URL(string: "ws://\(host):\(port)")!, config: [.log(false), .compress])
     let socket: SocketIOClient
@@ -26,7 +28,8 @@ class TrackViewModel: ObservableObject {
         
         socket.on(clientEvent: .connect){(data, ack) in
             print("Connected to: \(self.manager.socketURL.relativeString)")
-            self.socket.emit("request_track_data", "\(self.trackGP)")
+            self.socket.emit("request_track_data", "\(self.targetRatio):\(self.trackGP)")
+//            self.socket.emit("request_track_data", "\(1):\(self.trackGP)")
         }
         
         socket.on("track_data") {[weak self] (data, ack) in

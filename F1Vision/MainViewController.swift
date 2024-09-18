@@ -13,6 +13,8 @@ class MainViewController: UIViewController {
     
     private let trackView: TrackView = TrackView();
     
+    var targetRatio: Float = 0;
+    
     // search bar for testing
     private let textField: UITextField = UITextField()
     private let searchButton: UIButton = UIButton();
@@ -22,13 +24,12 @@ class MainViewController: UIViewController {
         self.view.backgroundColor = .darkGray
         
         createTestDriverData()
-        
         configureUI();
     }
     
     override func viewDidAppear(_ animated: Bool) {
-//        textField.text = "Spa"
-//        self.onButtonPressed()
+        textField.text = "baku"
+        self.onButtonPressed()
     }
     
     func configureUI() {
@@ -38,33 +39,29 @@ class MainViewController: UIViewController {
         
         
         view.addSubview(trackView)
-        trackView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
-//        trackView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        trackView.pinTop(to: textField.bottomAnchor)
+        
         trackView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         trackView.pinLeft(to: table.trailingAnchor)
-        
-        
+        trackView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+        trackView.pinTop(to: textField.bottomAnchor)
     }
     
     func configureTestSearch() {
-        view.addSubview(searchButton)
-        searchButton.setTitle("   Search   ", for: .normal)
-        searchButton.backgroundColor = .systemMint
-        searchButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        searchButton.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
-        searchButton.addTarget(self, action: #selector(onButtonPressed), for: .touchUpInside)
-        
-        
         view.addSubview(textField)
         textField.backgroundColor = UIColor(white: 0.3, alpha: 1)
         textField.placeholder = "   Search for track..."
         textField.pinLeft(to: table.trailingAnchor)
         textField.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        textField.pinRight(to: searchButton.leadingAnchor)
+//        textField.pinRight(to: searchButton.leadingAnchor)
         textField.font = .systemFont(ofSize: 30)
         
-        
+        view.addSubview(searchButton)
+        searchButton.setTitle("   Search   ", for: .normal)
+        searchButton.backgroundColor = .systemMint
+        searchButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        searchButton.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+        searchButton.pinLeft(to: textField.trailingAnchor)
+        searchButton.addTarget(self, action: #selector(onButtonPressed), for: .touchUpInside)
     }
     
     @objc
@@ -72,7 +69,7 @@ class MainViewController: UIViewController {
         self.trackView.reset()
         if textField.hasText{
             self.trackView.trackGP = textField.text!
-//            self.trackView.targetRatio = (self.trackView.bounds.height / self.trackView.bounds.width)
+            self.trackView.targetRatio = (self.trackView.bounds.height / self.trackView.bounds.width)
             self.trackView.connectToServer(completion: {
                 for driver in self.drivers {
                     self.trackView.drawDriver(driver: driver)
@@ -115,10 +112,11 @@ class MainViewController: UIViewController {
         table.dataSource = self;
         table.isScrollEnabled = false
         table.isUserInteractionEnabled = false
-        table.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 10);
+//        table.pinTop(to: view.safeAreaLayoutGuide.topAnchor);
+        table.pinTop(to: view.topAnchor)
         table.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor);
-        table.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor, 10);
-        table.pinRight(to: view.safeAreaLayoutGuide.centerXAnchor, 10);
+        table.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor);
+        table.pinRight(to: view.safeAreaLayoutGuide.centerXAnchor);
         table.register(DriverTableViewCell.self, forCellReuseIdentifier: DriverTableViewCell.reuseId);
     }
     
