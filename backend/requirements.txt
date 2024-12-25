@@ -1,0 +1,5 @@
+fastf1
+pymongo
+numpy
+flask
+flask_socketio

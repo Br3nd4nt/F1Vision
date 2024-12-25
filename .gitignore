@@ -46,5 +46,8 @@ fastlane/test_output
 
 # python testing
 python_test_with_FastF1/
-./p
-./run
+.DS_Store
+*.DS_Store
+backend/.fastf1_cache
+backend/__pycache__
+backend/data_creation_testing.ipynb
