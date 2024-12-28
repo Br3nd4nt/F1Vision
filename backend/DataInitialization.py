@@ -31,24 +31,21 @@ class DataInitializer:
         dp("data collected")
 
     def create_track_data(self): 
-        dp("getting track points")
-        self.track_points_telemetry = self.session.laps.pick_fastest().get_telemetry().add_distance()
-        x = np.array(self.track_points_telemetry['X'].values)
-        y = np.array(self.track_points_telemetry['Y'].values)
-        points = np.vstack((x, y)).T
-        self.points = [(int(i[0]), int(i[1])) for i in points]
-        dp(f'points created, size: {len(self.points)}')
-        self.data_created_flag = True
-
-    def save_track_metadata(self):
         if not self.data_created_flag:
-            self.create_track_data()
+            dp("getting track points")
+            self.track_points_telemetry = self.session.laps.pick_fastest().get_telemetry().add_distance()
+            x = np.array(self.track_points_telemetry['X'].values)
+            y = np.array(self.track_points_telemetry['Y'].values)
+            points = np.vstack((x, y)).T
+            self.points = [(int(i[0]), int(i[1])) for i in points]
+            dp(f'points created, size: {len(self.points)}')
+            self.data_created_flag = True
         
         metadata = {
-            'track_name': self.gp_name,
-            'grand_prix_name': self.gp_name,
-            'track_points': self.points,
-            'track_points_count': len(self.points),
+            'trackName': self.gp_name,
+            'grandPrixName': self.gp_name,
+            'trackPoints': self.points,
+            'trackPointsCount': len(self.points),
         }
 
         self.mdb_client[self.track_db_name][self.track_db_name].insert_one(metadata)
@@ -86,7 +83,9 @@ class DataInitializer:
                 
                 suitable_df = drivers_telemetry[driver].iloc[drivers_indicies[driver] - 1]
 
-                data_record = {
+                data_record = { 
+                    # TODO: not string, use ints where possible
+                    # TODO: first letter should be lowercase
                     "Driver": str(driver),
                     "Date" : str((suitable_df["Date"] - pd.Timestamp("1970-01-01")) // pd.Timedelta('1s')),
                     'DriverAhead' : str(suitable_df['DriverAhead']),
@@ -96,7 +95,7 @@ class DataInitializer:
                     "Speed" : str(suitable_df["Speed"]),
                     "nGear" : str(suitable_df["nGear"]) ,
                     "Throttle" : str(suitable_df["Throttle"]),
-                    "Brake" : str(suitable_df["Brake"]),
+                    "Brake" : str(suitable_df["Brake"]), # BOOL
                     "DRS" : str(suitable_df["DRS"]),
                     "Status" : str(suitable_df["Status"]),
                     "X" : str(suitable_df["X"]),

@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct TrackModel {
+struct TrackModel: Codable {
     let sectors: [[Int]]
 }

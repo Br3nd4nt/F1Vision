@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 class TrackView: UIView {
+    private let defaults = UserDefaults.standard
+    private var model: TrackModel? = nil
     let textView: UILabel = UILabel()
     
     private let viewModel: TrackViewModel = TrackViewModel()
@@ -52,15 +54,28 @@ class TrackView: UIView {
         print("connection to socket")
         viewModel.trackGP = self.trackGP
         viewModel.targetRatio = self.targetRatio
-        viewModel.connect(completion: {model in
-            print("got the model!")
-            print("number of sectors: \(String(describing: model?.sectors.count))")
-            
-            // create the view
-            if model!.sectors.count != 0 {
-                self.configureTrack(model: model!)
+//        viewModel.connect(completion: {model in
+//            print("got the model!")
+//            print("number of sectors: \(String(describing: model?.sectors.count))")
+//            
+//            // create the view
+//            if model!.sectors.count != 0 {
+//                self.configureTrack(model: model!)
+//            }
+//            completion()
+//        })
+        viewModel.connect(completion: {
+//            self.model = (TrackModel) self.defaults.object(forKey: TrackViewModel.trackDataKey)
+            guard let data = UserDefaults.standard.data(forKey: TrackViewModel.trackDataKey) else {
+                return
             }
-            completion()
+            do {
+                let decoder = JSONDecoder()
+                self.model = try decoder.decode(TrackModel.self, from: data)
+                self.configureTrack(model: self.model!)
+            } catch {
+                print("[Error] decoding from JSON")
+            }
         })
     }
     

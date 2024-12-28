@@ -24,13 +24,8 @@ def connected():
 def disconnected():
     dp("Client disconnected")
 
-@socketio.on("ping")
-def testing_socketio(data):
-    socketio.emit("pong")
-
 @socketio.on('get_track_info')
-def hangle_track_info(data):
-    dp(f"got data: {data}")
+def handle_track_info():
     track_info = client[track_db_name][track_db_name].find_one({}, {'_id': 0})
     dp(f"track info from database: {str(track_info)[:100]}")
     socketio.emit('track_info', json.dumps(track_info))
@@ -43,6 +38,7 @@ def handle_telemetry(data):
     # we assume that the timestamp from the client is already in correct format "xxxxx" (x - digit)
 
     # TODO: need to add check for that
+
     telemetry = list(client[telemetry_db_name][timestamp].find({}, {'_id': 0}))
     socketio.emit("telemetry_data", json.dumps(telemetry))
 
