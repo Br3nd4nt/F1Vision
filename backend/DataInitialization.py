@@ -13,7 +13,7 @@ def dp(message: str):
 class DataInitializer:
     def __init__(self, mongo_client: MongoClient, track_db_name = "track_metadata", 
                 telemetry_db_name = "telemetry", session_year = 2024, 
-                session_place = "Miami", data_frequency = 10):
+                session_place = "Monaco", data_frequency = 10):
         self.mdb_client = mongo_client
         self.place = session_place
         self.year = session_year
@@ -52,7 +52,7 @@ class DataInitializer:
 
     def create_telemetry(self):
         if not self.data_created_flag:
-            self.save_track_metadata()
+            self.create_track_data()
         
         drivers_telemetry = {driver : self.session.laps.pick_drivers(driver).get_telemetry().add_driver_ahead(drop_existing=True)
                             for driver in self.drivers}
@@ -89,17 +89,17 @@ class DataInitializer:
                     "Driver": str(driver),
                     "Date" : str((suitable_df["Date"] - pd.Timestamp("1970-01-01")) // pd.Timedelta('1s')),
                     'DriverAhead' : str(suitable_df['DriverAhead']),
-                    "DistanceToDriverAhead" : str(suitable_df["DistanceToDriverAhead"]),
-                    "SessionTime" : str(suitable_df["SessionTime"].total_seconds()),
-                    "RPM" : str(suitable_df["RPM"]), 
-                    "Speed" : str(suitable_df["Speed"]),
-                    "nGear" : str(suitable_df["nGear"]) ,
-                    "Throttle" : str(suitable_df["Throttle"]),
-                    "Brake" : str(suitable_df["Brake"]), # BOOL
-                    "DRS" : str(suitable_df["DRS"]),
+                    "DistanceToDriverAhead" : suitable_df["DistanceToDriverAhead"].item(),
+                    "SessionTime" : suitable_df["SessionTime"].total_seconds(),
+                    "RPM" : suitable_df["RPM"].item(), 
+                    "Speed" : suitable_df["Speed"].item(),
+                    "nGear" : suitable_df["nGear"].item(),
+                    "Throttle" : suitable_df["Throttle"].item(),
+                    "Brake" : suitable_df["Brake"].item(),
+                    "DRS" : suitable_df["DRS"].item(),
                     "Status" : str(suitable_df["Status"]),
-                    "X" : str(suitable_df["X"]),
-                    "Y" : str(suitable_df["Y"]), 
+                    "X" : suitable_df["X"].item(),
+                    "Y" : suitable_df["Y"].item(),
                 }
                 name_length = 5
                 name = f"{int(timestamp.total_seconds() * 10)}"
