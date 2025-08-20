@@ -10,7 +10,7 @@ class TrackMock: TrackProtocol {
     private let json: JSONDataProtocol = Dependencies.shared.jsonDataService
 
     func getTrackPoints() -> TrackLayoutModel {
-        let result = json.loadJSON(filename: "abu_dhabi_track_layout,json", as: ADModel.self) ?? ADModel(
+        let result = json.loadJSON(filename: "abu_dhabi_track_layout", as: ADModel.self) ?? ADModel(
             trackName: "",
             grandPrixName: "",
             trackPoints: [[]]
