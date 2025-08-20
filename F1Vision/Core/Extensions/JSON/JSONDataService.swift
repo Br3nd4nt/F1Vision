@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import Puppy
 
 class JSONDataService: JSONDataProtocol {
 
     static let shared = JSONDataService()
+
+    private let logger: Puppy = Dependencies.shared.logger
 
     private init() {}
 
@@ -22,7 +25,7 @@ class JSONDataService: JSONDataProtocol {
     /// - Returns: Decoded object of the specified type
     func loadJSON<T: Codable>(filename: String, as type: T.Type) -> T? {
         guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
-            print("❌ Could not find JSON file: \(filename).json")
+            logger.error("❌ Could not find JSON file: \(filename).json")
             return nil
         }
 
@@ -30,10 +33,10 @@ class JSONDataService: JSONDataProtocol {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
             let result = try decoder.decode(type, from: data)
-            print("✅ Successfully loaded JSON: \(filename).json")
+            logger.info("✅ Successfully loaded JSON: \(filename).json")
             return result
         } catch {
-            print("❌ Error parsing JSON file \(filename).json: \(error)")
+            logger.error("❌ Error parsing JSON file \(filename).json: \(error)")
             return nil
         }
     }
@@ -50,10 +53,10 @@ class JSONDataService: JSONDataProtocol {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
             let result = try decoder.decode(type, from: data)
-            print("✅ Successfully loaded JSON from path: \(path)")
+            logger.info("✅ Successfully loaded JSON from path: \(path)")
             return result
         } catch {
-            print("❌ Error parsing JSON from path \(path): \(error)")
+            logger.error("❌ Error parsing JSON from path \(path): \(error)")
             return nil
         }
     }

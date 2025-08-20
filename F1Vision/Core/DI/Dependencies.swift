@@ -6,6 +6,8 @@
 //
 
 import Swinject
+import Puppy
+import Foundation
 
 class Dependencies {
     static let shared = Dependencies()
@@ -18,11 +20,39 @@ class Dependencies {
     private func setupDependencies() {
         // MARK: - Register Services
 
+        // Logger
+        let puppy: Puppy
+        let formatter = LogFormatter()
+
+        let console = ConsoleLogger("br3nd4nt.F1Vision.console", logLevel: .info, logFormat: formatter)
+
+        let fileManager = FileManager.default
+        let directoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = directoryURL.appendingPathComponent("f1vision.log")
+        do {
+            let file = try FileLogger("br3nd4nt.F1Vision",
+                                      logLevel: .debug,
+                                      logFormat: formatter,
+                                      fileURL: fileURL,
+                                      filePermission: "600",
+                                      )
+
+            puppy = Puppy(loggers: [console, file])
+        } catch {
+            print("Couldnt create file logger: \(error)")
+            puppy = Puppy(loggers: [console])
+        }
+
+        container.register(Puppy.self) {_ in
+            puppy
+        }.inObjectScope(.container)
+
         // Register JSONDataService as singleton
         container.register(JSONDataProtocol.self) { _ in
             JSONDataService.shared
         }.inObjectScope(.container)
 
+        // Track
         container.register(TrackProtocol.self) { _ in
             TrackMock.init()
         }.inObjectScope(.container)
@@ -54,5 +84,9 @@ class Dependencies {
 
     var track: TrackProtocol {
         return resolve(TrackProtocol.self)!
+    }
+
+    var logger: Puppy {
+        return resolve(Puppy.self)!
     }
 }
