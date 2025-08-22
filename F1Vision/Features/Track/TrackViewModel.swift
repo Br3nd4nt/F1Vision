@@ -8,32 +8,28 @@
 import Foundation
 import Puppy
 
-class TrackViewModel {
-    private let trackService: TrackProtocol
-    private let logger: Puppy
+final class TrackViewModel {
+    private let trackService: TrackProtocol = Dependencies.shared.track
+    private let logger: Puppy = Dependencies.shared.logger
 
-    @Published var trackData: TrackLayoutModel = .init(points: [])
+    @Published var trackData: TrackLayoutModel?
 
-    init(
-        trackService: TrackProtocol = Dependencies.shared.track,
-        logger: Puppy = Dependencies.shared.logger
-    ) {
-        self.trackService = trackService
-        self.logger = logger
-
+    init() {
         Task {
             do {
                 try await getTrackData()
+                guard let data = trackData else {
+                    throw TrackServiceError.noData
+                }
                 logger.info("Got track data")
-                logger.debug("Track points count: \(trackData.points.count)")
+                logger.debug("Track points count: \(String(describing: data))")
             } catch {
                 logger.error("Failed getting track data: \(error)")
             }
         }
-
     }
 
     func getTrackData() async throws {
-        trackData = try await trackService.getTrackPoints()
+        trackData = try await trackService.getTrackData()
     }
 }

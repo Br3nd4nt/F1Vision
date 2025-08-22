@@ -9,9 +9,9 @@ import Swinject
 import Puppy
 import Foundation
 
-class Dependencies {
+final class Dependencies {
     static let shared = Dependencies()
-    private let container: Container = Container()
+    private let container = Container()
 
     private init() {
         setupDependencies()
@@ -30,12 +30,13 @@ class Dependencies {
         let directoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let fileURL = directoryURL.appendingPathComponent("f1vision.log")
         do {
-            let file = try FileLogger("br3nd4nt.F1Vision",
-                                      logLevel: .debug,
-                                      logFormat: formatter,
-                                      fileURL: fileURL,
-                                      filePermission: "600",
-                                      )
+            let file = try FileLogger(
+                "br3nd4nt.F1Vision",
+                logLevel: .debug,
+                logFormat: formatter,
+                fileURL: fileURL,
+                filePermission: "600",
+            )
 
             puppy = Puppy(loggers: [console, file])
         } catch {
@@ -45,48 +46,51 @@ class Dependencies {
 
         container.register(Puppy.self) {_ in
             puppy
-        }.inObjectScope(.container)
+        }
+        .inObjectScope(.container)
 
         // Register JSONDataService as singleton
         container.register(JSONDataProtocol.self) { _ in
             JSONDataService.shared
-        }.inObjectScope(.container)
+        }
+        .inObjectScope(.container)
 
         // Track
         container.register(TrackProtocol.self) { _ in
-            TrackMock.init()
-        }.inObjectScope(.container)
+            TrackMock()
+        }
+        .inObjectScope(.container)
     }
 
     // MARK: - Resolution Methods
 
     /// Resolve a service by type
     func resolve<T>(_ serviceType: T.Type) -> T? {
-        return container.resolve(serviceType)
+        container.resolve(serviceType)
     }
 
     /// Resolve a service by type (non-optional, will crash if not found)
     func resolve<T>(_ serviceType: T.Type) -> T {
-        return container.resolve(serviceType)!
+        container.resolve(serviceType)!
     }
 
     // MARK: - Convenience Methods
 
     /// Get JSONDataService
     var jsonDataService: JSONDataProtocol {
-        return resolve(JSONDataProtocol.self)!
+        resolve(JSONDataProtocol.self)!
     }
 
     /// Get JSONDataService as concrete type
     var jsonDataServiceConcrete: JSONDataService {
-        return resolve(JSONDataService.self)!
+        resolve(JSONDataService.self)!
     }
 
     var track: TrackProtocol {
-        return resolve(TrackProtocol.self)!
+        resolve(TrackProtocol.self)!
     }
 
     var logger: Puppy {
-        return resolve(Puppy.self)!
+        resolve(Puppy.self)!
     }
 }

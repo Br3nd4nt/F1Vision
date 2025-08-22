@@ -8,8 +8,7 @@
 import Foundation
 import Puppy
 
-class JSONDataService: JSONDataProtocol {
-
+final class JSONDataService: JSONDataProtocol {
     static let shared = JSONDataService()
 
     private let logger: Puppy = Dependencies.shared.logger
@@ -65,12 +64,14 @@ class JSONDataService: JSONDataProtocol {
 
     /// Check if a JSON file exists in the bundle
     func jsonFileExists(filename: String) -> Bool {
-        return Bundle.main.url(forResource: filename, withExtension: "json") != nil
+        Bundle.main.url(forResource: filename, withExtension: "json") != nil
     }
 
     /// List all JSON files in the bundle
     func listJSONFiles() -> [String] {
-        guard let resourcePath = Bundle.main.resourcePath else { return [] }
+        guard let resourcePath = Bundle.main.resourcePath else {
+            return []
+        }
 
         do {
             let files = try FileManager.default.contentsOfDirectory(atPath: resourcePath)
