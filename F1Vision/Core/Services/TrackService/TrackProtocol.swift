@@ -6,5 +6,5 @@
 //
 
 protocol TrackProtocol {
-    func getTrackPoints() -> TrackLayoutModel
+    func getTrackData() async throws -> TrackLayoutModel?
 }
