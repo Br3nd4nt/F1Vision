@@ -292,6 +292,47 @@ dmypy.json
 ### Track Data ###
 MockServer/trackData/*.json
 
+### Race Data ###
+MockServer/raceData/*.json
+
+### Generated Data ###
+# Ignore all generated data files but keep the directories
+MockServer/trackData/
+MockServer/raceData/
+!.gitkeep
+
+### Python ###
+# Additional Python files
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+### IDE ###
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+### Logs ###
+*.log
+logs/
+
+### Old Code ###
+# Ignore old code directories
+f1-old-code/
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
