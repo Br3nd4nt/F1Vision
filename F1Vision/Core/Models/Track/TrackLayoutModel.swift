@@ -8,5 +8,10 @@
 import Foundation
 
 struct TrackLayoutModel: Codable {
-    let points: [[Int]]
+    let id: String
+    let name: String
+    let length: Double
+    let points: [TrackPoint]
+    let boundingBox: BoundingBox
+    let startFinishLine: StartFinishLine
 }
