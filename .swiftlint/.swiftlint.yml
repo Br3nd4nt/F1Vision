@@ -1,5 +1,4 @@
 parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
 
 disabled_rules:
-  - accessibility_label_for_image
-  - accessibility_trait_for_button
+ - identifier_name

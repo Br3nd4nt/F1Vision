@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import Puppy
 
 @main
 struct F1Vision: App {
+    private let logger: Puppy = Dependencies.shared.logger
+
+    var viewModel = TrackViewModel()
+
     var body: some Scene {
         WindowGroup {
-
         }
     }
 }
