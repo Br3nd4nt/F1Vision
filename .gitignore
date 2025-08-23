@@ -301,6 +301,10 @@ MockServer/trackData/
 MockServer/raceData/
 !.gitkeep
 
+# Ignore JSON data files in Xcode Resources
+F1Vision/Resources/MockData/Track/*.json
+F1Vision/Resources/MockData/Race/*.json
+
 ### Python ###
 # Additional Python files
 *.pyc
