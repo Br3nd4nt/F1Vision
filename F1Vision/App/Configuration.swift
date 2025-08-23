@@ -8,13 +8,20 @@
 struct Configuration {
     static let isHitBoxesEnabled = true
     static let zoom = 0.95
+    private static let raceName: Race = .monza
 
-    static let trackMockDataset: trackMockDatasets = .baku
+    static var trackMockDataset: String {
+        "\(raceName.rawValue)_track_layout"
+    }
+
+    static var raceMockDataset: String {
+        "\(raceName.rawValue)_2024_race_data"
+    }
 }
 
-
-enum trackMockDatasets: String {
-    case suzuka = "suzuka_track_layout"
-    case spa = "spa_track_layout"
-    case baku = "baku_track_layout"
+enum Race: String {
+    case suzuka
+    case monaco
+    case monza
+    case spa
 }

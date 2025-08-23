@@ -14,6 +14,9 @@ help:
 	@echo ""
 	@echo "🧹 Maintenance:"
 	@echo "  make clean         - Clean generated data files"
+	@echo "  make copy-race     - Copy race data to Xcode"
+	@echo "  make copy-track    - Copy track data to Xcode"
+	@echo "  make copy-all      - Copy all data to Xcode"
 	@echo ""
 	@echo "📝 Examples:"
 	@echo "  make track track=suzuka year=2024"
@@ -48,4 +51,16 @@ clean:
 	@rm -rf ./trackData/*.json
 	@rm -rf ./raceData/*.json
 	@echo "✅ Cleaned track and race data files"
+
+copy-race:
+	@echo "📁 Copying race data to Xcode project..."
+	@python3 copy_to_xcode.py --type race
+
+copy-track:
+	@echo "📁 Copying track data to Xcode project..."
+	@python3 copy_to_xcode.py --type track
+
+copy-all:
+	@echo "📁 Copying all data to Xcode project..."
+	@python3 copy_to_xcode.py --type all
 
