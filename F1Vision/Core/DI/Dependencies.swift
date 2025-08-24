@@ -60,6 +60,12 @@ final class Dependencies {
             TrackMock()
         }
         .inObjectScope(.container)
+
+        // Race
+        container.register(RaceProtocol.self) { _ in
+            RaceMock()
+        }
+        .inObjectScope(.container)
     }
 
     // MARK: - Resolution Methods
@@ -88,6 +94,10 @@ final class Dependencies {
 
     var track: TrackProtocol {
         resolve(TrackProtocol.self)!
+    }
+
+    var race: RaceProtocol {
+        resolve(RaceProtocol.self)!
     }
 
     var logger: Puppy {

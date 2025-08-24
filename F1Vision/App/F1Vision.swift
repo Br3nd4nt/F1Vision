@@ -16,6 +16,8 @@ struct F1Vision: App {
 
     var body: some Scene {
         WindowGroup {
+            TabView {
+            }
         }
     }
 }

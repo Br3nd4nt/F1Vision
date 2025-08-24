@@ -9,6 +9,6 @@ final class TrackMock: TrackProtocol {
     private let json: JSONDataProtocol = Dependencies.shared.jsonDataService
 
     func getTrackData() -> TrackLayoutModel? {
-        json.loadJSON(filename: Configuration.trackMockDataset.rawValue, as: TrackLayoutModel.self)
+        json.loadJSON(filename: Configuration.trackMockDataset, as: TrackLayoutModel.self)
     }
 }
