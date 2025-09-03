@@ -12,12 +12,26 @@ import Puppy
 struct F1Vision: App {
     private let logger: Puppy = Dependencies.shared.logger
 
-    var viewModel = TrackViewModel()
-
     var body: some Scene {
         WindowGroup {
-            TabView {
-            }
+            ContentView()
+        }
+    }
+}
+
+struct ContentView: View {
+    @StateObject private var raceViewModel = RaceViewModel()
+    @StateObject private var trackViewModel = TrackViewModel()
+
+    var body: some View {
+        HStack {
+            RaceView(viewModel: raceViewModel, trackViewModel: trackViewModel)
+            TrackView(viewModel: trackViewModel)
+        }
+        .accentColor(.red)
+        .onAppear {
+            // Connect the view models for data synchronization
+            raceViewModel.setTrackViewModel(trackViewModel)
         }
     }
 }

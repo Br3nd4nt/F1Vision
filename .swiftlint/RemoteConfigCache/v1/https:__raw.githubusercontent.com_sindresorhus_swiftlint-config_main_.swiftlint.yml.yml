@@ -1,5 +1,5 @@
 #
-# Automatically downloaded from https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml by SwiftLint on 23/08/2025 at 9:16:28 AM.
+# Automatically downloaded from https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml by SwiftLint on 03/09/2025 at 7:19:46 PM.
 #
 only_rules:
   - accessibility_trait_for_button
