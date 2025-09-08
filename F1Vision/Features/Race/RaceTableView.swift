@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct RaceTableView: View {
-    @ObservedObject var viewModel: RaceViewModel
+    @ObservedObject private var viewModel: RaceViewModel
+
+    init(viewModel: RaceViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         VStack {
@@ -17,54 +21,32 @@ struct RaceTableView: View {
                 RaceInfoHeader(snapshot: currentSnapshot)
 
                 // Drivers Table
-                DriversTable(drivers: currentSnapshot.driverStates)
+                Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 6) {
+                    // Header
+                    GridRow {
+                        Text("Pos").bold()
+                            .frame(width: 30, alignment: .leading)
+                            .gridColumnAlignment(.leading)
+                        Text("Driver").bold()
+                        Text("Interval").bold()
+                        Text("Leader").bold()
+                        Text("Tyre").bold()
+                        Text("Speed").bold()
+                    }
+
+                    Divider()
+
+                    // Rows
+                    ForEach(currentSnapshot.driverStates) { driver in
+                        DriverTableRow(driver: driver)
+                    }
+                }
+                .padding(.horizontal)
             } else {
                 Text("No race data available")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-    }
-}
-
-struct RaceInfoHeader: View {
-    let snapshot: RaceSnapshot
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Lap \(snapshot.lap)")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text(snapshot.timestamp)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("\(snapshot.driverStates.count) Drivers")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(.horizontal)
-
-            Divider()
-        }
-        .background(Color(.systemBackground))
-    }
-}
-
-struct DriversTable: View {
-    let drivers: [DriverState]
-
-    var body: some View {
-        List {
-            ForEach(drivers.sorted(by: { $0.position < $1.position }), id: \.driverId.id) { driver in
-                DriverTableRow(driver: driver)
-            }
-        }
-        .listStyle(PlainListStyle())
     }
 }

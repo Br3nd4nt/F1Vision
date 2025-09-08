@@ -113,7 +113,9 @@ final class RaceViewModel: ObservableObject {
     }
 
     private func updateToNextSnapshot() {
-        guard let raceData = raceData else { return }
+        guard let raceData else {
+            return
+        }
 
         let nextIndex = (currentSnapshotIndex + 1) % raceData.raceSnapshots.count
         currentSnapshotIndex = nextIndex

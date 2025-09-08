@@ -8,17 +8,20 @@
 import SwiftUI
 
 struct TrackView: View {
-    @ObservedObject var viewModel: TrackViewModel
+    @ObservedObject private var viewModel: TrackViewModel
+
+    init(viewModel: TrackViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
-            VStack {
-                TrackUIViewRepresentable(viewModel: viewModel)
-                    .onAppear {
-                        Task {
-                            await viewModel.getTrackData()
-                        }
+        VStack {
+            TrackUIViewRepresentable(viewModel: viewModel)
+                .onAppear {
+                    Task {
+                        await viewModel.getTrackData()
                     }
-
+                }
         }
     }
 }

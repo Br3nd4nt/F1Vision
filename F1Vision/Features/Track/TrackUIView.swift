@@ -63,14 +63,18 @@ final class TrackUIView: UIView {
     // MARK: - Public Methods
 
     func configureView() {
-        guard viewModel.trackData != nil else { return }
+        guard viewModel.trackData != nil else {
+            return
+        }
         viewModel.translatePoints(for: bounds.size)
     }
 
     // MARK: - Drawing
 
     private func drawTrack(with points: [CGPoint]) {
-        guard !points.isEmpty else { return }
+        guard !points.isEmpty else {
+            return
+        }
 
         bezierPath.removeAllPoints()
         bezierPath.move(to: points[0])

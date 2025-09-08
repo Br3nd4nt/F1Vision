@@ -18,6 +18,6 @@ struct TrackPoint: Codable {
 
     // Calculate distance from start of track
     func distanceFromStart() -> Double {
-        return distance
+        distance
     }
 }

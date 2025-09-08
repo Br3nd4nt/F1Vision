@@ -11,6 +11,11 @@ struct RaceView: View {
     @ObservedObject private var viewModel: RaceViewModel
     @ObservedObject private var trackViewModel: TrackViewModel
 
+    init(viewModel: RaceViewModel, trackViewModel: TrackViewModel) {
+        self.viewModel = viewModel
+        self.trackViewModel = trackViewModel
+    }
+
     var body: some View {
             VStack {
                 if viewModel.isLoading {
@@ -40,3 +45,5 @@ struct RaceView: View {
         }
     }
 }
+
+

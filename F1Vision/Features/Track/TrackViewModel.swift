@@ -50,7 +50,9 @@ final class TrackViewModel: ObservableObject {
     // MARK: - Driver Position Management
 
     func updateDriverPositions(_ drivers: [DriverState]) {
-        guard let trackData = trackData else { return }
+        guard let trackData else {
+            return
+        }
 
         let newDriverPositions = drivers.map { driver in
             calculateDriverPosition(driver, trackData: trackData)
@@ -93,7 +95,9 @@ final class TrackViewModel: ObservableObject {
     }
 
     private func updateTranslatedDriverPositions() {
-        guard lastTranslatedSize != .zero else { return }
+        guard lastTranslatedSize != .zero else {
+            return
+        }
 
         for i in driverPositions.indices {
             let originalPosition = driverPositions[i].position
@@ -109,10 +113,14 @@ final class TrackViewModel: ObservableObject {
     // MARK: - Translation Logic
 
     func translatePoints(for viewSize: CGSize) {
-        guard let data = trackData else { return }
+        guard let data = trackData else {
+            return
+        }
 
         // Only translate if view size changed or we haven't translated yet
-        guard lastTranslatedSize != viewSize || translatedPoints.isEmpty else { return }
+        guard lastTranslatedSize != viewSize || translatedPoints.isEmpty else {
+            return
+        }
 
         // Setup translation parameters
         setupTranslationParameters(data)
