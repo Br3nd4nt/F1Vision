@@ -5,11 +5,12 @@ set -euo pipefail
 : "${TRACK:=Monaco}"
 : "${YEAR:=2024}"
 : "${FREQ:=200ms}"
+: "${MONGO_URL:=}"
 
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/.mplconfig}"
 mkdir -p "$FASTF1_CACHE_DIR" "$OUTPUT_TRACK_DIR" "$OUTPUT_RACE_DIR" "$MPLCONFIGDIR"
 
-echo "MODE=$MODE TRACK=$TRACK YEAR=$YEAR FREQ=$FREQ"
+echo "MODE=$MODE TRACK=$TRACK YEAR=$YEAR FREQ=$FREQ MONGO_URL=${MONGO_URL:-<none>}"
 
 export PATH="/opt/venv/bin:$PATH"
 

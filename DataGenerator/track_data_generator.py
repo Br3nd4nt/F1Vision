@@ -6,6 +6,7 @@ from datetime import datetime
 import math
 import argparse
 import os
+from pymongo import MongoClient
 
 # Setup FastF1
 fastf1.Cache.enable_cache(".fastf1_cache")
@@ -102,6 +103,18 @@ def save_track_data(track_data, filename):
         json.dump(track_data, f, indent=2)
     print(f"Track data saved to {filepath}")
 
+
+def write_track_to_mongo(mongo_url: str, track_data: dict) -> None:
+    try:
+        client = MongoClient(mongo_url)
+        db = client.get_default_database()
+        tracks = db["tracks"]
+        tracks.update_one({"id": track_data.get("id")}, {"$set": track_data}, upsert=True)
+        client.close()
+        print(f"Saved track to MongoDB at {mongo_url}: id={track_data.get('id')}")
+    except Exception as e:
+        print(f"MongoDB write error (track): {e}")
+
 def get_track_info(track_name):
     """Get track information using FastF1's search functionality"""
     # Try to find the track using FastF1's search
@@ -126,6 +139,9 @@ def generate_track(track_name, year=2024):
         # Create filename
         filename = f"{track_name.lower().replace(' ', '_')}_track_layout.json"
         save_track_data(track_data, filename)
+        mongo_url = os.getenv("MONGO_URL")
+        if mongo_url and track_data:
+            write_track_to_mongo(mongo_url, track_data)
         
         print(f"\n✅ Successfully generated {track_name} track layout!")
         return track_data

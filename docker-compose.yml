@@ -1,20 +1,21 @@
-version: "3.9"
-
 services:
   mongo:
     image: mongo:6.0
     container_name: f1vision-mongo
     restart: unless-stopped
+    command: ["mongod", "--quiet", "--bind_ip_all", "--logpath", "/proc/self/fd/1", "--logappend"]
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_DATABASE: f1vision
     volumes:
       - mongo_data:/data/db
+    logging:
+      driver: none 
 
   mock-data:
     build:
-      context: ./MockServer
+      context: ./DataGenerator
     container_name: f1vision-mock-data
     depends_on:
       - mongo
@@ -22,14 +23,26 @@ services:
       MODE: "both"          # track | race | both
       TRACK: "Monaco"       # e.g. Monaco, Silverstone
       YEAR: "2024"
-      FREQ: "200ms"         # snapshot frequency for real race data
+      FREQ: "200ms"
       FASTF1_CACHE_DIR: "/data/.fastf1_cache"
       OUTPUT_TRACK_DIR: "/data/trackData"
       OUTPUT_RACE_DIR: "/data/raceData"
+      MONGO_URL: "mongodb://mongo:27017/f1vision"
     volumes:
       - mock_data:/data
-    # If you later want to persist into Mongo instead of files, wire your script here
-    # and add MONGO_URL env, etc.
+
+  realtime-server:
+    build:
+      context: ./RealtimeServer
+    container_name: f1vision-realtime
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URL: "mongodb://mongo:27017/f1vision"
+      STREAM_DELAY_MS: 100
+      PORT: 5001
+    ports:
+      - "5001:5001"
 
 volumes:
   mongo_data:
