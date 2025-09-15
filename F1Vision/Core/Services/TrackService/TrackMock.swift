@@ -7,8 +7,16 @@
 
 final class TrackMock: TrackProtocol {
     private let json: JSONDataProtocol = Dependencies.shared.jsonDataService
+    private let logger: Puppy = Dependencies.shared.logger
 
     func getTrackData() -> TrackLayoutModel? {
-        json.loadJSON(filename: Configuration.trackMockDataset, as: TrackLayoutModel.self)
+        let result = json.loadJSON(filename: Configuration.trackMockDataset, as: TrackLayoutModel.self)
+        if let result {
+            logger.info("TrackMock: loaded track layout")
+            logger.debug("points=\(result.points.count) name=\(result.trackName)")
+        } else {
+            logger.error("TrackMock: failed to load track layout")
+        }
+        return result
     }
 }
