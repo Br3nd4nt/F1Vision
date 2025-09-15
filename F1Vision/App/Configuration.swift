@@ -6,22 +6,27 @@
 //
 
 struct Configuration {
-    static let isHitBoxesEnabled = true
+    static let debugMode = false
     static let zoom = 0.95
-    private static let raceName: Race = .monza
+    private static let raceName: Race = .defaultCase
 
     static var trackMockDataset: String {
-        "\(raceName.rawValue)_track_layout"
+        if raceName == .defaultCase {
+            return "track_layout"
+        }
+        return "\(raceName.rawValue)_track_layout"
     }
 
     static var raceMockDataset: String {
-        "\(raceName.rawValue)_2024_race_data"
+        if raceName == .defaultCase {
+            return "race_data"
+        }
+        return "\(raceName.rawValue)_2024_race_data"
+
     }
 }
 
 enum Race: String {
-    case suzuka
     case monaco
-    case monza
-    case spa
+    case defaultCase
 }
