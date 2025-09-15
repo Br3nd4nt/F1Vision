@@ -11,7 +11,7 @@ mkdir -p "$FASTF1_CACHE_DIR" "$OUTPUT_TRACK_DIR" "$OUTPUT_RACE_DIR" "$MPLCONFIGD
 
 echo "MODE=$MODE TRACK=$TRACK YEAR=$YEAR FREQ=$FREQ"
 
-source /opt/venv/bin/activate
+export PATH="/opt/venv/bin:$PATH"
 
 case "$MODE" in
   track)

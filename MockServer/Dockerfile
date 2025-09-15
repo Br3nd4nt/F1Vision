@@ -14,17 +14,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency definitions
-COPY pyproject.toml uv.lock /app/
+COPY pyproject.toml uv.lock README.md /app/
 
 # Install uv (fast Python package installer) if not present in base
 RUN pip install --no-cache-dir uv==0.4.24
 
 # Create a virtualenv to isolate deps (optional but clean)
-RUN python -m venv /opt/venv && . /opt/venv/bin/activate && \
-    uv pip install --system -r uv.lock || uv pip install --system .
-
-# Copy source
+# Create venv and install project
 COPY . /app
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir .
 
 # Make entrypoint executable
 RUN chmod +x /app/entrypoint.sh

@@ -11,6 +11,7 @@ import os
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Tuple
 from datetime import datetime, timezone
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -236,7 +237,24 @@ def build_race_data(session: fastf1.core.Session, track_name: str, year: int, fr
                 step = np.sqrt((dx.fillna(0)) ** 2 + (dy.fillna(0)) ** 2)
                 g["distance"] = step.cumsum()
                 return g
-            ts = ts.groupby(["Driver", "LapNumber"], include_groups=False, group_keys=False).apply(lap_distance)
+            # pandas compatibility: include_groups is available on newer versions
+            try:
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message=r".*DataFrameGroupBy.apply operated on the grouping columns.*",
+                    )
+                    ts = ts.groupby(["Driver", "LapNumber"], include_groups=False, group_keys=False).apply(lap_distance)
+            except TypeError:
+                # Older pandas without include_groups, still suppress compatibility FutureWarning
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message=r".*DataFrameGroupBy.apply operated on the grouping columns.*",
+                    )
+                    ts = ts.groupby(["Driver", "LapNumber"], group_keys=False).apply(lap_distance)
             # sector by thirds
             maxd = ts.groupby(["Driver", "LapNumber"])['distance'].transform('max').replace(0, np.nan)
             frac = ts['distance'] / maxd
