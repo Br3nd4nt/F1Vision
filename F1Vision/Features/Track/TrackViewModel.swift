@@ -17,6 +17,7 @@ final class TrackViewModel: ObservableObject {
     @Published var translatedPoints: [CGPoint] = []
     @Published var driverPositions: [DriverPosition] = []
 
+
     // Translation parameters
     private var boundingBox: BoundingBox = .init(minX: 0, minY: 0, maxX: 0, maxY: 0)
     private var trackWidth: Double = 0
@@ -108,6 +109,7 @@ final class TrackViewModel: ObservableObject {
             )
             driverPositions[i].translatedPosition = translatedPosition
         }
+
     }
 
     // MARK: - Translation Logic
@@ -139,6 +141,7 @@ final class TrackViewModel: ObservableObject {
         updateTranslatedDriverPositions()
 
         lastTranslatedSize = viewSize
+
     }
 
     private func setupTranslationParameters(_ data: TrackLayoutModel) {
