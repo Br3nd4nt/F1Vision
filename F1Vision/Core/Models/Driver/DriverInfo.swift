@@ -6,11 +6,12 @@
 //
 
 struct DriverInfo: Codable {
-    let id: String // example: "HAM44"
-    let name: String
-    let code: String
-    let number: Int
-    let team: String
+    let id: String // "HAM44"
+    let name: String // "Lewis Hamilton"
+    let code: String // "HAM"
+    let number: Int // 44
+    let team: String // "Ferrari"
+
     let teamColorHex: String
     let country: String
 }
