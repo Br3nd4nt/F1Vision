@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import Puppy
 
 @MainActor
 final class RaceViewModel: ObservableObject {
@@ -28,10 +29,12 @@ final class RaceViewModel: ObservableObject {
 
     private let raceService: RaceProtocol = Dependencies.shared.race
     private var trackViewModel: TrackViewModel?
+    private let logger: Puppy = Dependencies.shared.logger
 
     // MARK: - Init
 
     init() {
+        logger.info("RaceViewModel initialized")
         loadRaceData()
     }
 
@@ -48,6 +51,7 @@ final class RaceViewModel: ObservableObject {
         if let snapshot = currentSnapshot {
             trackViewModel.updateDriverPositions(snapshot.driverStates)
         }
+        logger.debug("TrackViewModel connected hasSnapshot=\(currentSnapshot != nil)")
     }
 
     // MARK: - Data Loading
@@ -55,6 +59,7 @@ final class RaceViewModel: ObservableObject {
     func loadRaceData() {
         isLoading = true
         errorMessage = nil
+        logger.info("Loading race data…")
 
         Task {
             do {
@@ -63,31 +68,38 @@ final class RaceViewModel: ObservableObject {
                         self.raceData = data
                         self.currentSnapshotIndex = 0
                     }
+                    logger.info("Race data loaded")
+                    logger.debug("snapshots.count=\(data.raceSnapshots.count)")
 
                     if let snapshot = try await raceService.getCurrentSnapshot() {
                         await MainActor.run {
                             self.currentSnapshot = snapshot
                             self.startRealTimeUpdates()
                         }
+                        self.logger.debug("initialSnapshot.lap=\(snapshot.lap) drivers=\(snapshot.driverStates.count)")
                     } else {
                         await MainActor.run {
                             self.errorMessage = "Failed to load current snapshot"
                         }
+                        self.logger.error("No current snapshot available")
                     }
                 } else {
                     await MainActor.run {
                         self.errorMessage = "Failed to load race data"
                     }
+                    self.logger.error("Race data is nil")
                 }
             } catch {
                 await MainActor.run {
                     self.errorMessage = "Error: \(error.localizedDescription)"
                 }
+                self.logger.error("Race data load failed: \(error)")
             }
 
             await MainActor.run {
                 self.isLoading = false
             }
+            self.logger.debug("isLoading=false")
         }
     }
 
@@ -106,11 +118,13 @@ final class RaceViewModel: ObservableObject {
                 self?.updateToNextSnapshot()
             }
         }
+        logger.info("Started real-time updates")
     }
 
     private func stopRealTimeUpdates() {
         updateTimer?.invalidate()
         updateTimer = nil
+        logger.info("Stopped real-time updates")
     }
 
     private func updateToNextSnapshot() {
@@ -123,6 +137,7 @@ final class RaceViewModel: ObservableObject {
 
         let newSnapshot = raceData.raceSnapshots[nextIndex]
         currentSnapshot = newSnapshot
+        logger.debug("snapshotIndex=\(nextIndex) lap=\(newSnapshot.lap) drivers=\(newSnapshot.driverStates.count)")
 
         // Update track view with new driver positions
         trackViewModel?.updateDriverPositions(newSnapshot.driverStates)

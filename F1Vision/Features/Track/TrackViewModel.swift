@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import Combine
+import Puppy
 
 @MainActor
 final class TrackViewModel: ObservableObject {
@@ -17,6 +18,7 @@ final class TrackViewModel: ObservableObject {
     @Published var translatedPoints: [CGPoint] = []
     @Published var driverPositions: [DriverPosition] = []
 
+    private let logger: Puppy = Dependencies.shared.logger
 
     // Translation parameters
     private var boundingBox: BoundingBox = .init(minX: 0, minY: 0, maxX: 0, maxY: 0)
@@ -30,6 +32,7 @@ final class TrackViewModel: ObservableObject {
     // MARK: - Init
 
     init() {
+        logger.info("TrackViewModel initialized")
         Task {
             await getTrackData()
         }
@@ -43,8 +46,11 @@ final class TrackViewModel: ObservableObject {
             await MainActor.run {
                 self.trackData = data
             }
+            let pointsCount = data?.points.count ?? 0
+            logger.info("Loaded track data")
+            logger.debug("track.points=\(pointsCount) bb=\(String(describing: data?.boundingBox))")
         } catch {
-            print("Failed to get track data: \(error)")
+            logger.error("Failed to get track data: \(error)")
         }
     }
 
@@ -60,6 +66,7 @@ final class TrackViewModel: ObservableObject {
         }
 
         driverPositions = newDriverPositions
+        logger.debug("driverPositions.count=\(driverPositions.count)")
 
         // Update translated positions if view size is available
         if lastTranslatedSize != .zero {
@@ -136,6 +143,7 @@ final class TrackViewModel: ObservableObject {
         }
 
         translatedPoints = newTranslatedPoints
+        logger.debug("translatedPoints.count=\(translatedPoints.count) viewSize=\(viewSize)")
 
         // Update driver positions
         updateTranslatedDriverPositions()
