@@ -130,9 +130,8 @@ fastlane/test_output
 iOSInjectionProject/
 
 ### SwiftPackageManager ###
-Packages
-xcuserdata
-*.xcodeproj
+# Keep SPM artifacts as-is; do not ignore Xcode projects wholesale
+# (we selectively ignore user-specific files below)
 
 
 ### SwiftPM ###
@@ -143,13 +142,16 @@ xcuserdata
 ## Xcode 8 and earlier
 
 ### Xcode Patch ###
+# Track the project and shared settings; ignore only per-user state
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
-/*.gcno
+/*/*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+**/*.xcuserstate
+**/*.xcuserdata/**
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,osx,swift,swiftpm,swiftpackagemanager,xcode
 Pods
@@ -301,9 +303,9 @@ MockServer/trackData/
 MockServer/raceData/
 !.gitkeep
 
-# Ignore JSON data files in Xcode Resources
-F1Vision/Resources/MockData/Track/*.json
-F1Vision/Resources/MockData/Race/*.json
+# Keep mock JSON in repo so a fresh clone can run
+# F1Vision/Resources/MockData/Track/*.json
+# F1Vision/Resources/MockData/Race/*.json
 
 ### Python ###
 # Additional Python files
@@ -337,6 +339,10 @@ logs/
 ### Old Code ###
 # Ignore old code directories
 f1-old-code/
+
+# Keep generated server output directory, ignore its contents except .gitkeep
+MockServer/server/race_output/*
+!MockServer/server/race_output/.gitkeep
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
