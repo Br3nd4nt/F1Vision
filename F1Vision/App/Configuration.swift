@@ -22,6 +22,7 @@ struct Configuration {
             return "race_data"
         }
         return "\(raceName.rawValue)_2024_race_data"
+
     }
 }
 

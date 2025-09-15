@@ -303,7 +303,6 @@ MockServer/trackData/
 MockServer/raceData/
 !.gitkeep
 
-# Ignore mock JSON in app resources to reduce repo size
 F1Vision/Resources/MockData/Track/*.json
 F1Vision/Resources/MockData/Race/*.json
 
@@ -339,6 +338,7 @@ logs/
 ### Old Code ###
 # Ignore old code directories
 f1-old-code/
+
 
 # Keep generated server output directory, ignore its contents except .gitkeep
 MockServer/race_output/*

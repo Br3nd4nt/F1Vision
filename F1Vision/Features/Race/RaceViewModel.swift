@@ -13,6 +13,7 @@ import Combine
 final class RaceViewModel: ObservableObject {
     // MARK: - Published Properties
 
+
     @Published var raceData: RaceData?
     @Published var currentSnapshot: RaceSnapshot?
     @Published var isLoading = false

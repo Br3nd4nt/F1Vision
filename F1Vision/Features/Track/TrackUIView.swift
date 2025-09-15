@@ -156,6 +156,7 @@ final class TrackUIView: UIView {
         if !bounds.isEmpty && viewModel.trackData != nil {
             viewModel.translatePoints(for: bounds.size)
         }
+
     }
 }
 
@@ -174,7 +175,6 @@ struct TrackUIViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: TrackUIView, context: Context) {
-        // No updates needed for this view
     }
 }
 

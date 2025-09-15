@@ -11,6 +11,7 @@ struct DriverInfo: Codable {
     let code: String // "HAM"
     let number: Int // 44
     let team: String // "Ferrari"
+
     let teamColorHex: String
     let country: String
 }

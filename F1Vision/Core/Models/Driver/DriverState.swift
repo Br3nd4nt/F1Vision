@@ -7,6 +7,7 @@
 
 struct DriverState: Codable, Identifiable {
     var id: String { driverId.code }
+
     let driverId: DriverInfo
     let lap: Int
     let position: Int
