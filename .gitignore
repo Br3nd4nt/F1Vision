@@ -341,8 +341,8 @@ logs/
 f1-old-code/
 
 # Keep generated server output directory, ignore its contents except .gitkeep
-MockServer/server/race_output/*
-!MockServer/server/race_output/.gitkeep
+MockServer/race_output/*
+!MockServer/race_output/.gitkeep
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache

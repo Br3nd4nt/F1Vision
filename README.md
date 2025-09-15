@@ -17,7 +17,7 @@ Optional: Mock Server
 
 If you want to generate live-like race data:
    - Python 3.11+
-   - From `MockServer/server`, run according to `README.md` there. Output goes to `MockServer/server/race_output/` (kept via `.gitkeep`, contents ignored).
+   - From `MockServer`, run according to `README.md` there. Output goes to `MockServer/race_output/` (kept via `.gitkeep`, contents ignored).
 
 Notes
 
