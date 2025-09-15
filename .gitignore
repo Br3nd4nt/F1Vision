@@ -303,9 +303,9 @@ MockServer/trackData/
 MockServer/raceData/
 !.gitkeep
 
-# Keep mock JSON in repo so a fresh clone can run
-# F1Vision/Resources/MockData/Track/*.json
-# F1Vision/Resources/MockData/Race/*.json
+# Ignore mock JSON in app resources to reduce repo size
+F1Vision/Resources/MockData/Track/*.json
+F1Vision/Resources/MockData/Race/*.json
 
 ### Python ###
 # Additional Python files
