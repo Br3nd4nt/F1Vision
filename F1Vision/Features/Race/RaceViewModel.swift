@@ -14,6 +14,7 @@ import Puppy
 final class RaceViewModel: ObservableObject {
     // MARK: - Published Properties
 
+
     @Published var raceData: RaceData?
     @Published var currentSnapshot: RaceSnapshot?
     @Published var isLoading = false
@@ -69,13 +70,6 @@ final class RaceViewModel: ObservableObject {
                     }
                     logger.info("Race data loaded")
                     logger.debug("snapshots.count=\(data.raceSnapshots.count)")
-//                    
-//                    for (index, snapshot) in data.raceSnapshots.enumerated() {
-//                        if snapshot.lap > 10 {
-//                            print("\(snapshot.lap) - \(index)")
-//                            break
-//                        }
-//                    }
 
                     if let snapshot = try await raceService.getCurrentSnapshot() {
                         await MainActor.run {

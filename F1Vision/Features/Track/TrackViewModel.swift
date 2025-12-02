@@ -67,8 +67,6 @@ final class TrackViewModel: ObservableObject {
 
         driverPositions = newDriverPositions
         logger.debug("driverPositions.count=\(driverPositions.count)")
-//        logger.debug("driver data: \(drivers)")
-//        logger.debug("translated driver data: \(driverPositions)")
 
         // Update translated positions if view size is available
         if lastTranslatedSize != .zero {
@@ -118,6 +116,7 @@ final class TrackViewModel: ObservableObject {
             )
             driverPositions[i].translatedPosition = translatedPosition
         }
+
     }
 
     // MARK: - Translation Logic
@@ -150,6 +149,7 @@ final class TrackViewModel: ObservableObject {
         updateTranslatedDriverPositions()
 
         lastTranslatedSize = viewSize
+
     }
 
     private func setupTranslationParameters(_ data: TrackLayoutModel) {

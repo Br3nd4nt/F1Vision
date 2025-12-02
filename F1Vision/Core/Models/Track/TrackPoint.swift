@@ -20,4 +20,5 @@ struct TrackPoint: Codable {
     func distanceFromStart() -> Double {
         distance
     }
+
 }

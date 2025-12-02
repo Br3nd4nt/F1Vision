@@ -156,6 +156,7 @@ final class TrackUIView: UIView {
         if !bounds.isEmpty && viewModel.trackData != nil {
             viewModel.translatePoints(for: bounds.size)
         }
+
     }
 }
 
