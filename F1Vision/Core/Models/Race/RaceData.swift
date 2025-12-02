@@ -24,7 +24,7 @@ struct RaceData: Codable, CustomStringConvertible {
 struct RaceSnapshot: Codable, CustomStringConvertible {
     let timestamp: String
     let lap: Int
-    let driverStates: [DriverState]
+    var driverStates: [DriverState]
 
     var description: String {
         "time: \(timestamp) lap: \(lap), driver state count: \(driverStates.count)"

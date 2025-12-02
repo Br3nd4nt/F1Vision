@@ -9,7 +9,7 @@ import socketio
 
 def main():
     parser = argparse.ArgumentParser(description="Test client for F1Vision realtime server")
-    parser.add_argument("--url", default="http://localhost:5000", help="Socket.IO server URL")
+    parser.add_argument("--url", default="http://localhost:5001", help="Socket.IO server URL")
     args = parser.parse_args()
 
     sio = socketio.Client()

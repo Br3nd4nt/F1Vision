@@ -67,6 +67,8 @@ final class TrackViewModel: ObservableObject {
 
         driverPositions = newDriverPositions
         logger.debug("driverPositions.count=\(driverPositions.count)")
+//        logger.debug("driver data: \(drivers)")
+//        logger.debug("translated driver data: \(driverPositions)")
 
         // Update translated positions if view size is available
         if lastTranslatedSize != .zero {
@@ -76,7 +78,7 @@ final class TrackViewModel: ObservableObject {
 
     private func calculateDriverPosition(_ driver: DriverState, trackData: TrackLayoutModel) -> DriverPosition {
         // Find the track point closest to the driver's distance
-        let targetDistance = driver.distance
+        let targetDistance = driver.distance.truncatingRemainder(dividingBy: trackData.length)
         let trackPoints = trackData.points
 
         guard !trackPoints.isEmpty else {
@@ -116,7 +118,6 @@ final class TrackViewModel: ObservableObject {
             )
             driverPositions[i].translatedPosition = translatedPosition
         }
-
     }
 
     // MARK: - Translation Logic
@@ -149,7 +150,6 @@ final class TrackViewModel: ObservableObject {
         updateTranslatedDriverPositions()
 
         lastTranslatedSize = viewSize
-
     }
 
     private func setupTranslationParameters(_ data: TrackLayoutModel) {

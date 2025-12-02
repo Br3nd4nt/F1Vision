@@ -14,7 +14,6 @@ import Puppy
 final class RaceViewModel: ObservableObject {
     // MARK: - Published Properties
 
-
     @Published var raceData: RaceData?
     @Published var currentSnapshot: RaceSnapshot?
     @Published var isLoading = false
@@ -66,10 +65,17 @@ final class RaceViewModel: ObservableObject {
                 if let data = try await raceService.getRaceData() {
                     await MainActor.run {
                         self.raceData = data
-                        self.currentSnapshotIndex = 0
+                        self.currentSnapshotIndex = 40000
                     }
                     logger.info("Race data loaded")
                     logger.debug("snapshots.count=\(data.raceSnapshots.count)")
+//                    
+//                    for (index, snapshot) in data.raceSnapshots.enumerated() {
+//                        if snapshot.lap > 10 {
+//                            print("\(snapshot.lap) - \(index)")
+//                            break
+//                        }
+//                    }
 
                     if let snapshot = try await raceService.getCurrentSnapshot() {
                         await MainActor.run {
@@ -110,10 +116,7 @@ final class RaceViewModel: ObservableObject {
     // MARK: - Real-time Updates
 
     private func startRealTimeUpdates() {
-        stopRealTimeUpdates()
-
-        // Update every 2 seconds to simulate real-time data
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.updateToNextSnapshot()
             }
@@ -135,10 +138,12 @@ final class RaceViewModel: ObservableObject {
         let nextIndex = (currentSnapshotIndex + 1) % raceData.raceSnapshots.count
         currentSnapshotIndex = nextIndex
 
-        let newSnapshot = raceData.raceSnapshots[nextIndex]
+        var newSnapshot = raceData.raceSnapshots[nextIndex]
+        newSnapshot.driverStates.sort {
+            $0.position < $1.position
+        }
         currentSnapshot = newSnapshot
         logger.debug("snapshotIndex=\(nextIndex) lap=\(newSnapshot.lap) drivers=\(newSnapshot.driverStates.count)")
-
         // Update track view with new driver positions
         trackViewModel?.updateDriverPositions(newSnapshot.driverStates)
     }

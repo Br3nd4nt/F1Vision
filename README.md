@@ -1,57 +1,23 @@
-Dockerized Mock Data + MongoDB
-==============================
+# F1Vision
+### Watch F1 race telemetry in real time
 
-Quick start
------------
 
-1) Build and run services:
-
+## Runnning the project 
+Firstly, you need to create test data. After clonging the project, go to `DataGenerator` and run the data generation script:
+```bash
+uv run race_data_builder.py
 ```
-docker compose up -d --build
+You can use `uv` or any other package manager of your preference.
+
+After that there will be track and race data generated:
 ```
-
-This starts:
-- MongoDB at localhost:27017
-- Data generator (FastF1) which outputs JSONs and can persist into MongoDB using frequency-based snapshots from real race data
-- Realtime server on ws(s)://localhost:5000 using Socket.IO
-
-2) Generated output
-
-JSON and cache are stored in a named volume mounted at `/data` inside the container:
-- `/data/trackData`
-- `/data/raceData`
-- `/data/.fastf1_cache`
-
-To inspect files on host:
-
-```
-docker compose run --rm mock-data ls -la /data/trackData
-docker compose run --rm mock-data ls -la /data/raceData
+DataGenerator
+├── race_data_builder.py
+└── race_output
+    ├── race_data.json
+    └── track_layout.json
 ```
 
-Configuration
--------------
+Head over to Xcode and copy `race_data.json` and `track_layout.json` into the project (preferably into `Resources` folder).
 
-Edit `docker-compose.yml` env for the generator:
-- `MODE`: `track` | `race` | `both`
-- `TRACK`: e.g. `Monaco`, `Silverstone`
-- `YEAR`: e.g. `2024`
-- `FREQ`: e.g. `200ms`, `500ms`, `1s` (sampling frequency for snapshots)
-- `MONGO_URL`: set to write data into MongoDB (default wired to the compose mongo service)
-
-Realtime server
----------------
-
-- Connect via Socket.IO to `http://localhost:5000`
-- Events:
-  - `track`: emitted first after connect, contains the `TrackLayoutModel`
-  - `race_snapshot`: emitted repeatedly with ordered snapshots for the latest race
-  - `complete`: emitted after the final snapshot
-  - `error`: error messages
-
-
-Notes
------
-
-- FastF1 downloads and caches telemetry; first run may take time.
-- Currently data is written to JSON files. Next step is writing into MongoDB.
+After that you are good to go!
