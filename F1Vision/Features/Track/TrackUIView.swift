@@ -123,7 +123,7 @@ final class TrackUIView: UIView {
         labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
         labelLayer.foregroundColor = UIColor.black.cgColor
         labelLayer.alignmentMode = .center
-        labelLayer.frame = CGRect(x: -15, y: 12, width: 30, height: 20)
+        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
         labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
         labelLayer.cornerRadius = 4
 

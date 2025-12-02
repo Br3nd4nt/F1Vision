@@ -11,8 +11,10 @@ import os
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Tuple
 from datetime import datetime, timezone
+import warnings
 
 import numpy as np
+from pymongo import MongoClient
 import pandas as pd
 import fastf1
 
@@ -236,7 +238,24 @@ def build_race_data(session: fastf1.core.Session, track_name: str, year: int, fr
                 step = np.sqrt((dx.fillna(0)) ** 2 + (dy.fillna(0)) ** 2)
                 g["distance"] = step.cumsum()
                 return g
-            ts = ts.groupby(["Driver", "LapNumber"], include_groups=False, group_keys=False).apply(lap_distance)
+            # pandas compatibility: include_groups is available on newer versions
+            try:
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message=r".*DataFrameGroupBy.apply operated on the grouping columns.*",
+                    )
+                    ts = ts.groupby(["Driver", "LapNumber"], include_groups=False, group_keys=False).apply(lap_distance)
+            except TypeError:
+                # Older pandas without include_groups, still suppress compatibility FutureWarning
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message=r".*DataFrameGroupBy.apply operated on the grouping columns.*",
+                    )
+                    ts = ts.groupby(["Driver", "LapNumber"], group_keys=False).apply(lap_distance)
             # sector by thirds
             maxd = ts.groupby(["Driver", "LapNumber"])['distance'].transform('max').replace(0, np.nan)
             frac = ts['distance'] / maxd
@@ -290,6 +309,32 @@ def build_race_data(session: fastf1.core.Session, track_name: str, year: int, fr
     return race_data
 
 
+def write_race_to_mongo(mongo_url: str, race_data: Dict[str, Any]) -> None:
+    try:
+        client = MongoClient(mongo_url)
+        db = client.get_default_database()
+        races = db["races"]
+        snapshots = db["race_snapshots"]
+
+        # Upsert race metadata
+        race_id = race_data.get("raceId")
+        races.update_one({"raceId": race_id}, {"$set": {k: v for k, v in race_data.items() if k != "raceSnapshots"}}, upsert=True)
+
+        # Bulk write snapshots with reference to raceId
+        docs = []
+        for snap in race_data.get("raceSnapshots", []):
+            doc = {"raceId": race_id, **snap}
+            docs.append(doc)
+        if docs:
+            # Replace any existing snapshots for this race
+            snapshots.delete_many({"raceId": race_id})
+            snapshots.insert_many(docs)
+        client.close()
+        print(f"Saved race to MongoDB at {mongo_url}: raceId={race_id}, snapshots={len(docs)}")
+    except Exception as e:
+        print(f"MongoDB write error: {e}")
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Build RaceData and TrackLayoutModel JSON")
@@ -317,6 +362,11 @@ def main():
     with open(os.path.join(args.outdir, "race_data.json"), "w") as f:
         json.dump(race_data, f, indent=2)
     print(f"Saved {args.outdir}/race_data.json")
+
+    # Optionally write to MongoDB if configured
+    mongo_url = os.getenv("MONGO_URL")
+    if mongo_url:
+        write_race_to_mongo(mongo_url, race_data)
 
 
 if __name__ == "__main__":

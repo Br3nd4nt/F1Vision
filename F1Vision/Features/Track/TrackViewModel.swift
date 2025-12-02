@@ -76,7 +76,7 @@ final class TrackViewModel: ObservableObject {
 
     private func calculateDriverPosition(_ driver: DriverState, trackData: TrackLayoutModel) -> DriverPosition {
         // Find the track point closest to the driver's distance
-        let targetDistance = driver.distance
+        let targetDistance = driver.distance.truncatingRemainder(dividingBy: trackData.length)
         let trackPoints = trackData.points
 
         guard !trackPoints.isEmpty else {

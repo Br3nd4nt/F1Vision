@@ -1,0 +1,22 @@
+[project]
+name = "f1vision-realtime-server"
+version = "0.1.0"
+description = "Realtime Socket.IO server for F1Vision streaming track + race snapshots from MongoDB"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.0.0",
+    "flask-socketio>=5.3.6",
+    "pymongo>=4.6.0",
+    "simple-websocket>=1.0.0",
+    "websocket-client>=1.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+

@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct RaceInfoHeader: View {
-    let snapshot: RaceSnapshot
+    @ObservedObject private var viewModel: RaceViewModel
+
+    init(viewModel: RaceViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         VStack(spacing: 8) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Lap \(snapshot.lap)")
+                    Text("Lap \(viewModel.currentSnapshot?.lap ?? 0)")
                         .font(.title2)
                         .fontWeight(.bold)
 //                    Text(snapshot.timestamp)

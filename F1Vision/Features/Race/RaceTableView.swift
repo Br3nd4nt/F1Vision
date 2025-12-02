@@ -18,7 +18,7 @@ struct RaceTableView: View {
         VStack {
             if let currentSnapshot = viewModel.currentSnapshot {
                 // Race Info Header
-                RaceInfoHeader(snapshot: currentSnapshot)
+                RaceInfoHeader(viewModel: viewModel)
 
                 // Drivers Table
                 Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 6) {

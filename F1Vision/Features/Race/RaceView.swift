@@ -45,5 +45,3 @@ struct RaceView: View {
         }
     }
 }
-
-
