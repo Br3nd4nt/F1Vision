@@ -1,11 +1,13 @@
 import redis
 import json
+import time
 
 class RedisClient:
-    def __init__(self, track_layout_path: str, telemetry_path: str, host='localhost', port=6379):
+    def __init__(self, track_layout_path: str, telemetry_path: str, host='localhost', port=6379, data_frequency=25, track_layout_key='track_layout', telemetry_channel='telemetry_channel'):
         self.host = host
         self.port = port
         self.client = redis.Redis(host=self.host, port=self.port, decode_responses=True, db=0)
+        
         if not self.check_connection():
             raise ConnectionError(f"Could not connect to Redis at {self.host}:{self.port}")
 
@@ -13,6 +15,10 @@ class RedisClient:
         self.telemetry_path = telemetry_path
 
         self._track_layout_key = "track_layout"
+        self._telemetry_channel = "telemetry_channel"
+
+
+        self._sleep_time = 1 / data_frequency
 
     def save_track_layout(self):
         with open(self.track_layout_path, 'r') as file:
@@ -42,3 +48,19 @@ class RedisClient:
 
     def check_key_exists(self, key: str):
         return self.client.exists(key) == 1
+    
+    # telemetry pub sub stuff
+
+    def publish(self, channel: str, message: dict):
+        self.client.publish(channel, json.dumps(message))
+
+    def publish_telemetry_data(self):
+        print("Starting telemetry data publishing...")
+        with open(self.telemetry_path, 'r') as file:
+            telemetry_data = json.load(file)['frames']
+            print(f"Loaded {len(telemetry_data)} telemetry frames from {self.telemetry_path}")
+            for _, data_point in enumerate(telemetry_data):
+                self.publish(self._telemetry_channel, data_point)
+                if _ % 250 == 0:
+                    print(f"Published {_} telemetry frames...")
+                time.sleep(self._sleep_time)

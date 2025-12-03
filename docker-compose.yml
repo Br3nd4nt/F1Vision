@@ -13,8 +13,13 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      TRACK_LAYOUT_KEY: track_layout
+      TELEMETRY_CHANNEL: telemetry_channel
     depends_on:
       - redis
+    volumes:
+      - "./DataGeneration/.fastf1-cache:/app/.fastf1-cache"
+      - "./DataGeneration/computed_data:/app/computed_data"
 
   live_server:
     build:
@@ -23,6 +28,8 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      TRACK_LAYOUT_KEY: track_layout
+      TELEMETRY_CHANNEL: telemetry_channel
     depends_on:
       - redis
       - generator

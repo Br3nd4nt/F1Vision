@@ -26,8 +26,9 @@ class RaceTelemetryProcessor:
     # --------------------------
     def enable_cache(self):
         if not os.path.exists(self.cache_dir):
+            print("Creating FastF1 cache directory at:", self.cache_dir)
             os.makedirs(self.cache_dir)
-
+        print("Using FastF1 cache at:", self.cache_dir)
         fastf1.Cache.enable_cache(self.cache_dir)
         fastf1.set_log_level("ERROR")
 
@@ -348,6 +349,12 @@ class RaceTelemetryProcessor:
     
     def get_telemetry_path(self):
         return f"{self.output_dir}/{self.event_name}_race_telemetry.json"
+    
+    def check_track_layout_exists(self):
+        return os.path.exists(self.get_track_layout_path())
+    
+    def check_telemetry_exists(self):
+        return os.path.exists(self.get_telemetry_path())
 
     # --------------------------
     #  DRIVER COLORS
