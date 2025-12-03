@@ -1,10 +1,26 @@
-import src.f1_data as f1
+import os
 
-def main():
-    f1.enable_cache()
-    session = f1.load_race_session(2025, 12)
-    race_telemetry = f1.get_race_telemetry(session)
-    result = f1.generate_track_layout(session)
+from src.f1_data import RaceTelemetryProcessor
+import src.redis_client as redis_client
 
-if __name__ == "__main__":
-    main()
+
+proccessor = RaceTelemetryProcessor(2025, 12)
+session = proccessor.load_race_session()
+proccessor.generate_track_layout()
+
+
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+client = redis_client.RedisClient(
+    track_layout_path=proccessor.get_track_layout_path,
+    telemetry_path=proccessor.get_telemetry_path,
+    host=redis_host,
+    port=redis_port
+)
+
+if client.check_track_layout_exists():
+    print("Track layout already exists in Redis.")
+else:
+    client.save_track_layout()
+
+

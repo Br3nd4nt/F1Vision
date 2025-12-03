@@ -11,4 +11,8 @@ COPY main.py .
 
 ENV PYTHONPATH=/app/src
 
+ENV REDIS_HOST=localhost
+ENV REDIS_PORT=6379
+
+
 CMD ["python3", "main.py"]
