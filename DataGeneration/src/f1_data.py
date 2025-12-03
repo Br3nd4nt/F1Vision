@@ -35,6 +35,7 @@ class RaceTelemetryProcessor:
     #  LOAD SESSION
     # --------------------------
     def load_race_session(self):
+        print("Loading race session for year", self.year, "round", self.round_number)
         self.session = fastf1.get_session(self.year, self.round_number, "R")
         self.session.load(telemetry=True)
         self.event_name = str(self.session).replace(" ", "_")
@@ -45,6 +46,7 @@ class RaceTelemetryProcessor:
     #  TRACK LAYOUT GENERATION
     # --------------------------
     def generate_track_layout(self, track_width=200):
+        print("Generating track layout for ", self.event_name)
         lap = self.session.laps.pick_fastest().get_telemetry()
         plot_x_ref = lap["X"].to_numpy()
         plot_y_ref = lap["Y"].to_numpy()

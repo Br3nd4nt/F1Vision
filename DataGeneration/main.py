@@ -12,8 +12,8 @@ proccessor.generate_track_layout()
 redis_host = os.getenv("REDIS_HOST", "localhost")
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 client = redis_client.RedisClient(
-    track_layout_path=proccessor.get_track_layout_path,
-    telemetry_path=proccessor.get_telemetry_path,
+    track_layout_path=proccessor.get_track_layout_path(),
+    telemetry_path=proccessor.get_telemetry_path(),
     host=redis_host,
     port=redis_port
 )
