@@ -6,6 +6,7 @@ COPY requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY src/ ./src
 COPY main.py .
 
 ENV PYTHONPATH=/app/src
@@ -20,5 +21,4 @@ ENV TELEMETRY_CHANNEL=telemetry_channel
 
 ENV DATA_FREQUENCY=25
 
-#uvicorn main:app --host 0.0.0.0
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+CMD ["python3", "main.py"]

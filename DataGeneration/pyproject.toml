@@ -1,12 +1,11 @@
 [project]
-name = "realtimeserver"
+name = "datageneration"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.123.5",
+    "fastf1>=3.7.0",
+    "numpy>=2.3.5",
     "redis>=7.1.0",
-    "uvicorn[standard]>=0.38.0",
-    "websocket>=0.2.1",
 ]
