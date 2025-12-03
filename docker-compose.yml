@@ -4,6 +4,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    restart: "unless-stopped"
 
   generator:
     build:
@@ -14,3 +15,17 @@ services:
       REDIS_PORT: 6379
     depends_on:
       - redis
+
+  live_server:
+    build:
+      context: ./RealtimeServer/
+    container_name: liveServer
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+      - generator
+    ports:
+      - "8000:8000"
+      - "8000:8000/tcp"
