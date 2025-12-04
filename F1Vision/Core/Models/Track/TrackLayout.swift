@@ -9,4 +9,8 @@ struct TrackLayout: Codable {
     let track_name: String
     let track_points: [TrackPoint]
     let world_bounds: TrackBoundBox
+
+    var distance: Double {
+        track_points.last?.distance ?? 0
+    }
 }

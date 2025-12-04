@@ -22,6 +22,6 @@ struct Configuration {
         fatalError("Error creating URL")
     }
 
-    static let debugMode = true
+    static let debugMode = false
     static let zoom = 0.95
 }

@@ -23,21 +23,31 @@ final class TrackViewModel: ObservableObject {
 
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
+    @Published var driverPoints: [TrackDriverPosition] = []
+
+    @Published var viewSize: CGSize = .zero
+    private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
 
     // Configuration
     private let zoom: Double = Configuration.zoom
-    @Published var viewSize: CGSize = .zero
-    private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
+
+    let driverPointSize = CGSize(width: 8, height: 8)
 
     // MARK: - Init
 
     init(_ socketService: SocketService) {
         self.socketService = socketService
-        socketService.$trackLayout
+        self.socketService.$trackLayout
             .receive(on: DispatchQueue.main)
             .sink { [weak self] layout in
                 self?.logger.debug(String(describing: layout?.world_bounds))
                 self?.translateTrackLayoutPoints()
+            }
+            .store(in: &cancellables)
+        self.socketService.$snapshot
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateDrivers()
             }
             .store(in: &cancellables)
         viewSizeSubject
@@ -52,10 +62,7 @@ final class TrackViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    private func calculateDriverPosition(_ driver: DriverState) {
-        // use distance to get point on track
-    }
-
+    // MARK: - points translation
     private func translatePoint(_ point: TrackPoint, layout: TrackLayout) -> CGPoint {
         let box = layout.world_bounds
         let scale = box.getScale(for: viewSize) * zoom
@@ -87,5 +94,29 @@ final class TrackViewModel: ObservableObject {
 
     func sendViewSize(_ viewSize: CGSize) {
         viewSizeSubject.send(viewSize)
+    }
+
+    private func updateDrivers() {
+        guard socketService.isConnected,
+        let layout = socketService.trackLayout,
+        let snapshot = socketService.snapshot else {
+            return
+        }
+        driverPoints = snapshot.drivers
+            .filter { driver in
+                driver.speed > 0
+            }
+            .map { driver in
+            let point = calculateDriverPosition(driver, layout: layout)
+            return TrackDriverPosition(name: driver.code, point: point)
+        }
+    }
+
+    private func calculateDriverPosition(_ driver: DriverState, layout: TrackLayout) -> CGPoint {
+        let distance = driver.dist.truncatingRemainder(dividingBy: layout.distance)
+        let mockPoint = TrackPoint(with: distance)
+        let index = layout.track_points.binarySearch(for: mockPoint)
+        let point = trackPoints[index]
+        return CGPoint(x: point.x - driverPointSize.width / 2, y: point.y - driverPointSize.height / 2)
     }
 }

@@ -22,21 +22,20 @@ struct F1Vision: App {
 struct ContentView: View {
     @StateObject private var socketService: SocketService
     @ObservedObject private var trackViewModel: TrackViewModel
+    @ObservedObject private var raceViewModel: RaceViewModel
 
     init() {
         let socketService = SocketService()
         _socketService = StateObject(wrappedValue: socketService)
         _trackViewModel = ObservedObject(wrappedValue: TrackViewModel(socketService))
+        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(socketService))
     }
 
     var body: some View {
         HStack {
-            Text("table goes here")
+            RaceTableView(viewModel: raceViewModel)
             TrackView(viewModel: trackViewModel)
         }
         .accentColor(.red)
     }
 }
-// #Preview {
-//    ContentView()
-// }

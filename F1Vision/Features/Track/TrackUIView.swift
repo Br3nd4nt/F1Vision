@@ -64,6 +64,12 @@ final class TrackUIView: UIView {
                 self?.drawTrack(with: points)
             }
             .store(in: &cancellables)
+        viewModel.$driverPoints
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] positions in
+                self?.updateDriverPositions(positions)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
@@ -105,21 +111,21 @@ final class TrackUIView: UIView {
 
     // MARK: - Driver Position Drawing
 
-//    private func updateDriverPositions(_ driverPositions: [DriverPosition]) {
-//        clearDriverLayers()
-//
-//        for driverPosition in driverPositions {
-//            addDriverLayer(for: driverPosition)
-//        }
-//    }
+    private func updateDriverPositions(_ driverPositions: [TrackDriverPosition]) {
+        clearDriverLayers()
 
-//    private func addDriverLayer(for driverPosition: DriverPosition) {
-//        let driverId = driverPosition.driver.driverId.id
+        for driverPosition in driverPositions {
+            addDriverLayer(driverPosition)
+        }
+    }
+
+    private func addDriverLayer(_ driverPosition: TrackDriverPosition) {
+        let driverId = driverPosition.name
 //
 //        // Create driver marker (circle)
-//        let driverLayer = CAShapeLayer()
-//        driverLayer.path = UIBezierPath(ovalIn: CGRect(x: -8, y: -8, width: 16, height: 16)).cgPath
-//
+        let driverLayer = CAShapeLayer()
+        driverLayer.path = UIBezierPath(ovalIn: CGRect(origin: driverPosition.point, size: viewModel.driverPointSize)).cgPath
+        let color = UIColor.cyan
 //        // Use team color or fallback to white
 //        let teamColor: UIColor
 //        if driverPosition.teamColor.hasPrefix("#") {
@@ -128,10 +134,9 @@ final class TrackUIView: UIView {
 //            teamColor = UIColor.white
 //        }
 //
-//        driverLayer.fillColor = teamColor.cgColor
+        driverLayer.fillColor = color.cgColor
 //        driverLayer.strokeColor = UIColor.black.cgColor
-//        driverLayer.lineWidth = 2
-//        driverLayer.position = driverPosition.translatedPosition
+        driverLayer.lineWidth = 2
 //
 //        // Create driver code label
 //        let labelLayer = CATextLayer()
@@ -145,23 +150,23 @@ final class TrackUIView: UIView {
 //        labelLayer.cornerRadius = 4
 //
 //        // Add to view
-//        layer.addSublayer(driverLayer)
+        layer.addSublayer(driverLayer)
 //        layer.addSublayer(labelLayer)
 //
 //        // Store references
-//        driverLayers[driverId] = driverLayer
+        driverLayers[driverId] = driverLayer
 //        driverLabelLayers[driverId] = labelLayer
-//    }
+    }
 
     private func clearDriverLayers() {
         for layer in driverLayers.values {
             layer.removeFromSuperlayer()
         }
-        for layer in driverLabelLayers.values {
-            layer.removeFromSuperlayer()
-        }
+//        for layer in driverLabelLayers.values {
+//            layer.removeFromSuperlayer()
+//        }
         driverLayers.removeAll()
-        driverLabelLayers.removeAll()
+//        driverLabelLayers.removeAll()
     }
 
     // MARK: - Layout

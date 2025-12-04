@@ -12,46 +12,33 @@ import Puppy
 
 @MainActor
 final class RaceViewModel: ObservableObject {
-    // MARK: - Published Properties
-
-    @Published var isLoading = false
-    // MARK: - Private Properties
-
-//    private let raceService: RaceProtocol = Dependencies.shared.race
-    private var trackViewModel: TrackViewModel?
     private let logger: Puppy = Dependencies.shared.logger
 
-    // MARK: - Init
+    private var cancellables = Set<AnyCancellable>()
+    private let socketService: SocketService
 
-    init() {
-        loadRaceData()
+    @Published var isLoaded = false
+    @Published var drivers: [DriverTableEntry] = []
+
+    init(_ socketService: SocketService) {
+        self.socketService = socketService
+        self.socketService.$snapshot
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateStandings()
+            }
+            .store(in: &cancellables)
     }
 
-    deinit {
-    }
-
-    // MARK: - Track Integration
-
-    func setTrackViewModel(_ trackViewModel: TrackViewModel) {
-        self.trackViewModel = trackViewModel
-    }
-
-    // MARK: - Data Loading
-
-    func loadRaceData() {
-    }
-
-    func refreshData() {
-    }
-
-    // MARK: - Real-time Updates
-
-    private func startRealTimeUpdates() {
-    }
-
-    private func stopRealTimeUpdates() {
-    }
-
-    private func updateToNextSnapshot() {
+    private func updateStandings() {
+        guard let snapshot = socketService.snapshot else {
+            logger.error("Called update standings without snapshot")
+            return
+        }
+        isLoaded = true
+        drivers = snapshot.drivers.map {
+            DriverTableEntry($0)
+        }
+        .sorted()
     }
 }
