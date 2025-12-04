@@ -26,7 +26,11 @@ struct TrackView: View {
 }
 
 struct TrackUIViewRepresentable: UIViewRepresentable {
-    @ObservedObject var viewModel: TrackViewModel
+    @ObservedObject private var viewModel: TrackViewModel
+
+    init(viewModel: TrackViewModel) {
+        self.viewModel = viewModel
+    }
 
     func makeUIView(context: Context) -> TrackUIView {
         let trackView = TrackUIView(viewModel)

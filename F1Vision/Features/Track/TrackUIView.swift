@@ -17,6 +17,8 @@ final class TrackUIView: UIView {
     private let shapeLayer = CAShapeLayer()
     private let bezierPath = UIBezierPath()
 
+    private let debugBoundingBoxLayer = CAShapeLayer()
+
     // Driver position layers
     private var driverLayers: [String: CAShapeLayer] = [:]
     private var driverLabelLayers: [String: CATextLayer] = [:]
@@ -45,6 +47,14 @@ final class TrackUIView: UIView {
         shapeLayer.strokeColor = UIColor.lightGray.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.lineWidth = 5
+
+        if Configuration.debugMode {
+            debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
+            debugBoundingBoxLayer.fillColor = UIColor.clear.cgColor
+            debugBoundingBoxLayer.lineWidth = 1
+            debugBoundingBoxLayer.lineDashPattern = [4, 3]
+            layer.addSublayer(debugBoundingBoxLayer)
+        }
     }
 
     private func setupBindings() {
@@ -54,19 +64,12 @@ final class TrackUIView: UIView {
                 self?.drawTrack(with: points)
             }
             .store(in: &cancellables)
-//
-//        viewModel.$driverPositions
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] driverPositions in
-//                self?.updateDriverPositions(driverPositions)
-//            }
-//            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
 
     func configureView() {
-        viewModel.viewSizeSubject.send(bounds.size)
+        viewModel.sendViewSize(bounds.size)
     }
 
     // MARK: - Drawing
@@ -84,6 +87,20 @@ final class TrackUIView: UIView {
         }
 
         shapeLayer.path = bezierPath.cgPath
+        if Configuration.debugMode {
+            let minX = points.map(\.x).min() ?? 0
+            let maxX = points.map(\.x).max() ?? 0
+            let minY = points.map(\.y).min() ?? 0
+            let maxY = points.map(\.y).max() ?? 0
+            let rect = CGRect(
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+            )
+            let bboxPath = UIBezierPath(rect: rect)
+            debugBoundingBoxLayer.path = bboxPath.cgPath
+        }
     }
 
     // MARK: - Driver Position Drawing
@@ -154,7 +171,7 @@ final class TrackUIView: UIView {
         shapeLayer.frame = bounds
 
         if !bounds.isEmpty {
-            viewModel.viewSizeSubject.send(bounds.size)
+            viewModel.sendViewSize(bounds.size)
         }
     }
 }

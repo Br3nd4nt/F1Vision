@@ -31,7 +31,7 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            TrackView(viewModel: trackViewModel)
+            Text("table goes here")
             TrackView(viewModel: trackViewModel)
         }
         .accentColor(.red)

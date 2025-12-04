@@ -28,8 +28,7 @@ struct TrackBoundBox: Codable {
     func getScale(for size: CGSize) -> Double {
         if size.height / size.width > trackAspectRatio {
             return size.width / trackWidth
-        } else {
-            return size.height / trackHeight
         }
+        return size.height / trackHeight
     }
 }

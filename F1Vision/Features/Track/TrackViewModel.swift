@@ -27,7 +27,7 @@ final class TrackViewModel: ObservableObject {
     // Configuration
     private let zoom: Double = Configuration.zoom
     @Published var viewSize: CGSize = .zero
-    let viewSizeSubject = PassthroughSubject<CGSize, Never>()
+    private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
 
     // MARK: - Init
 
@@ -81,8 +81,11 @@ final class TrackViewModel: ObservableObject {
         }
         isLoaded = true
         trackPoints = layout.track_points.map { point in
-            let newPoint = translatePoint(point, layout: layout)
-            return newPoint
+            translatePoint(point, layout: layout)
         }
+    }
+
+    func sendViewSize(_ viewSize: CGSize) {
+        viewSizeSubject.send(viewSize)
     }
 }
