@@ -12,9 +12,9 @@ struct DriversTable: View {
 
     var body: some View {
         List {
-            ForEach(drivers.sorted { $0.position < $1.position }, id: \.driverId.id) { driver in
-                DriverTableRow(driver: driver)
-            }
+//            ForEach(drivers.sorted { $0.position < $1.position }, id: \.driverId.id) { driver in
+//                DriverTableRow(driver: driver)
+//            }
         }
         .listStyle(PlainListStyle())
     }

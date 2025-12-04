@@ -18,26 +18,26 @@ struct RaceView: View {
 
     var body: some View {
             VStack {
-                if viewModel.isLoading {
-                    ProgressView("Loading race data...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let errorMessage = viewModel.errorMessage {
-                    VStack {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundColor(.orange)
-                        Text(errorMessage)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        Button("Retry") {
-                            viewModel.refreshData()
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    RaceTableView(viewModel: viewModel)
-                }
+//                if viewModel.isLoading {
+//                    ProgressView("Loading race data...")
+//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                } else if let errorMessage = viewModel.errorMessage {
+//                    VStack {
+//                        Image(systemName: "exclamationmark.triangle")
+//                            .font(.largeTitle)
+//                            .foregroundColor(.orange)
+//                        Text(errorMessage)
+//                            .multilineTextAlignment(.center)
+//                            .padding()
+//                        Button("Retry") {
+//                            viewModel.refreshData()
+//                        }
+//                        .buttonStyle(.borderedProminent)
+//                    }
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                } else {
+//                    RaceTableView(viewModel: viewModel)
+//                }
             }
 
         .onAppear {

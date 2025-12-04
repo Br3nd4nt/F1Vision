@@ -7,8 +7,11 @@
 
 import UIKit
 import Combine
+import Puppy
 
 final class TrackUIView: UIView {
+    private let logger: Puppy = Dependencies.shared.logger
+
     // MARK: - Properties
 
     private let shapeLayer = CAShapeLayer()
@@ -45,28 +48,25 @@ final class TrackUIView: UIView {
     }
 
     private func setupBindings() {
-        viewModel.$translatedPoints
+        viewModel.$trackPoints
             .receive(on: DispatchQueue.main)
             .sink { [weak self] points in
                 self?.drawTrack(with: points)
             }
             .store(in: &cancellables)
-
-        viewModel.$driverPositions
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] driverPositions in
-                self?.updateDriverPositions(driverPositions)
-            }
-            .store(in: &cancellables)
+//
+//        viewModel.$driverPositions
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] driverPositions in
+//                self?.updateDriverPositions(driverPositions)
+//            }
+//            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
 
     func configureView() {
-        guard viewModel.trackData != nil else {
-            return
-        }
-        viewModel.translatePoints(for: bounds.size)
+        viewModel.viewSizeSubject.send(bounds.size)
     }
 
     // MARK: - Drawing
@@ -88,53 +88,53 @@ final class TrackUIView: UIView {
 
     // MARK: - Driver Position Drawing
 
-    private func updateDriverPositions(_ driverPositions: [DriverPosition]) {
-        clearDriverLayers()
+//    private func updateDriverPositions(_ driverPositions: [DriverPosition]) {
+//        clearDriverLayers()
+//
+//        for driverPosition in driverPositions {
+//            addDriverLayer(for: driverPosition)
+//        }
+//    }
 
-        for driverPosition in driverPositions {
-            addDriverLayer(for: driverPosition)
-        }
-    }
-
-    private func addDriverLayer(for driverPosition: DriverPosition) {
-        let driverId = driverPosition.driver.driverId.id
-
-        // Create driver marker (circle)
-        let driverLayer = CAShapeLayer()
-        driverLayer.path = UIBezierPath(ovalIn: CGRect(x: -8, y: -8, width: 16, height: 16)).cgPath
-
-        // Use team color or fallback to white
-        let teamColor: UIColor
-        if driverPosition.teamColor.hasPrefix("#") {
-            teamColor = UIColor(hex: driverPosition.teamColor)
-        } else {
-            teamColor = UIColor.white
-        }
-
-        driverLayer.fillColor = teamColor.cgColor
-        driverLayer.strokeColor = UIColor.black.cgColor
-        driverLayer.lineWidth = 2
-        driverLayer.position = driverPosition.translatedPosition
-
-        // Create driver code label
-        let labelLayer = CATextLayer()
-        labelLayer.string = driverPosition.driverCode
-        labelLayer.fontSize = 12
-        labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
-        labelLayer.foregroundColor = UIColor.black.cgColor
-        labelLayer.alignmentMode = .center
-        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
-        labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
-        labelLayer.cornerRadius = 4
-
-        // Add to view
-        layer.addSublayer(driverLayer)
-        layer.addSublayer(labelLayer)
-
-        // Store references
-        driverLayers[driverId] = driverLayer
-        driverLabelLayers[driverId] = labelLayer
-    }
+//    private func addDriverLayer(for driverPosition: DriverPosition) {
+//        let driverId = driverPosition.driver.driverId.id
+//
+//        // Create driver marker (circle)
+//        let driverLayer = CAShapeLayer()
+//        driverLayer.path = UIBezierPath(ovalIn: CGRect(x: -8, y: -8, width: 16, height: 16)).cgPath
+//
+//        // Use team color or fallback to white
+//        let teamColor: UIColor
+//        if driverPosition.teamColor.hasPrefix("#") {
+//            teamColor = UIColor(hex: driverPosition.teamColor)
+//        } else {
+//            teamColor = UIColor.white
+//        }
+//
+//        driverLayer.fillColor = teamColor.cgColor
+//        driverLayer.strokeColor = UIColor.black.cgColor
+//        driverLayer.lineWidth = 2
+//        driverLayer.position = driverPosition.translatedPosition
+//
+//        // Create driver code label
+//        let labelLayer = CATextLayer()
+//        labelLayer.string = driverPosition.driverCode
+//        labelLayer.fontSize = 12
+//        labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
+//        labelLayer.foregroundColor = UIColor.black.cgColor
+//        labelLayer.alignmentMode = .center
+//        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
+//        labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
+//        labelLayer.cornerRadius = 4
+//
+//        // Add to view
+//        layer.addSublayer(driverLayer)
+//        layer.addSublayer(labelLayer)
+//
+//        // Store references
+//        driverLayers[driverId] = driverLayer
+//        driverLabelLayers[driverId] = labelLayer
+//    }
 
     private func clearDriverLayers() {
         for layer in driverLayers.values {
@@ -153,37 +153,8 @@ final class TrackUIView: UIView {
         super.layoutSubviews()
         shapeLayer.frame = bounds
 
-        if !bounds.isEmpty && viewModel.trackData != nil {
-            viewModel.translatePoints(for: bounds.size)
+        if !bounds.isEmpty {
+            viewModel.viewSizeSubject.send(bounds.size)
         }
-
     }
 }
-
-// MARK: - SwiftUI Preview
-
-#if DEBUG
-import SwiftUI
-
-struct TrackUIViewRepresentable: UIViewRepresentable {
-    let viewModel: TrackViewModel
-
-    func makeUIView(context: Context) -> TrackUIView {
-        let view = TrackUIView(viewModel)
-        view.configureView()
-        return view
-    }
-
-    func updateUIView(_ uiView: TrackUIView, context: Context) {
-    }
-}
-
-struct TrackUIView_Previews: PreviewProvider {
-    static var previews: some View {
-        TrackUIViewRepresentable(viewModel: TrackViewModel())
-            .background(Color.black)
-            .previewLayout(.sizeThatFits)
-            .previewDisplayName("Track UI View")
-    }
-}
-#endif

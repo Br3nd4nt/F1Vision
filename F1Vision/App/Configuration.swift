@@ -14,7 +14,7 @@ struct Configuration {
     private static var socketAddress = "127.0.0.1"
 
     static var socketURL: URL {
-        let url = URL(string: "ws://\(socketAddress):8080/ws")
+        let url = URL(string: "ws://\(socketAddress):8000/ws")
         if let url {
             return url
         }
@@ -24,25 +24,4 @@ struct Configuration {
 
     static let debugMode = false
     static let zoom = 0.95
-    private static let raceName: Race = .defaultCase
-
-    static var trackMockDataset: String {
-        if raceName == .defaultCase {
-            return "track_layout"
-        }
-        return "\(raceName.rawValue)_track_layout"
-    }
-
-    static var raceMockDataset: String {
-        if raceName == .defaultCase {
-            return "race_data"
-        }
-        return "\(raceName.rawValue)_2024_race_data"
-
-    }
-}
-
-enum Race: String {
-    case monaco
-    case defaultCase
 }

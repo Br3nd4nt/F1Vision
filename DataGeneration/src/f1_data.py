@@ -7,6 +7,7 @@ import fastf1.plotting
 import numpy as np
 import json
 from datetime import timedelta
+import math
 
 from src.lib.tyres import get_tyre_compound_int
 
@@ -306,13 +307,14 @@ class RaceTelemetryProcessor:
             snapshot.sort(key=lambda r: r["dist"], reverse=True)
             leader = snapshot[0]
 
-            frame_data = {
-                car["code"]: {
+            frame_data = [
+                {
+                    "code": car["code"],
                     "x": car["x"],
                     "y": car["y"],
                     "dist": car["dist"],
                     "lap": car["lap"],
-                    "rel_dist": round(car["rel_dist"], 6),
+                    "rel_dist": self._sanitize(round(car["rel_dist"], 6)),
                     "tyre": car["tyre"],
                     "position": idx + 1,
                     "speed": car["speed"],
@@ -320,7 +322,7 @@ class RaceTelemetryProcessor:
                     "drs": car["drs"],
                 }
                 for idx, car in enumerate(snapshot)
-            }
+            ]
 
             frames.append({
                 "t": float(t),
@@ -370,3 +372,8 @@ class RaceTelemetryProcessor:
             )
 
         return rgb_colors
+
+    def _sanitize(self, value):
+        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+            return None
+        return value

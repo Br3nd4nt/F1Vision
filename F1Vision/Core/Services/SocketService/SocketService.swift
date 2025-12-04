@@ -1,0 +1,95 @@
+//
+//  SocketSerivce.swift
+//  F1Vision
+//
+//  Created by br3nd4nt on 25.09.2025.
+//
+import Foundation
+import Puppy
+import Starscream
+
+final class SocketService: WebSocketDelegate, ObservableObject {
+    @Published var isConnected = false
+
+    @Published var trackLayout: TrackLayout?
+    @Published var snapshot: RaceSnapshot?
+
+    private let logger: Puppy = Dependencies.shared.logger
+
+    private var socket: WebSocket
+    private let server = WebSocketServer()
+
+    private static let jsonDecoder = Dependencies.shared.jsonDecoder
+
+    init() {
+        var request = URLRequest(url: Configuration.socketURL)
+        request.timeoutInterval = 5
+        socket = WebSocket(request: request)
+        socket.delegate = self
+        socket.connect()
+    }
+
+    deinit {
+        socket.disconnect()
+    }
+
+    // MARK: - WebSocketDelegate
+    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+        switch event {
+        case .connected(let headers):
+            isConnected = true
+            logger.info("websocket connected")
+            logger.debug("websocket headers: \(headers)")
+        case .disconnected(let reason, let code):
+            isConnected = false
+            logger.info("websocket is disconnected with code \(code), reason: \(reason)")
+        case .text(let string):
+            guard let data = string.data(using: .utf8) else {
+                logger.error("got incorrect data from websocket")
+                logger.debug("websocket data: \(string)")
+                return
+            }
+            do {
+                let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
+                switch message {
+                case .raceSnapshot(let newSnapshot):
+                    snapshot = newSnapshot
+                case .trackLayout(let layout):
+                    trackLayout = layout
+                    logger.info("got track layout")
+                }
+            } catch {
+                logger.error("got incorrect data from websocket")
+                logger.debug("websocket data: \(string)")
+            }
+        case .cancelled:
+            isConnected = false
+            logger.warning("websocket connection cancelled")
+        case .error(let error):
+            isConnected = false
+            handleError(error)
+        case .peerClosed:
+            break
+        case .binary:
+            break
+        case .pong:
+            break
+        case .ping:
+            break
+        case .viabilityChanged:
+            break
+        case .reconnectSuggested:
+            break
+        }
+    }
+
+    func handleError(_ error: Error?) {
+        if let e = error as? WSError {
+            logger.error("websocket encountered an error: \(e.message)")
+        } else if let e = error {
+            logger.error("websocket encountered an error: \(e.localizedDescription)")
+        } else {
+            logger.error("websocket encountered an error")
+        }
+    }
+}

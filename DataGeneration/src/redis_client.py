@@ -61,6 +61,6 @@ class RedisClient:
             print(f"Loaded {len(telemetry_data)} telemetry frames from {self.telemetry_path}")
             for _, data_point in enumerate(telemetry_data):
                 self.publish(self._telemetry_channel, data_point)
-                if _ % 250 == 0:
+                if _ % 1000 == 0:
                     print(f"Published {_} telemetry frames...")
                 time.sleep(self._sleep_time)

@@ -20,22 +20,23 @@ struct F1Vision: App {
 }
 
 struct ContentView: View {
-    @StateObject private var raceViewModel = RaceViewModel()
-    @StateObject private var trackViewModel = TrackViewModel()
+    @StateObject private var socketService: SocketService
+    @ObservedObject private var trackViewModel: TrackViewModel
+
+    init() {
+        let socketService = SocketService()
+        _socketService = StateObject(wrappedValue: socketService)
+        _trackViewModel = ObservedObject(wrappedValue: TrackViewModel(socketService))
+    }
 
     var body: some View {
         HStack {
-            RaceView(viewModel: raceViewModel, trackViewModel: trackViewModel)
+            TrackView(viewModel: trackViewModel)
             TrackView(viewModel: trackViewModel)
         }
         .accentColor(.red)
-        .onAppear {
-            // Connect the view models for data synchronization
-            raceViewModel.setTrackViewModel(trackViewModel)
-        }
     }
 }
-
-#Preview {
-    ContentView()
-}
+// #Preview {
+//    ContentView()
+// }

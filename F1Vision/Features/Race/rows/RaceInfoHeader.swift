@@ -18,9 +18,9 @@ struct RaceInfoHeader: View {
         VStack(spacing: 8) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Lap \(viewModel.currentSnapshot?.lap ?? 0)")
-                        .font(.title2)
-                        .fontWeight(.bold)
+//                    Text("Lap \(viewModel.currentSnapshot?.lap ?? 0)")
+//                        .font(.title2)
+//                        .fontWeight(.bold)
 //                    Text(snapshot.timestamp)
 //                        .font(.caption)
 //                        .foregroundColor(.secondary)

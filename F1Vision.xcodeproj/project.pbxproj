@@ -10,7 +10,7 @@
 		06083F152E567F7A00F83348 /* Puppy in Frameworks */ = {isa = PBXBuildFile; productRef = 06083F142E567F7A00F83348 /* Puppy */; };
 		06083F192E567F9000F83348 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 06083F182E567F9000F83348 /* RswiftLibrary */; };
 		06083F1C2E567F9B00F83348 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 06083F1B2E567F9B00F83348 /* Swinject */; };
-		06A894252E794E990032D66A /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 06A894242E794E990032D66A /* SocketIO */; };
+		06CE272E2EE0DBBB005CB293 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 06CE272D2EE0DBBB005CB293 /* Starscream */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,9 +31,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				06083F152E567F7A00F83348 /* Puppy in Frameworks */,
-				06A894252E794E990032D66A /* SocketIO in Frameworks */,
 				06083F192E567F9000F83348 /* RswiftLibrary in Frameworks */,
 				06083F1C2E567F9B00F83348 /* Swinject in Frameworks */,
+				06CE272E2EE0DBBB005CB293 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,7 +80,7 @@
 				06083F142E567F7A00F83348 /* Puppy */,
 				06083F182E567F9000F83348 /* RswiftLibrary */,
 				06083F1B2E567F9B00F83348 /* Swinject */,
-				06A894242E794E990032D66A /* SocketIO */,
+				06CE272D2EE0DBBB005CB293 /* Starscream */,
 			);
 			productName = F1Vision;
 			productReference = 06083EE92E567EC400F83348 /* F1Vision.app */;
@@ -115,7 +115,7 @@
 				06083F162E567F8300F83348 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				06083F172E567F9000F83348 /* XCRemoteSwiftPackageReference "R" */,
 				06083F1A2E567F9B00F83348 /* XCRemoteSwiftPackageReference "Swinject" */,
-				06A894232E794E990032D66A /* XCRemoteSwiftPackageReference "socket" */,
+				06CE272C2EE0DBBB005CB293 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 06083EEA2E567EC400F83348 /* Products */;
@@ -413,12 +413,12 @@
 				minimumVersion = 2.9.1;
 			};
 		};
-		06A894232E794E990032D66A /* XCRemoteSwiftPackageReference "socket" */ = {
+		06CE272C2EE0DBBB005CB293 /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			repositoryURL = "https://github.com/daltoniam/Starscream";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.8;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -439,10 +439,10 @@
 			package = 06083F1A2E567F9B00F83348 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
-		06A894242E794E990032D66A /* SocketIO */ = {
+		06CE272D2EE0DBBB005CB293 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 06A894232E794E990032D66A /* XCRemoteSwiftPackageReference "socket" */;
-			productName = SocketIO;
+			package = 06CE272C2EE0DBBB005CB293 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
