@@ -13,6 +13,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
 
     @Published var trackLayout: TrackLayout?
     @Published var snapshot: RaceSnapshot?
+    @Published var driverColors: [DriverColor]?
 
     private let logger: Puppy = Dependencies.shared.logger
 
@@ -57,6 +58,11 @@ final class SocketService: WebSocketDelegate, ObservableObject {
                 case .trackLayout(let layout):
                     trackLayout = layout
                     logger.info("got track layout")
+                case .colors(let colors):
+                    driverColors = colors.map { color in
+                        DriverColor(color)
+                    }
+                    logger.info("got driver colors")
                 }
             } catch {
                 logger.error("got incorrect data from websocket")

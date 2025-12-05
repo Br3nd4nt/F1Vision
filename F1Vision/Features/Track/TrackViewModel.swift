@@ -108,7 +108,10 @@ final class TrackViewModel: ObservableObject {
             }
             .map { driver in
             let point = calculateDriverPosition(driver, layout: layout)
-            return TrackDriverPosition(name: driver.code, point: point)
+            let color = socketService.driverColors?.first(where: { color in
+                color.code == driver.code
+            })?.color ?? UIColor.cyan
+            return TrackDriverPosition(name: driver.code, point: point, color: color)
         }
     }
 

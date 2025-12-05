@@ -33,7 +33,7 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            RaceTableView(viewModel: raceViewModel)
+            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
             TrackView(viewModel: trackViewModel)
         }
         .accentColor(.red)

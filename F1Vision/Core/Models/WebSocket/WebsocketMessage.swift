@@ -12,6 +12,7 @@ enum WebsocketMessage: Codable {
 
     case trackLayout(TrackLayout)
     case raceSnapshot(RaceSnapshot)
+    case colors([DriverColorDTO])
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -21,6 +22,7 @@ enum WebsocketMessage: Codable {
     private enum MessageType: String, Codable {
         case trackLayout
         case snapshot
+        case driverColors
     }
 
     init(from decoder: Decoder) throws {
@@ -28,13 +30,14 @@ enum WebsocketMessage: Codable {
         let type = try container.decode(MessageType.self, forKey: .type)
         switch type {
         case .trackLayout:
-            Self.logger.debug("decoding as TrackLayout")
             let data = try container.decode(TrackLayout.self, forKey: .data)
             self = .trackLayout(data)
         case .snapshot:
-            Self.logger.debug("decoding as RaceSnapshot")
             let data = try container.decode(RaceSnapshot.self, forKey: .data)
             self = .raceSnapshot(data)
+        case .driverColors:
+            let data = try container.decode([DriverColorDTO].self, forKey: .data)
+            self = .colors(data)
         }
     }
 
@@ -46,6 +49,9 @@ enum WebsocketMessage: Codable {
             try container.encode(value, forKey: .data)
         case .trackLayout(let value):
             try container.encode(MessageType.trackLayout, forKey: .type)
+            try container.encode(value, forKey: .data)
+        case .colors(let value):
+            try container.encode(MessageType.driverColors, forKey: .type)
             try container.encode(value, forKey: .data)
         }
     }

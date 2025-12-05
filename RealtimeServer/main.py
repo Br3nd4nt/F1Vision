@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 redis_host = os.getenv("REDIS_HOST", "localhost")
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 track_layout_key = os.getenv("TRACK_LAYOUT_KEY", "track_layout")
+driver_colors_key = os.getenv("DRIVER_COLOR_KEY", "driver_colors")
 telemetry_channel = os.getenv("TELEMETRY_CHANNEL", "telemetry_channel")
 frequency = int(os.getenv("DATA_FREQUENCY", 25))
 
@@ -43,6 +44,22 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_json({
             "type": "error",
             "data": "Track layout not found"
+        })
+        await websocket.close()
+        return
+
+    driver_colors = await redis_client.get(driver_colors_key)
+
+    if driver_colors:
+        message = {
+            "type": "driverColors",
+            "data": json.loads(driver_colors)
+        }
+        await websocket.send_text(json.dumps(message))
+    else:
+        await websocket.send_json({
+            "type": "error",
+            "data": "Driver colors not found"
         })
         await websocket.close()
         return

@@ -363,15 +363,15 @@ class RaceTelemetryProcessor:
     # --------------------------
     def get_driver_colors(self, session):
         color_mapping = fastf1.plotting.get_driver_color_mapping(session)
-        rgb_colors = {}
+        colors = []
 
         for driver, hex_color in color_mapping.items():
-            hex_color = hex_color.lstrip("#")
-            rgb_colors[driver] = tuple(
-                int(hex_color[i:i + 2], 16) for i in (0, 2, 4)
-            )
+            colors.append({
+                "driver": driver,
+                "hex_color": hex_color
+            })
 
-        return rgb_colors
+        return colors
 
     def _sanitize(self, value):
         if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):

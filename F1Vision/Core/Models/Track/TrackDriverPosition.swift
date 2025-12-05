@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 struct TrackDriverPosition: Identifiable {
     var id = UUID()
 
     let name: String
     let point: CGPoint
+    let color: UIColor
 }

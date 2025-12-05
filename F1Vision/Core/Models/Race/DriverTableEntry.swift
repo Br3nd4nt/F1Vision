@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import UIKit
+import SwiftUI
 
 struct DriverTableEntry: Comparable, Identifiable {
     var id = UUID()
@@ -13,6 +15,10 @@ struct DriverTableEntry: Comparable, Identifiable {
     let position: Int
     let speed: Double
     let gear: Int
+    let color: UIColor
+    let interval: Double?
+    var leader: Double?
+    let tyre: Int
 
     var positionString: String {
         String(position)
@@ -26,11 +32,19 @@ struct DriverTableEntry: Comparable, Identifiable {
         String(gear)
     }
 
-    init(_ state: DriverState) {
+    var primeColor: Color {
+        Color(cgColor: color.cgColor)
+    }
+
+    init(_ state: DriverState, color: UIColor) {
         self.name = state.code
         self.position = state.position
         self.speed = state.speed
         self.gear = state.gear
+        self.color = color
+        self.interval = state.rel_dist
+        self.leader = state.rel_dist
+        self.tyre = state.tyre
     }
 
     static func < (lhs: Self, rhs: Self) -> Bool {

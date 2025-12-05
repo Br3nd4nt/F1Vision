@@ -22,6 +22,7 @@ def main():
     redis_host = os.getenv("REDIS_HOST", "localhost")
     redis_port = int(os.getenv("REDIS_PORT", 6379))
     track_layout_key = os.getenv("TRACK_LAYOUT_KEY", "track_layout")
+    driver_colors_key = os.getenv("DRIVER_COLOR_KEY", "driver_colors")
     telemetry_channel = os.getenv("TELEMETRY_CHANNEL", "telemetry_channel")
     frequency = int(os.getenv("DATA_FREQUENCY", 25))
 
@@ -39,6 +40,10 @@ def main():
         print("Track layout already exists in Redis.")
     else:
         client.save_track_layout()
+    if client.check_driver_colors_exists():
+        print("Driver colors already exist in Redis.")
+    else:
+        client.save_driver_colors()
     client.publish_telemetry_data()
     
 main()

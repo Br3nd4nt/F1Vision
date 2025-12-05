@@ -5,10 +5,10 @@
 //  Created by br3nd4nt on 23.08.2025.
 //
 
-import Foundation
-import SwiftUI
 import Combine
+import Foundation
 import Puppy
+import SwiftUI
 
 @MainActor
 final class RaceViewModel: ObservableObject {
@@ -19,6 +19,8 @@ final class RaceViewModel: ObservableObject {
 
     @Published var isLoaded = false
     @Published var drivers: [DriverTableEntry] = []
+    
+    let numberOfTableColumns = 3
 
     init(_ socketService: SocketService) {
         self.socketService = socketService
@@ -32,12 +34,14 @@ final class RaceViewModel: ObservableObject {
 
     private func updateStandings() {
         guard let snapshot = socketService.snapshot else {
-            logger.error("Called update standings without snapshot")
             return
         }
         isLoaded = true
-        drivers = snapshot.drivers.map {
-            DriverTableEntry($0)
+        drivers = snapshot.drivers.map {driver in
+            let color = socketService.driverColors?.first { driverColor in
+                driverColor.code == driver.code
+            }?.color ?? UIColor.gray
+            return DriverTableEntry(driver, color: color)
         }
         .sorted()
     }
