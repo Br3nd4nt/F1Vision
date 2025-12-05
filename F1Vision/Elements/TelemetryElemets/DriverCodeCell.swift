@@ -8,7 +8,7 @@
 import UIKit
 import SwiftUI
 
-final class DriverCodeView: UICollectionViewCell {
+final class DriverCodeCell: UICollectionViewCell {
     private let backgroundWrapperView = UIView()
     private let codeLabel = UILabel()
 
@@ -16,6 +16,8 @@ final class DriverCodeView: UICollectionViewCell {
     private let verticalPadding: Double = 5
     private let horizontalPadding: Double = 10
     private let fontSize: Double = 20
+
+    static var reuseId = "DriverCodeCell"
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -55,18 +57,23 @@ final class DriverCodeView: UICollectionViewCell {
         backgroundWrapperView.pinRight(to: codeLabel, -horizontalPadding)
         backgroundWrapperView.pinTop(to: codeLabel, -verticalPadding)
         backgroundWrapperView.pinBottom(to: codeLabel, -verticalPadding)
+        
+        if Configuration.debugMode {
+            self.layer.borderColor = UIColor.yellow.cgColor
+            self.layer.borderWidth = 1
+        }
     }
 }
 
 // MARK: - Preview
 #Preview("Dark") {
-    let v = DriverCodeView()
+    let v = DriverCodeCell()
     v.configure(code: "HAM", backgroundColor: UIColor(hex: "#E80020"))
     return v
 }
 
 #Preview("Light") {
-    let v = DriverCodeView()
+    let v = DriverCodeCell()
     v.configure(code: "BEA", backgroundColor: UIColor(hex: "#B6BABD"))
     return v
 }

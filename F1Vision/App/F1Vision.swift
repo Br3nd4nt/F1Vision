@@ -34,8 +34,14 @@ struct ContentView: View {
     var body: some View {
         HStack {
             TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+                .frame(minWidth: 300, maxWidth: 400)
+                .border(Configuration.debugMode ? Color.green : Color.clear)
+//                .layoutPriority(1)
             TrackView(viewModel: trackViewModel)
+                .border(Configuration.debugMode ? Color.cyan : Color.clear)
+//                .layoutPriority(0)
         }
         .accentColor(.red)
+        .background(Color(.background))
     }
 }

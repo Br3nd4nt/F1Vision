@@ -14,6 +14,21 @@ extension UIView {
         case lsOE
     }
 
+    // MARK: - Pin all
+    @discardableResult
+    func pinAll(
+        to otherView: UIView,
+        _ const: Double = 0,
+        _ mode: ConstraintMode = .equal
+    ) -> [NSLayoutConstraint] {
+        [
+            pinTop(to: otherView, const, mode),
+            pinBottom(to: otherView, const, mode),
+            pinLeft(to: otherView, const, mode),
+            pinRight(to: otherView, const, mode),
+        ]
+    }
+    
     // MARK: - Pin left
     @discardableResult
     func pinLeft(
@@ -183,7 +198,7 @@ extension UIView {
         _ secondConstraint: AnyAnchor,
         constant: Double = 0
     ) -> NSLayoutConstraint {
-        let const = CGFloat(constant)
+        let const = Double(constant)
         let result: NSLayoutConstraint
 
         translatesAutoresizingMaskIntoConstraints = false
@@ -207,7 +222,7 @@ extension UIView {
         _ secondConstraint: NSLayoutDimension,
         multiplier: Double = 1
     ) -> NSLayoutConstraint {
-        let mult = CGFloat(multiplier)
+        let mult = Double(multiplier)
         let result: NSLayoutConstraint
 
         translatesAutoresizingMaskIntoConstraints = false
@@ -231,7 +246,7 @@ extension UIView {
         _ dimension: NSLayoutDimension,
         constant: Double = 0
     ) -> NSLayoutConstraint {
-        let const = CGFloat(constant)
+        let const = Double(constant)
         let result: NSLayoutConstraint
 
         translatesAutoresizingMaskIntoConstraints = false

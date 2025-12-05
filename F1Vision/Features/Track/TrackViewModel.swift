@@ -107,12 +107,12 @@ final class TrackViewModel: ObservableObject {
                 driver.speed > 0
             }
             .map { driver in
-            let point = calculateDriverPosition(driver, layout: layout)
-            let color = socketService.driverColors?.first(where: { color in
-                color.code == driver.code
-            })?.color ?? UIColor.cyan
-            return TrackDriverPosition(name: driver.code, point: point, color: color)
-        }
+                let point = calculateDriverPosition(driver, layout: layout)
+                let color = socketService.driverColors.first { color in
+                    color.code == driver.code
+                }?.color ?? UIColor.cyan
+                return TrackDriverPosition(name: driver.code, point: point, color: color)
+            }
     }
 
     private func calculateDriverPosition(_ driver: DriverState, layout: TrackLayout) -> CGPoint {

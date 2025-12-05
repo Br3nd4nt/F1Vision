@@ -11,16 +11,18 @@ import SwiftUI
 import Puppy
 
 final class TelemetryTableViewController: UIViewController {
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TelemetryCollectionViewFlowLayout())
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 
     private var cancellables = Set<AnyCancellable>()
 
     private let viewModel: RaceViewModel
     private let dataSource: UICollectionViewDataSource
+    private let delegate: TelemetryTableCollectionViewDelegate
 
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
         self.dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
+        self.delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
         self.viewModel.$drivers
             .receive(on: DispatchQueue.main)
@@ -38,25 +40,28 @@ final class TelemetryTableViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
+
+        if Configuration.debugMode {
+            view.layer.borderColor = UIColor.yellow.cgColor
+            view.layer.borderWidth = 1
+        }
     }
 
     private func configureCollectionView() {
+        view.configureSubview(collectionView)
+        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        collectionView.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor)
+        collectionView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
+        collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+
         collectionView.backgroundColor = .systemGroupedBackground
-
         collectionView.dataSource = self.dataSource
-        collectionView.register(DriverCodeView.self, forCellWithReuseIdentifier: "cell")
-
-        view.addSubview(collectionView)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.delegate = self.delegate
+        collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
+        collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
         collectionView.isScrollEnabled = false
-
-        collectionView.backgroundColor = UIColor(hex: "#EEEEEE")
-
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        collectionView.backgroundColor = .background
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
     }
 }

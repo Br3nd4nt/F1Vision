@@ -8,40 +8,48 @@
 import UIKit
 
 final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDataSource {
-    
     private let viewModel: RaceViewModel
-    
+
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
     }
-    
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         viewModel.drivers.count
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        viewModel.numberOfTableColumns
+        viewModel.tableColumnWidths.count
     }
 
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! DriverCodeView
-
-        let text: String
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let driver = viewModel.drivers[indexPath.section]
 
         switch indexPath.item {
         case 0:
-            text = "\(driver.position)"
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCodeCell.reuseId, for: indexPath) as? DriverCodeCell else {
+                return UICollectionViewCell()
+            }
+            cell.configure(code: "\(driver.position)", backgroundColor: driver.color)
+            return cell
         case 1:
-            text = driver.name
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCodeCell.reuseId, for: indexPath) as? DriverCodeCell else {
+                return UICollectionViewCell()
+            }
+            cell.configure(code: driver.name, backgroundColor: driver.color)
+            return cell
+        case 2:
+            fallthrough
+        case 3:
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: IntervalTimeCell.reuseId, for: indexPath) as? IntervalTimeCell else {
+                return UICollectionViewCell()
+            }
+            cell.configure(interval: driver.interval)
+            return cell
         default:
-            text = "test"
+            return UICollectionViewCell()
         }
-
-        cell.configure(code: text, backgroundColor: driver.color)
-
-        return cell
     }
 }
+
+

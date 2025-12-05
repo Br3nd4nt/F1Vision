@@ -13,7 +13,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
 
     @Published var trackLayout: TrackLayout?
     @Published var snapshot: RaceSnapshot?
-    @Published var driverColors: [DriverColor]?
+    @Published var driverColors: [DriverColor] = []
 
     private let logger: Puppy = Dependencies.shared.logger
 

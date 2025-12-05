@@ -19,8 +19,8 @@ final class RaceViewModel: ObservableObject {
 
     @Published var isLoaded = false
     @Published var drivers: [DriverTableEntry] = []
-    
-    let numberOfTableColumns = 3
+
+    let tableColumnWidths: [Double] = [40, 60, 80, 80]
 
     init(_ socketService: SocketService) {
         self.socketService = socketService
@@ -38,7 +38,7 @@ final class RaceViewModel: ObservableObject {
         }
         isLoaded = true
         drivers = snapshot.drivers.map {driver in
-            let color = socketService.driverColors?.first { driverColor in
+            let color = socketService.driverColors.first { driverColor in
                 driverColor.code == driver.code
             }?.color ?? UIColor.gray
             return DriverTableEntry(driver, color: color)
