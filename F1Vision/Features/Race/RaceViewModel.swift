@@ -20,7 +20,7 @@ final class RaceViewModel: ObservableObject {
     @Published var isLoaded = false
     @Published var drivers: [DriverTableEntry] = []
 
-    let tableColumnWidths: [Double] = [40, 60, 80, 80]
+    let tableColumnWidths: [Double] = [40, 60, 35]
 
     init(_ socketService: SocketService) {
         self.socketService = socketService

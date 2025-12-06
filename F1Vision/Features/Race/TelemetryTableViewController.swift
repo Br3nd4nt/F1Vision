@@ -59,6 +59,7 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.delegate = self.delegate
         collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
+        collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .background
         collectionView.showsVerticalScrollIndicator = false

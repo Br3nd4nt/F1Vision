@@ -30,8 +30,7 @@ final class TrackViewModel: ObservableObject {
 
     // Configuration
     private let zoom: Double = Configuration.zoom
-
-    let driverPointSize = CGSize(width: 8, height: 8)
+    let driverPointSize = CGSize(width: 12, height: 12)
 
     // MARK: - Init
 
@@ -52,7 +51,7 @@ final class TrackViewModel: ObservableObject {
             .store(in: &cancellables)
         viewSizeSubject
             .removeDuplicates()
-            .debounce(for: .milliseconds(0), scheduler: RunLoop.main)
+//            .debounce(for: .milliseconds(0), scheduler: RunLoop.main)
             .assign(to: &$viewSize)
         $viewSize
             .receive(on: DispatchQueue.main)
@@ -93,7 +92,9 @@ final class TrackViewModel: ObservableObject {
     }
 
     func sendViewSize(_ viewSize: CGSize) {
-        viewSizeSubject.send(viewSize)
+        DispatchQueue.main.async {
+            self.viewSizeSubject.send(viewSize)
+        }
     }
 
     private func updateDrivers() {

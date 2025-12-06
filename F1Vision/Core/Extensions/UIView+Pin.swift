@@ -25,10 +25,10 @@ extension UIView {
             pinTop(to: otherView, const, mode),
             pinBottom(to: otherView, const, mode),
             pinLeft(to: otherView, const, mode),
-            pinRight(to: otherView, const, mode),
+            pinRight(to: otherView, const, mode)
         ]
     }
-    
+
     // MARK: - Pin left
     @discardableResult
     func pinLeft(

@@ -39,17 +39,19 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
             cell.configure(code: driver.name, backgroundColor: driver.color)
             return cell
         case 2:
-            fallthrough
-        case 3:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: IntervalTimeCell.reuseId, for: indexPath) as? IntervalTimeCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TyreCell.reuseId, for: indexPath) as? TyreCell else {
                 return UICollectionViewCell()
             }
-            cell.configure(interval: driver.interval)
+            cell.configure(TyreType(driver.tyre))
             return cell
+//        case 3:
+//            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: IntervalTimeCell.reuseId, for: indexPath) as? IntervalTimeCell else {
+//                return UICollectionViewCell()
+//            }
+//            cell.configure(interval: driver.interval)
+//            return cell
         default:
             return UICollectionViewCell()
         }
     }
 }
-
-
