@@ -11,7 +11,6 @@ import Puppy
 struct Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
 
-//    private static var socketAddress = "192.168.10.129"
     private static var socketAddress = "localhost"
 
     static var socketURL: URL {
