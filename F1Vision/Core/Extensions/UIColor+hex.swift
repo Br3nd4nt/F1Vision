@@ -20,4 +20,12 @@ extension UIColor {
         let blue = Double(rgb & 0xFF) / 255.0
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
+
+    var isLight: Bool {
+        // swiftlint:disable no_cgfloat
+        var white: CGFloat = 0
+        self.getWhite(&white, alpha: nil)
+        // swiftlint:enable no_cgfloat
+        return white > 0.7
+    }
 }

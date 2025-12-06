@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 redis_host = os.getenv("REDIS_HOST", "localhost")
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 track_layout_key = os.getenv("TRACK_LAYOUT_KEY", "track_layout")
+driver_colors_key = os.getenv("DRIVER_COLOR_KEY", "driver_colors")
 telemetry_channel = os.getenv("TELEMETRY_CHANNEL", "telemetry_channel")
 frequency = int(os.getenv("DATA_FREQUENCY", 25))
 
@@ -34,11 +35,31 @@ async def websocket_endpoint(websocket: WebSocket):
     track_json = await redis_client.get(track_layout_key)
 
     if track_json:
-        await websocket.send_text(track_json)
+        message = {
+            "type": "trackLayout",
+            "data": json.loads(track_json)
+        }
+        await websocket.send_text(json.dumps(message))
     else:
         await websocket.send_json({
             "type": "error",
-            "message": "Track layout not found"
+            "data": "Track layout not found"
+        })
+        await websocket.close()
+        return
+
+    driver_colors = await redis_client.get(driver_colors_key)
+
+    if driver_colors:
+        message = {
+            "type": "driverColors",
+            "data": json.loads(driver_colors)
+        }
+        await websocket.send_text(json.dumps(message))
+    else:
+        await websocket.send_json({
+            "type": "error",
+            "data": "Driver colors not found"
         })
         await websocket.close()
         return
@@ -48,13 +69,26 @@ async def websocket_endpoint(websocket: WebSocket):
     await pubsub.subscribe(telemetry_channel)
     print(f"Subscribed to {telemetry_channel}")
     try:
-        async for message in pubsub.listen():
-            if message["type"] != "message":
-                # ignore subscribe/unsubscribe/pmessage/etc.
+        async for raw_msg in pubsub.listen():
+            if raw_msg["type"] != "message":
+                continue  # ignore subscription messages
+
+            # Redis returns data as a string
+            data_str = raw_msg["data"]
+            try:
+                # Decode the inner telemetry JSON
+                data_obj = json.loads(data_str)
+            except json.JSONDecodeError:
+                print("Failed to decode telemetry frame")
                 continue
 
-            telemetry_json = message["data"]
-            await websocket.send_text(telemetry_json)
+            # Wrap with WebSocket message type
+            ws_message = {
+                "type": "snapshot",
+                "data": data_obj
+            }
+
+            await websocket.send_text(json.dumps(ws_message))
 
     except WebSocketDisconnect:
         await pubsub.unsubscribe(telemetry_channel)
@@ -62,7 +96,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         await websocket.send_json({
             "type": "error",
-            "message": str(e)
+            "data": str(e)
         })
         await pubsub.unsubscribe(telemetry_channel)
         await pubsub.close()

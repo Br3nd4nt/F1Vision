@@ -11,10 +11,10 @@ import Puppy
 struct Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
 
-    private static var socketAddress = "127.0.0.1"
+    private static var socketAddress = "localhost"
 
     static var socketURL: URL {
-        let url = URL(string: "ws://\(socketAddress):8080/ws")
+        let url = URL(string: "ws://\(socketAddress):8000/ws")
         if let url {
             return url
         }
@@ -22,27 +22,6 @@ struct Configuration {
         fatalError("Error creating URL")
     }
 
-    static let debugMode = false
+    static let debugMode = true
     static let zoom = 0.95
-    private static let raceName: Race = .defaultCase
-
-    static var trackMockDataset: String {
-        if raceName == .defaultCase {
-            return "track_layout"
-        }
-        return "\(raceName.rawValue)_track_layout"
-    }
-
-    static var raceMockDataset: String {
-        if raceName == .defaultCase {
-            return "race_data"
-        }
-        return "\(raceName.rawValue)_2024_race_data"
-
-    }
-}
-
-enum Race: String {
-    case monaco
-    case defaultCase
 }

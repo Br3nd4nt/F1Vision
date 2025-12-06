@@ -30,6 +30,11 @@ final class Dependencies {
         let directoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let fileURL = directoryURL.appendingPathComponent("f1vision.log")
         do {
+            if fileManager.fileExists(atPath: fileURL.path) {
+                // clearing out old logs
+                try "".write(to: fileURL, atomically: true, encoding: .utf8)
+            }
+
             let file = try FileLogger(
                 "br3nd4nt.F1Vision",
                 logLevel: .debug,
@@ -39,8 +44,9 @@ final class Dependencies {
             )
 
             puppy = Puppy(loggers: [console, file])
+            puppy.info("Debug logs path: \(fileURL)")
         } catch {
-            print("Couldnt create file logger: \(error)")
+            logger.warning("Couldnt create file logger: \(error)")
             puppy = Puppy(loggers: [console])
         }
 
@@ -50,22 +56,22 @@ final class Dependencies {
         .inObjectScope(.container)
 
         // Register JSONDataService as singleton
-        container.register(JSONDataProtocol.self) { _ in
-            JSONDataService.shared
+        container.register(JSONDecoder.self) { _ in
+            JSONDecoder()
         }
         .inObjectScope(.container)
 
-        // Track
-        container.register(TrackProtocol.self) { _ in
-            TrackMock()
-        }
-        .inObjectScope(.container)
-
-        // Race
-        container.register(RaceProtocol.self) { _ in
-            RaceMock()
-        }
-        .inObjectScope(.container)
+//        // Track
+//        container.register(TrackProtocol.self) { _ in
+//            TrackMock()
+//        }
+//        .inObjectScope(.container)
+//
+//        // Race
+//        container.register(RaceProtocol.self) { _ in
+//            RaceMock()
+//        }
+//        .inObjectScope(.container)
     }
 
     // MARK: - Resolution Methods
@@ -83,22 +89,22 @@ final class Dependencies {
     // MARK: - Convenience Methods
 
     /// Get JSONDataService
-    var jsonDataService: JSONDataProtocol {
-        resolve(JSONDataProtocol.self)!
+    var jsonDecoder: JSONDecoder {
+        resolve(JSONDecoder.self)!
     }
 
     /// Get JSONDataService as concrete type
-    var jsonDataServiceConcrete: JSONDataService {
-        resolve(JSONDataService.self)!
-    }
+//    var jsonDataServiceConcrete: JSONDataService {
+//        resolve(JSONDataService.self)!
+//    }
+//
+//    var track: TrackProtocol {
+//        resolve(TrackProtocol.self)!
+//    }
 
-    var track: TrackProtocol {
-        resolve(TrackProtocol.self)!
-    }
-
-    var race: RaceProtocol {
-        resolve(RaceProtocol.self)!
-    }
+//    var race: RaceProtocol {
+//        resolve(RaceProtocol.self)!
+//    }
 
     var logger: Puppy {
         resolve(Puppy.self)!

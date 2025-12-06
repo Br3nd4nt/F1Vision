@@ -1,0 +1,68 @@
+//
+//  RaceTableView.swift
+//  F1Vision
+//
+//  Created by br3nd4nt on 04.12.2025.
+//
+
+import UIKit
+import Combine
+import SwiftUI
+import Puppy
+
+final class TelemetryTableViewController: UIViewController {
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+
+    private var cancellables = Set<AnyCancellable>()
+
+    private let viewModel: RaceViewModel
+    private let dataSource: UICollectionViewDataSource
+    private let delegate: TelemetryTableCollectionViewDelegate
+
+    init(viewModel: RaceViewModel) {
+        self.viewModel = viewModel
+        self.dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
+        self.delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.$drivers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureCollectionView()
+
+        if Configuration.debugMode {
+            view.layer.borderColor = UIColor.yellow.cgColor
+            view.layer.borderWidth = 1
+        }
+    }
+
+    private func configureCollectionView() {
+        view.configureSubview(collectionView)
+        collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
+        collectionView.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor)
+        collectionView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
+        collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
+
+        collectionView.backgroundColor = .systemGroupedBackground
+        collectionView.dataSource = self.dataSource
+        collectionView.delegate = self.delegate
+        collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
+        collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
+        collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)
+        collectionView.isScrollEnabled = false
+        collectionView.backgroundColor = .background
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+    }
+}

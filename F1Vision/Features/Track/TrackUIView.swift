@@ -7,12 +7,17 @@
 
 import UIKit
 import Combine
+import Puppy
 
 final class TrackUIView: UIView {
+    private let logger: Puppy = Dependencies.shared.logger
+
     // MARK: - Properties
 
     private let shapeLayer = CAShapeLayer()
     private let bezierPath = UIBezierPath()
+
+    private let debugBoundingBoxLayer = CAShapeLayer()
 
     // Driver position layers
     private var driverLayers: [String: CAShapeLayer] = [:]
@@ -38,24 +43,33 @@ final class TrackUIView: UIView {
     // MARK: - Setup
 
     private func setupUI() {
+        self.backgroundColor = .background
+
         layer.addSublayer(shapeLayer)
         shapeLayer.strokeColor = UIColor.lightGray.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.lineWidth = 5
+
+        if Configuration.debugMode {
+            debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
+            debugBoundingBoxLayer.fillColor = UIColor.clear.cgColor
+            debugBoundingBoxLayer.lineWidth = 1
+            debugBoundingBoxLayer.lineDashPattern = [4, 3]
+            layer.addSublayer(debugBoundingBoxLayer)
+        }
     }
 
     private func setupBindings() {
-        viewModel.$translatedPoints
+        viewModel.$trackPoints
             .receive(on: DispatchQueue.main)
             .sink { [weak self] points in
                 self?.drawTrack(with: points)
             }
             .store(in: &cancellables)
-
-        viewModel.$driverPositions
+        viewModel.$driverPoints
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] driverPositions in
-                self?.updateDriverPositions(driverPositions)
+            .sink { [weak self] positions in
+                self?.updateDriverPositions(positions)
             }
             .store(in: &cancellables)
     }
@@ -63,10 +77,7 @@ final class TrackUIView: UIView {
     // MARK: - Public Methods
 
     func configureView() {
-        guard viewModel.trackData != nil else {
-            return
-        }
-        viewModel.translatePoints(for: bounds.size)
+        viewModel.sendViewSize(bounds.size)
     }
 
     // MARK: - Drawing
@@ -84,67 +95,80 @@ final class TrackUIView: UIView {
         }
 
         shapeLayer.path = bezierPath.cgPath
+        if Configuration.debugMode {
+            let minX = points.map(\.x).min() ?? 0
+            let maxX = points.map(\.x).max() ?? 0
+            let minY = points.map(\.y).min() ?? 0
+            let maxY = points.map(\.y).max() ?? 0
+            let rect = CGRect(
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+            )
+            let bboxPath = UIBezierPath(rect: rect)
+            debugBoundingBoxLayer.path = bboxPath.cgPath
+        }
     }
 
     // MARK: - Driver Position Drawing
 
-    private func updateDriverPositions(_ driverPositions: [DriverPosition]) {
+    private func updateDriverPositions(_ driverPositions: [TrackDriverPosition]) {
         clearDriverLayers()
 
         for driverPosition in driverPositions {
-            addDriverLayer(for: driverPosition)
+            addDriverLayer(driverPosition)
         }
     }
 
-    private func addDriverLayer(for driverPosition: DriverPosition) {
-        let driverId = driverPosition.driver.driverId.id
-
-        // Create driver marker (circle)
+    private func addDriverLayer(_ driverPosition: TrackDriverPosition) {
+        let driverId = driverPosition.name
+//
+//        // Create driver marker (circle)
         let driverLayer = CAShapeLayer()
-        driverLayer.path = UIBezierPath(ovalIn: CGRect(x: -8, y: -8, width: 16, height: 16)).cgPath
-
-        // Use team color or fallback to white
-        let teamColor: UIColor
-        if driverPosition.teamColor.hasPrefix("#") {
-            teamColor = UIColor(hex: driverPosition.teamColor)
-        } else {
-            teamColor = UIColor.white
-        }
-
-        driverLayer.fillColor = teamColor.cgColor
-        driverLayer.strokeColor = UIColor.black.cgColor
+        driverLayer.path = UIBezierPath(ovalIn: CGRect(origin: driverPosition.point, size: viewModel.driverPointSize)).cgPath
+        let color = driverPosition.color
+//        // Use team color or fallback to white
+//        let teamColor: UIColor
+//        if driverPosition.teamColor.hasPrefix("#") {
+//            teamColor = UIColor(hex: driverPosition.teamColor)
+//        } else {
+//            teamColor = UIColor.white
+//        }
+//
+        driverLayer.fillColor = color.cgColor
+//        driverLayer.strokeColor = UIColor.black.cgColor
         driverLayer.lineWidth = 2
-        driverLayer.position = driverPosition.translatedPosition
-
-        // Create driver code label
-        let labelLayer = CATextLayer()
-        labelLayer.string = driverPosition.driverCode
-        labelLayer.fontSize = 12
-        labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
-        labelLayer.foregroundColor = UIColor.black.cgColor
-        labelLayer.alignmentMode = .center
-        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
-        labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
-        labelLayer.cornerRadius = 4
-
-        // Add to view
+//
+//        // Create driver code label
+//        let labelLayer = CATextLayer()
+//        labelLayer.string = driverPosition.driverCode
+//        labelLayer.fontSize = 12
+//        labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
+//        labelLayer.foregroundColor = UIColor.black.cgColor
+//        labelLayer.alignmentMode = .center
+//        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
+//        labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
+//        labelLayer.cornerRadius = 4
+//
+//        // Add to view
         layer.addSublayer(driverLayer)
-        layer.addSublayer(labelLayer)
-
-        // Store references
+//        layer.addSublayer(labelLayer)
+//
+//        // Store references
         driverLayers[driverId] = driverLayer
-        driverLabelLayers[driverId] = labelLayer
+//        driverLabelLayers[driverId] = labelLayer
     }
 
     private func clearDriverLayers() {
         for layer in driverLayers.values {
             layer.removeFromSuperlayer()
         }
-        for layer in driverLabelLayers.values {
-            layer.removeFromSuperlayer()
-        }
+//        for layer in driverLabelLayers.values {
+//            layer.removeFromSuperlayer()
+//        }
         driverLayers.removeAll()
-        driverLabelLayers.removeAll()
+//        driverLabelLayers.removeAll()
     }
 
     // MARK: - Layout
@@ -153,37 +177,8 @@ final class TrackUIView: UIView {
         super.layoutSubviews()
         shapeLayer.frame = bounds
 
-        if !bounds.isEmpty && viewModel.trackData != nil {
-            viewModel.translatePoints(for: bounds.size)
+        if !bounds.isEmpty {
+            viewModel.sendViewSize(bounds.size)
         }
-
     }
 }
-
-// MARK: - SwiftUI Preview
-
-#if DEBUG
-import SwiftUI
-
-struct TrackUIViewRepresentable: UIViewRepresentable {
-    let viewModel: TrackViewModel
-
-    func makeUIView(context: Context) -> TrackUIView {
-        let view = TrackUIView(viewModel)
-        view.configureView()
-        return view
-    }
-
-    func updateUIView(_ uiView: TrackUIView, context: Context) {
-    }
-}
-
-struct TrackUIView_Previews: PreviewProvider {
-    static var previews: some View {
-        TrackUIViewRepresentable(viewModel: TrackViewModel())
-            .background(Color.black)
-            .previewLayout(.sizeThatFits)
-            .previewDisplayName("Track UI View")
-    }
-}
-#endif

@@ -9,197 +9,118 @@ import Foundation
 import UIKit
 import Combine
 import Puppy
+import SwiftUI
 
+// Only manages data for track - track layout, points, point transformation etc.
 @MainActor
 final class TrackViewModel: ObservableObject {
     // MARK: - Properties
 
-    @Published var trackData: TrackLayoutModel?
-    @Published var translatedPoints: [CGPoint] = []
-    @Published var driverPositions: [DriverPosition] = []
-
     private let logger: Puppy = Dependencies.shared.logger
 
-    // Translation parameters
-    private var boundingBox: BoundingBox = .init(minX: 0, minY: 0, maxX: 0, maxY: 0)
-    private var trackWidth: Double = 0
-    private var trackHeight: Double = 0
-    private var lastTranslatedSize: CGSize = .zero
+    private var cancellables = Set<AnyCancellable>()
+    private var socketService: SocketService
+
+    @Published var isLoaded = false
+    @Published var trackPoints: [CGPoint] = []
+    @Published var driverPoints: [TrackDriverPosition] = []
+
+    @Published var viewSize: CGSize = .zero
+    private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
 
     // Configuration
     private let zoom: Double = Configuration.zoom
+    let driverPointSize = CGSize(width: 12, height: 12)
 
     // MARK: - Init
 
-    init() {
-        logger.info("TrackViewModel initialized")
-        Task {
-            await getTrackData()
-        }
-    }
-
-    // MARK: - Data Loading
-
-    func getTrackData() async {
-        do {
-            let data = try await Dependencies.shared.track.getTrackData()
-            await MainActor.run {
-                self.trackData = data
+    init(_ socketService: SocketService) {
+        self.socketService = socketService
+        self.socketService.$trackLayout
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] layout in
+                self?.logger.debug(String(describing: layout?.world_bounds))
+                self?.translateTrackLayoutPoints()
             }
-            let pointsCount = data?.points.count ?? 0
-            logger.info("Loaded track data")
-            logger.debug("track.points=\(pointsCount) bb=\(String(describing: data?.boundingBox))")
-        } catch {
-            logger.error("Failed to get track data: \(error)")
-        }
-    }
-
-    // MARK: - Driver Position Management
-
-    func updateDriverPositions(_ drivers: [DriverState]) {
-        guard let trackData else {
-            return
-        }
-
-        let newDriverPositions = drivers.map { driver in
-            calculateDriverPosition(driver, trackData: trackData)
-        }
-
-        driverPositions = newDriverPositions
-        logger.debug("driverPositions.count=\(driverPositions.count)")
-
-        // Update translated positions if view size is available
-        if lastTranslatedSize != .zero {
-            updateTranslatedDriverPositions()
-        }
-    }
-
-    private func calculateDriverPosition(_ driver: DriverState, trackData: TrackLayoutModel) -> DriverPosition {
-        // Find the track point closest to the driver's distance
-        let targetDistance = driver.distance.truncatingRemainder(dividingBy: trackData.length)
-        let trackPoints = trackData.points
-
-        guard !trackPoints.isEmpty else {
-            return DriverPosition(driver: driver, position: .zero, trackDistance: 0)
-        }
-
-        // Find the closest track point based on distance
-        var closestPoint = trackPoints[0]
-        var minDistance = abs(trackPoints[0].distance - targetDistance)
-
-        for point in trackPoints {
-            let distanceDiff = abs(point.distance - targetDistance)
-            if distanceDiff < minDistance {
-                minDistance = distanceDiff
-                closestPoint = point
+            .store(in: &cancellables)
+        self.socketService.$snapshot
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateDrivers()
             }
-        }
-
-        return DriverPosition(
-            driver: driver,
-            position: CGPoint(x: closestPoint.x, y: closestPoint.y),
-            trackDistance: closestPoint.distance
-        )
+            .store(in: &cancellables)
+        viewSizeSubject
+            .removeDuplicates()
+//            .debounce(for: .milliseconds(0), scheduler: RunLoop.main)
+            .assign(to: &$viewSize)
+        $viewSize
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.translateTrackLayoutPoints()
+            }
+            .store(in: &cancellables)
     }
 
-    private func updateTranslatedDriverPositions() {
-        guard lastTranslatedSize != .zero else {
-            return
-        }
+    // MARK: - points translation
+    private func translatePoint(_ point: TrackPoint, layout: TrackLayout) -> CGPoint {
+        let box = layout.world_bounds
+        let scale = box.getScale(for: viewSize) * zoom
 
-        for i in driverPositions.indices {
-            let originalPosition = driverPositions[i].position
-            let translatedPosition = translatePoint(
-                TrackPoint(x: originalPosition.x, y: originalPosition.y, distance: 0),
-                scaleFactor: calculateScaleFactor(for: lastTranslatedSize),
-                viewSize: lastTranslatedSize
-            )
-            driverPositions[i].translatedPosition = translatedPosition
-        }
+        let translatedX = (point.x - box.x_min) * scale
+        let translatedY = (point.y - box.y_min) * scale
 
-    }
+        let xOffset = (viewSize.width - box.trackWidth * scale) / 2
+        let yOffset = (viewSize.height - box.trackHeight * scale) / 2
 
-    // MARK: - Translation Logic
-
-    func translatePoints(for viewSize: CGSize) {
-        guard let data = trackData else {
-            return
-        }
-
-        // Only translate if view size changed or we haven't translated yet
-        guard lastTranslatedSize != viewSize || translatedPoints.isEmpty else {
-            return
-        }
-
-        // Setup translation parameters
-        setupTranslationParameters(data)
-
-        // Calculate scale factor
-        let scaleFactor = calculateScaleFactor(for: viewSize)
-
-        // Translate all points
-        let newTranslatedPoints = data.points.map { point in
-            translatePoint(point, scaleFactor: scaleFactor, viewSize: viewSize)
-        }
-
-        translatedPoints = newTranslatedPoints
-        logger.debug("translatedPoints.count=\(translatedPoints.count) viewSize=\(viewSize)")
-
-        // Update driver positions
-        updateTranslatedDriverPositions()
-
-        lastTranslatedSize = viewSize
-
-    }
-
-    private func setupTranslationParameters(_ data: TrackLayoutModel) {
-        boundingBox = data.boundingBox
-        trackWidth = boundingBox.maxX - boundingBox.minX
-        trackHeight = boundingBox.maxY - boundingBox.minY
-    }
-
-    private func calculateScaleFactor(for viewSize: CGSize) -> Double {
-        let trackAspectRatio = trackHeight / trackWidth
-        let viewAspectRatio = viewSize.height / viewSize.width
-
-        let scale: Double
-        if viewAspectRatio > trackAspectRatio {
-            scale = viewSize.width / trackWidth
-        } else {
-            scale = viewSize.height / trackHeight
-        }
-
-        return scale * zoom
-    }
-
-    private func translatePoint(_ point: TrackPoint, scaleFactor: Double, viewSize: CGSize) -> CGPoint {
-        let translatedX = (point.x - boundingBox.minX) * scaleFactor
-        let translatedY = (point.y - boundingBox.minY) * scaleFactor
-
-        let trackWidthInView = trackWidth * scaleFactor
-        let trackHeightInView = trackHeight * scaleFactor
-
-        let centeredX = translatedX + (viewSize.width - trackWidthInView) / 2
-        let centeredY = translatedY + (viewSize.height - trackHeightInView) / 2
+        let centeredX = translatedX + xOffset
+        let centeredY = translatedY + yOffset
 
         return CGPoint(x: centeredX, y: centeredY)
     }
-}
 
-// MARK: - Driver Position Model
-
-struct DriverPosition: Identifiable {
-    let id = UUID()
-    let driver: DriverState
-    let position: CGPoint
-    let trackDistance: Double
-    var translatedPosition: CGPoint = .zero
-
-    var driverCode: String {
-        driver.driverId.code
+    private func translateTrackLayoutPoints() {
+        guard socketService.isConnected,
+        let layout = socketService.trackLayout,
+        !layout.track_points.isEmpty else {
+            isLoaded = false
+            return
+        }
+        isLoaded = true
+        trackPoints = layout.track_points.map { point in
+            translatePoint(point, layout: layout)
+        }
     }
 
-    var teamColor: String {
-        driver.driverId.teamColorHex
+    func sendViewSize(_ viewSize: CGSize) {
+        DispatchQueue.main.async {
+            self.viewSizeSubject.send(viewSize)
+        }
+    }
+
+    private func updateDrivers() {
+        guard socketService.isConnected,
+        let layout = socketService.trackLayout,
+        let snapshot = socketService.snapshot else {
+            return
+        }
+        driverPoints = snapshot.drivers
+            .filter { driver in
+                driver.speed > 0
+            }
+            .map { driver in
+                let point = calculateDriverPosition(driver, layout: layout)
+                let color = socketService.driverColors.first { color in
+                    color.code == driver.code
+                }?.color ?? UIColor.cyan
+                return TrackDriverPosition(name: driver.code, point: point, color: color)
+            }
+    }
+
+    private func calculateDriverPosition(_ driver: DriverState, layout: TrackLayout) -> CGPoint {
+        let distance = driver.dist.truncatingRemainder(dividingBy: layout.distance)
+        let mockPoint = TrackPoint(with: distance)
+        let index = layout.track_points.binarySearch(for: mockPoint)
+        let point = trackPoints[index]
+        return CGPoint(x: point.x - driverPointSize.width / 2, y: point.y - driverPointSize.height / 2)
     }
 }
