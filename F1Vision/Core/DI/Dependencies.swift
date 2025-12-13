@@ -80,7 +80,7 @@ final class Dependencies {
     func resolve<T>(_ serviceType: T.Type) -> T? {
         container.resolve(serviceType)
     }
-
+// swiftlint: disable force_unwrapping
     /// Resolve a service by type (non-optional, will crash if not found)
     func resolve<T>(_ serviceType: T.Type) -> T {
         container.resolve(serviceType)!
@@ -93,20 +93,8 @@ final class Dependencies {
         resolve(JSONDecoder.self)!
     }
 
-    /// Get JSONDataService as concrete type
-//    var jsonDataServiceConcrete: JSONDataService {
-//        resolve(JSONDataService.self)!
-//    }
-//
-//    var track: TrackProtocol {
-//        resolve(TrackProtocol.self)!
-//    }
-
-//    var race: RaceProtocol {
-//        resolve(RaceProtocol.self)!
-//    }
-
     var logger: Puppy {
         resolve(Puppy.self)!
     }
+// swiftlint: enable force_unwrapping
 }

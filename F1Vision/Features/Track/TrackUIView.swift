@@ -126,7 +126,12 @@ final class TrackUIView: UIView {
 //
 //        // Create driver marker (circle)
         let driverLayer = CAShapeLayer()
-        driverLayer.path = UIBezierPath(ovalIn: CGRect(origin: driverPosition.point, size: viewModel.driverPointSize)).cgPath
+        driverLayer.path = UIBezierPath(
+            ovalIn: CGRect(
+                origin: driverPosition.point,
+                size: viewModel.driverPointSize
+            )
+        ).cgPath
         let color = driverPosition.color
 //        // Use team color or fallback to white
 //        let teamColor: UIColor
@@ -147,7 +152,12 @@ final class TrackUIView: UIView {
 //        labelLayer.font = UIFont.boldSystemFont(ofSize: 12)
 //        labelLayer.foregroundColor = UIColor.black.cgColor
 //        labelLayer.alignmentMode = .center
-//        labelLayer.frame = CGRect(x: driverPosition.translatedPosition.x, y: driverPosition.translatedPosition.y, width: 30, height: 20)
+//        labelLayer.frame = CGRect(
+//        x: driverPosition.translatedPosition.x,
+//        y: driverPosition.translatedPosition.y,
+//        width: 30,
+//        height: 20
+//        )
 //        labelLayer.backgroundColor = UIColor.white.withAlphaComponent(0.8).cgColor
 //        labelLayer.cornerRadius = 4
 //

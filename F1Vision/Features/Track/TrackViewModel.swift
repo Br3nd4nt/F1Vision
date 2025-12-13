@@ -95,7 +95,9 @@ final class TrackViewModel: ObservableObject {
         for i in 0..<response.x.count {
             points.append(translatePoint(response.x[i], response.y[i], box: box))
         }
-        points.append(translatePoint(response.x[0], response.y[0], box: box)) // some tracks have blank spaces around start line
+
+        // some tracks have blank spaces around start line
+        points.append(translatePoint(response.x[0], response.y[0], box: box))
         trackPoints = points
         isLoaded = true
     }

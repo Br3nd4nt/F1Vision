@@ -38,55 +38,63 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
         switch event {
         case .connected(let headers):
-            isConnected = true
-            logger.info("websocket connected")
-            logger.debug("websocket headers: \(headers)")
+            handleConnected(headers)
         case .disconnected(let reason, let code):
-            isConnected = false
-            logger.info("websocket is disconnected with code \(code), reason: \(reason)")
+            handleDisconnected(reason: reason, code: code)
         case .text(let string):
-            guard let data = string.data(using: .utf8) else {
-                logger.error("got incorrect data from websocket")
-                logger.debug("websocket data: \(string)")
-                return
-            }
-            do {
-                let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
-                switch message {
-                case .raceSnapshot(let newSnapshot):
-                    snapshot = newSnapshot
-                case .trackLayout(let layout):
-                    trackLayout = layout
-                    logger.info("got track layout")
-                case .colors(let colors):
-                    driverColors = colors.map { color in
-                        DriverColor(color)
-                    }
-                    logger.info("got driver colors")
-                }
-            } catch {
-                logger.error("got incorrect data from websocket")
-                logger.debug("websocket data: \(string)")
-            }
+            handleTextEvent(string)
         case .cancelled:
-            isConnected = false
-            logger.warning("websocket connection cancelled")
+            handleCancelled()
         case .error(let error):
             isConnected = false
             handleError(error)
         case .peerClosed:
             break
-        case .binary:
-            break
-        case .pong:
-            break
-        case .ping:
-            break
-        case .viabilityChanged:
-            break
-        case .reconnectSuggested:
+        case .binary, .pong, .ping, .viabilityChanged, .reconnectSuggested:
             break
         }
+    }
+
+    private func handleConnected(_ headers: [String: String]) {
+        isConnected = true
+        logger.info("websocket connected")
+        logger.debug("websocket headers: \(headers)")
+    }
+
+    private func handleDisconnected(reason: String, code: UInt16) {
+        isConnected = false
+        logger.info("websocket is disconnected with code \(code), reason: \(reason)")
+    }
+
+    private func handleTextEvent(_ string: String) {
+        guard let data = string.data(using: .utf8) else {
+            logger.error("got incorrect data from websocket")
+            logger.debug("websocket data: \(string)")
+            return
+        }
+        do {
+            let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
+            switch message {
+            case .raceSnapshot(let newSnapshot):
+                snapshot = newSnapshot
+            case .trackLayout(let layout):
+                trackLayout = layout
+                logger.info("got track layout")
+            case .colors(let colors):
+                driverColors = colors.map { color in
+                    DriverColor(color)
+                }
+                logger.info("got driver colors")
+            }
+        } catch {
+            logger.error("got incorrect data from websocket")
+            logger.debug("websocket data: \(string)")
+        }
+    }
+
+    private func handleCancelled() {
+        isConnected = false
+        logger.warning("websocket connection cancelled")
     }
 
     func handleError(_ error: Error?) {
