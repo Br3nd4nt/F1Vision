@@ -22,7 +22,7 @@ final class RaceViewModel: ObservableObject {
 
     let tableColumnWidths: [Double] = [40, 60, 35]
 
-    init(_ socketService: SocketService) {
+    init(socketService: SocketService) {
         self.socketService = socketService
         self.socketService.$snapshot
             .receive(on: DispatchQueue.main)

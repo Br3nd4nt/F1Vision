@@ -291,21 +291,6 @@ dmypy.json
 # FastF1 cache directory
 .fastf1_cache/
 
-### Track Data ###
-MockServer/trackData/*.json
-
-### Race Data ###
-MockServer/raceData/*.json
-
-### Generated Data ###
-# Ignore all generated data files but keep the directories
-MockServer/trackData/
-MockServer/raceData/
-!.gitkeep
-
-F1Vision/Resources/MockData/Track/*.json
-F1Vision/Resources/MockData/Race/*.json
-
 ### Python ###
 # Additional Python files
 *.pyc
@@ -334,15 +319,6 @@ coverage.xml
 ### Logs ###
 *.log
 logs/
-
-### Old Code ###
-# Ignore old code directories
-f1-old-code/
-
-
-# Keep generated server output directory, ignore its contents except .gitkeep
-MockServer/race_output/*
-!MockServer/race_output/.gitkeep
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
