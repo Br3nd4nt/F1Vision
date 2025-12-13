@@ -31,7 +31,7 @@ final class MapRequestService: ObservableObject {
         logger.info("Got track for \(message.location)")
         await MainActor.run {
             self.response = message
-            getBoundBox()
+            getBoundBox(message)
         }
     }
 
@@ -41,15 +41,11 @@ final class MapRequestService: ObservableObject {
             .appendingPathComponent("2025")
     }
     
-    private func getBoundBox() {
+    private func getBoundBox(_ response: MapResponse) {
         var minX: Double = .greatestFiniteMagnitude
         var minY: Double = .greatestFiniteMagnitude
         var maxX: Double = -Double.greatestFiniteMagnitude
         var maxY: Double = -Double.greatestFiniteMagnitude
-        
-        guard let response else {
-            return
-        }
         
         for x in response.x {
             maxX = max(maxX, x)
