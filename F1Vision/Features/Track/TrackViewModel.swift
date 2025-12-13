@@ -20,6 +20,7 @@ final class TrackViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
     private var socketService: SocketService
+    private var mapService: MapRequestService
 
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
@@ -34,8 +35,15 @@ final class TrackViewModel: ObservableObject {
 
     // MARK: - Init
 
-    init(_ socketService: SocketService) {
+    init(socketService: SocketService, mapService: MapRequestService) {
         self.socketService = socketService
+        self.mapService = mapService
+        self.mapService.$box
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.translateTrackLayoutPoints()
+            }
+            .store(in: &cancellables)
         self.socketService.$trackLayout
             .receive(on: DispatchQueue.main)
             .sink { [weak self] layout in
@@ -51,7 +59,6 @@ final class TrackViewModel: ObservableObject {
             .store(in: &cancellables)
         viewSizeSubject
             .removeDuplicates()
-//            .debounce(for: .milliseconds(0), scheduler: RunLoop.main)
             .assign(to: &$viewSize)
         $viewSize
             .receive(on: DispatchQueue.main)
@@ -62,12 +69,11 @@ final class TrackViewModel: ObservableObject {
     }
 
     // MARK: - points translation
-    private func translatePoint(_ point: TrackPoint, layout: TrackLayout) -> CGPoint {
-        let box = layout.world_bounds
+    private func translatePoint(_ x: Double, _ y: Double, box: TrackBoundBox) -> CGPoint {
         let scale = box.getScale(for: viewSize) * zoom
 
-        let translatedX = (point.x - box.x_min) * scale
-        let translatedY = (point.y - box.y_min) * scale
+        let translatedX = (x - box.x_min) * scale
+        let translatedY = (y - box.y_min) * scale
 
         let xOffset = (viewSize.width - box.trackWidth * scale) / 2
         let yOffset = (viewSize.height - box.trackHeight * scale) / 2
@@ -79,16 +85,19 @@ final class TrackViewModel: ObservableObject {
     }
 
     private func translateTrackLayoutPoints() {
-        guard socketService.isConnected,
-        let layout = socketService.trackLayout,
-        !layout.track_points.isEmpty else {
+        guard mapService.isLoaded,
+        let response = mapService.response,
+        let box = mapService.box else {
             isLoaded = false
             return
         }
-        isLoaded = true
-        trackPoints = layout.track_points.map { point in
-            translatePoint(point, layout: layout)
+        var points: [CGPoint] = []
+        for i in 0..<response.x.count {
+            points.append(translatePoint(response.x[i], response.y[i], box: box))
         }
+        points.append(translatePoint(response.x[0], response.y[0], box: box)) // some tracks have blank spaces around start line
+        trackPoints = points
+        isLoaded = true
     }
 
     func sendViewSize(_ viewSize: CGSize) {

@@ -29,14 +29,18 @@ struct ContentView: View {
 
     init() {
         let socketService = SocketService()
-        _mapService = StateObject(wrappedValue: MapRequestService())
+        let mapService = MapRequestService()
+        _mapService = StateObject(wrappedValue: mapService)
         _socketService = StateObject(wrappedValue: socketService)
-        _trackViewModel = ObservedObject(wrappedValue: TrackViewModel(socketService))
-        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(socketService))
+        _trackViewModel = ObservedObject(wrappedValue: TrackViewModel(socketService: socketService, mapService: mapService))
+        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(socketService: socketService))
     }
 
     var body: some View {
-        TestingView(mapService: mapService)
+        HStack {
+            TestingView(mapService: mapService)
+            TrackView(viewModel: trackViewModel)
+        }
 //        HStack {
 //            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
 //                .frame(minWidth: 300, maxWidth: 400)

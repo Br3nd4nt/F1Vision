@@ -2,3 +2,4 @@ parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/m
 
 disabled_rules:
  - identifier_name
+ - trailing_whitespace

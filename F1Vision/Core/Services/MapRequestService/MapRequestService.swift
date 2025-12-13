@@ -14,11 +14,8 @@ final class MapRequestService: ObservableObject {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
 
     @Published var response: MapResponse?
-    @Published var isLoading = false
-
-    private let possibleCodes = [
-        2, 4, 6, 7, 9, 10, 14, 15, 19, 22, 23, 28, 34, 39, 46, 49, 55, 59, 61, 63, 65, 70, 72, 79, 144, 146, 147, 148, 149, 150, 151, 152
-    ]
+    @Published var box: TrackBoundBox?
+    @Published var isLoaded = true
 
     func fetchMapData() async throws {
         let requestURL = createRequestURL()
@@ -32,7 +29,10 @@ final class MapRequestService: ObservableObject {
         logger.debug(response.debugDescription)
         let message = try! Self.jsonDecoder.decode(MapResponse.self, from: data)
         logger.info("Got track for \(message.location)")
-        await MainActor.run { self.response = message }
+        await MainActor.run {
+            self.response = message
+            getBoundBox()
+        }
     }
 
     private func createRequestURL() -> URL {
@@ -40,10 +40,38 @@ final class MapRequestService: ObservableObject {
             .appendingPathComponent(String(getTrackCode()))
             .appendingPathComponent("2025")
     }
-var index = 0
+    
+    private func getBoundBox() {
+        var minX: Double = .greatestFiniteMagnitude
+        var minY: Double = .greatestFiniteMagnitude
+        var maxX: Double = -Double.greatestFiniteMagnitude
+        var maxY: Double = -Double.greatestFiniteMagnitude
+        
+        guard let response else {
+            return
+        }
+        
+        for x in response.x {
+            maxX = max(maxX, x)
+            minX = min(minX, x)
+        }
+        
+        for y in response.y {
+            maxY = max(maxY, y)
+            minY = min(minY, y)
+        }
+
+        self.box = TrackBoundBox(x_min: minX, x_max: maxX, y_min: minY, y_max: maxY)
+    }
+
+    
+    private let possibleCodes = [
+        2, 4, 6, 7, 9, 10, 14, 15, 19, 22, 23, 28, 34, 39, 46, 49, 55, 59, 61, 63, 65, 70, 72, 79, 144, 146, 147, 148, 149, 150, 151, 152
+    ]
+    var index = 0
     private func getTrackCode() -> Int {
 //        possibleCodes.randomElement()!
-        var val = possibleCodes[index]
+        let val = possibleCodes[index]
         index = (index + 1) % possibleCodes.count
         return val
     }
