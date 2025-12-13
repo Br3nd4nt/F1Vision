@@ -10,18 +10,35 @@ import Puppy
 
 struct Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
-
-    private static var socketAddress = "localhost"
-
+    static let debugMode = true
+    static let zoom = 0.95
+    private static var socketHost = "localhost"
+    private static var socketPath = "/ws"
     static var socketURL: URL {
-        let url = URL(string: "ws://\(socketAddress):8000/ws")
+        var components = URLComponents()
+        components.scheme = "ws"
+        components.host = socketHost
+        components.path = socketPath
+        let url = components.url
         if let url {
             return url
         }
-        logger.error("Error creating URL")
-        fatalError("Error creating URL")
+        logger.error("Error creating websocket URL")
+        fatalError("Error creating websocket URL")
     }
 
-    static let debugMode = true
-    static let zoom = 0.95
+    private static let mapRequestHost = "api.multiviewer.app"
+    private static let mapRequestPath = "/api/v1/circuits"
+    static var mapRequestBaseURL: URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = mapRequestHost
+        components.path = mapRequestPath
+        let url = components.url
+        if let url {
+            return url
+        }
+        logger.error("Error creating map request URL")
+        fatalError("Error creating map request URL")
+    }
 }
