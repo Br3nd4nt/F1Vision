@@ -5,10 +5,12 @@
 //  Created by br3nd4nt on 05.12.2025.
 //
 
-import UIKit
 import Puppy
+import UIKit
 
-final class TelemetryTableCollectionViewDelegate: NSObject, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+final class TelemetryTableCollectionViewDelegate: NSObject,
+                                                    UICollectionViewDelegate,
+                                                    UICollectionViewDelegateFlowLayout {
     private let logger: Puppy = Dependencies.shared.logger
     private let viewModel: RaceViewModel
 
@@ -16,7 +18,11 @@ final class TelemetryTableCollectionViewDelegate: NSObject, UICollectionViewDele
         self.viewModel = viewModel
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout _: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         let availableHeight = collectionView.bounds.inset(by: collectionView.layoutMargins).height
         let rowCount = 20.0
         let cellHeight = availableHeight / rowCount

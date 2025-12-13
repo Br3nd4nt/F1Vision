@@ -8,7 +8,7 @@
 import Foundation
 import Puppy
 
-struct Configuration {
+enum ConfigurationParameters {
     private static let logger: Puppy = Dependencies.shared.logger
     static let debugMode = true
     static let zoom = 0.95

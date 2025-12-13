@@ -44,13 +44,13 @@ enum WebsocketMessage: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
-        case .raceSnapshot(let value):
+        case let .raceSnapshot(value):
             try container.encode(MessageType.snapshot, forKey: .type)
             try container.encode(value, forKey: .data)
-        case .trackLayout(let value):
+        case let .trackLayout(value):
             try container.encode(MessageType.trackLayout, forKey: .type)
             try container.encode(value, forKey: .data)
-        case .colors(let value):
+        case let .colors(value):
             try container.encode(MessageType.driverColors, forKey: .type)
             try container.encode(value, forKey: .data)
         }

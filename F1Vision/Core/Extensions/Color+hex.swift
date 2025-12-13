@@ -25,10 +25,8 @@ extension Color {
     var isLight: Bool {
         // Convert to UIColor
         let uiColor = UIColor(self)
-        // swiftlint:disable no_cgfloat
         var white: CGFloat = 0
         uiColor.getWhite(&white, alpha: nil)
-        // swiftlint:enable no_cgfloat
         return white > 0.7
     }
 }

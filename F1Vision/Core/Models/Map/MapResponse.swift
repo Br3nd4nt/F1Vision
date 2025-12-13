@@ -9,7 +9,8 @@ import Foundation
 
 struct MapResponse: Codable {
     let corners: [MapCorner]? // Bahrain does not have them
-    let marshalLights: [MapCorner]? // structure is the same as map corner, so just reusing the structure for useless (?) part of response
+    // structure is the same as map corner, so just reusing the structure for useless (?) part of response
+    let marshalLights: [MapCorner]?
     let marshalSectors: [MapCorner]? // same goes here
     let candidateLap: CandidateLap
     let circuitKey: Int

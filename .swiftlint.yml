@@ -1,4 +1,4 @@
-parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
+parent_config: swiftlint-config/.swiftlint.yml
 
 disabled_rules:
  - identifier_name

@@ -5,8 +5,8 @@
 //  Created by br3nd4nt on 21.08.2025.
 //
 
-import Puppy
 import Foundation
+import Puppy
 
 // swiftlint:disable all
 struct LogFormatter: LogFormattable {
@@ -15,15 +15,16 @@ struct LogFormatter: LogFormattable {
     init() {
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
     }
-    func formatMessage(_ level: LogLevel, message: String, tag: String, function: String, file: String, line: UInt, swiftLogInfo: [String: String], label: String, date: Date, threadID: UInt64) -> String {
+
+    func formatMessage(_ level: LogLevel, message: String, tag _: String, function: String, file: String, line: UInt, swiftLogInfo _: [String: String], label _: String, date: Date, threadID _: UInt64) -> String {
         let date = dateFormatter(date, withFormatter: dateFormat)
         let fileName = fileName(file)
         var q: String = function
         if let parentheses = function.firstIndex(of: "(") {
             q = String(function[..<parentheses])
-        } else {
-        }
+        } else {}
         return "\(date) [\(level.emoji) \(level)]\t\(message) (\(fileName.replacingOccurrences(of: ".swift", with: "")):\(q):\(line))"
     }
 }
+
 // swiftlint:enable all

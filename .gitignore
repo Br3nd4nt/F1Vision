@@ -322,3 +322,8 @@ logs/
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
+
+
+#SwiftFormat
+BuildTools/.build
+BuildTools/.swiftpm
