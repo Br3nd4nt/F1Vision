@@ -15,6 +15,7 @@ extension UIView {
     }
 
     // MARK: - Pin all
+
     @discardableResult
     func pinAll(
         to otherView: UIView,
@@ -25,11 +26,12 @@ extension UIView {
             pinTop(to: otherView, const, mode),
             pinBottom(to: otherView, const, mode),
             pinLeft(to: otherView, const, mode),
-            pinRight(to: otherView, const, mode)
+            pinRight(to: otherView, const, mode),
         ]
     }
 
     // MARK: - Pin left
+
     @discardableResult
     func pinLeft(
         to otherView: UIView,
@@ -176,7 +178,7 @@ extension UIView {
 
     @discardableResult
     func setWidth(
-       _ const: Double
+        _ const: Double
     ) -> NSLayoutConstraint {
         pinConstraint(mode: .equal, widthAnchor, constant: const)
     }
@@ -191,6 +193,7 @@ extension UIView {
     }
 
     // MARK: - Private methods
+
     @discardableResult
     private func pinConstraint<Axis: AnyObject, AnyAnchor: NSLayoutAnchor<Axis>>(
         mode: ConstraintMode,

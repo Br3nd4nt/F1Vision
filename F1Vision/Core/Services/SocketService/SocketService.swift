@@ -23,7 +23,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
 
     init() {
-        var request = URLRequest(url: Configuration.socketURL)
+        var request = URLRequest(url: ConfigurationParameters.socketURL)
         request.timeoutInterval = 5
         socket = WebSocket(request: request)
         socket.delegate = self
@@ -35,58 +35,64 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     }
 
     // MARK: - WebSocketDelegate
-    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+
+    func didReceive(event: Starscream.WebSocketEvent, client _: Starscream.WebSocketClient) {
         switch event {
-        case .connected(let headers):
-            isConnected = true
-            logger.info("websocket connected")
-            logger.debug("websocket headers: \(headers)")
-        case .disconnected(let reason, let code):
-            isConnected = false
-            logger.info("websocket is disconnected with code \(code), reason: \(reason)")
-        case .text(let string):
-            guard let data = string.data(using: .utf8) else {
-                logger.error("got incorrect data from websocket")
-                logger.debug("websocket data: \(string)")
-                return
-            }
-            do {
-                let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
-                switch message {
-                case .raceSnapshot(let newSnapshot):
-                    snapshot = newSnapshot
-                case .trackLayout(let layout):
-                    trackLayout = layout
-                    logger.info("got track layout")
-                case .colors(let colors):
-                    driverColors = colors.map { color in
-                        DriverColor(color)
-                    }
-                    logger.info("got driver colors")
-                }
-            } catch {
-                logger.error("got incorrect data from websocket")
-                logger.debug("websocket data: \(string)")
-            }
+        case let .connected(headers):
+            handleConnected(headers: headers)
+        case let .disconnected(reason, code):
+            handleDisconnected(reason: reason, code: code)
+        case let .text(string):
+            handleText(string: string)
         case .cancelled:
-            isConnected = false
-            logger.warning("websocket connection cancelled")
-        case .error(let error):
-            isConnected = false
+            handleCancelled()
+        case let .error(error):
             handleError(error)
-        case .peerClosed:
-            break
-        case .binary:
-            break
-        case .pong:
-            break
-        case .ping:
-            break
-        case .viabilityChanged:
-            break
-        case .reconnectSuggested:
+        case .peerClosed, .binary, .pong, .ping, .viabilityChanged, .reconnectSuggested:
             break
         }
+    }
+
+    private func handleConnected(headers: [String: String]) {
+        isConnected = true
+        logger.info("websocket connected")
+        logger.debug("websocket headers: \(headers)")
+    }
+
+    private func handleDisconnected(reason: String, code: UInt16) {
+        isConnected = false
+        logger.info("websocket is disconnected with code \(code), reason: \(reason)")
+    }
+
+    private func handleText(string: String) {
+        guard let data = string.data(using: .utf8) else {
+            logger.error("got incorrect data from websocket")
+            logger.debug("websocket data: \(string)")
+            return
+        }
+        do {
+            let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
+            switch message {
+            case let .raceSnapshot(newSnapshot):
+                snapshot = newSnapshot
+            case let .trackLayout(layout):
+                trackLayout = layout
+                logger.info("got track layout")
+            case let .colors(colors):
+                driverColors = colors.map { color in
+                    DriverColor(color)
+                }
+                logger.info("got driver colors")
+            }
+        } catch {
+            logger.error("got incorrect data from websocket")
+            logger.debug("websocket data: \(string)")
+        }
+    }
+
+    private func handleCancelled() {
+        isConnected = false
+        logger.warning("websocket connection cancelled")
     }
 
     func handleError(_ error: Error?) {

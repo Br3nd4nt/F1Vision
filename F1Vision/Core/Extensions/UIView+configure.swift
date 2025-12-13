@@ -9,7 +9,7 @@ import UIKit
 
 extension UIView {
     func configureSubview(_ subview: UIView) {
-        self.addSubview(subview)
+        addSubview(subview)
         subview.translatesAutoresizingMaskIntoConstraints = false
     }
 }

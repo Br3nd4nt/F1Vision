@@ -32,13 +32,13 @@ struct TrackUIViewRepresentable: UIViewRepresentable {
         self.viewModel = viewModel
     }
 
-    func makeUIView(context: Context) -> TrackUIView {
+    func makeUIView(context _: Context) -> TrackUIView {
         let trackView = TrackUIView(viewModel)
         trackView.configureView()
         return trackView
     }
 
-    func updateUIView(_ uiView: TrackUIView, context: Context) {
+    func updateUIView(_ uiView: TrackUIView, context _: Context) {
         uiView.configureView()
     }
 }

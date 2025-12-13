@@ -14,12 +14,11 @@ struct TelemetryTableUIViewRepresentable: UIViewControllerRepresentable {
         self.viewModel = viewModel
     }
 
-    func makeUIViewController(context: Context) -> TelemetryTableViewController {
+    func makeUIViewController(context _: Context) -> TelemetryTableViewController {
         TelemetryTableViewController(viewModel: viewModel)
     }
 
-    func updateUIViewController(_ uiViewController: TelemetryTableViewController, context: Context) {
-    }
+    func updateUIViewController(_: TelemetryTableViewController, context _: Context) {}
 
     typealias UIViewControllerType = TelemetryTableViewController
 }

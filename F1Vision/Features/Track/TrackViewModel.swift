@@ -5,11 +5,11 @@
 //  Created by br3nd4nt on 21.08.2025.
 //
 
-import Foundation
-import UIKit
 import Combine
+import Foundation
 import Puppy
 import SwiftUI
+import UIKit
 
 // Only manages data for track - track layout, points, point transformation etc.
 @MainActor
@@ -30,7 +30,7 @@ final class TrackViewModel: ObservableObject {
     private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
 
     // Configuration
-    private let zoom: Double = Configuration.zoom
+    private let zoom: Double = ConfigurationParameters.zoom
     let driverPointSize = CGSize(width: 12, height: 12)
 
     // MARK: - Init
@@ -69,6 +69,7 @@ final class TrackViewModel: ObservableObject {
     }
 
     // MARK: - points translation
+
     private func translatePoint(_ x: Double, _ y: Double, box: TrackBoundBox) -> CGPoint {
         let scale = box.getScale(for: viewSize) * zoom
 
@@ -86,16 +87,19 @@ final class TrackViewModel: ObservableObject {
 
     private func translateTrackLayoutPoints() {
         guard mapService.isLoaded,
-        let response = mapService.response,
-        let box = mapService.box else {
+              let response = mapService.response,
+              let box = mapService.box
+        else {
             isLoaded = false
             return
         }
         var points: [CGPoint] = []
-        for i in 0..<response.x.count {
+        for i in 0 ..< response.x.count {
             points.append(translatePoint(response.x[i], response.y[i], box: box))
         }
-        points.append(translatePoint(response.x[0], response.y[0], box: box)) // some tracks have blank spaces around start line
+        
+        // some tracks have blank spaces around start line
+        points.append(translatePoint(response.x[0], response.y[0], box: box))
         trackPoints = points
         isLoaded = true
     }
@@ -108,8 +112,9 @@ final class TrackViewModel: ObservableObject {
 
     private func updateDrivers() {
         guard socketService.isConnected,
-        let layout = socketService.trackLayout,
-        let snapshot = socketService.snapshot else {
+              let layout = socketService.trackLayout,
+              let snapshot = socketService.snapshot
+        else {
             return
         }
         driverPoints = snapshot.drivers

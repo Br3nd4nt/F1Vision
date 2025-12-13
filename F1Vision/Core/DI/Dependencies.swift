@@ -5,9 +5,9 @@
 //  Created by br3nd4nt on 21.08.2025.
 //
 
-import Swinject
-import Puppy
 import Foundation
+import Puppy
+import Swinject
 
 final class Dependencies {
     static let shared = Dependencies()
@@ -40,7 +40,7 @@ final class Dependencies {
                 logLevel: .debug,
                 logFormat: formatter,
                 fileURL: fileURL,
-                filePermission: "600",
+                filePermission: "600"
             )
 
             puppy = Puppy(loggers: [console, file])
@@ -50,7 +50,7 @@ final class Dependencies {
             puppy = Puppy(loggers: [console])
         }
 
-        container.register(Puppy.self) {_ in
+        container.register(Puppy.self) { _ in
             puppy
         }
         .inObjectScope(.container)
@@ -81,6 +81,8 @@ final class Dependencies {
         container.resolve(serviceType)
     }
 
+// swiftlint:disable force_unwrapping
+
     /// Resolve a service by type (non-optional, will crash if not found)
     func resolve<T>(_ serviceType: T.Type) -> T {
         container.resolve(serviceType)!
@@ -93,20 +95,8 @@ final class Dependencies {
         resolve(JSONDecoder.self)!
     }
 
-    /// Get JSONDataService as concrete type
-//    var jsonDataServiceConcrete: JSONDataService {
-//        resolve(JSONDataService.self)!
-//    }
-//
-//    var track: TrackProtocol {
-//        resolve(TrackProtocol.self)!
-//    }
-
-//    var race: RaceProtocol {
-//        resolve(RaceProtocol.self)!
-//    }
-
     var logger: Puppy {
         resolve(Puppy.self)!
     }
 }
+// swiftlint:enable force_unwrapping
