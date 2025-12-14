@@ -28,6 +28,8 @@ final class TrackViewModel: ObservableObject {
 
     @Published var viewSize: CGSize = .zero
     private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
+    
+    private var rotatedTargetValues: [Double: TrackBoundBox] = [:]
 
     // Configuration
     private let zoom: Double = Configuration.zoom
@@ -38,7 +40,7 @@ final class TrackViewModel: ObservableObject {
     init(socketService: SocketService, mapService: MapRequestService) {
         self.socketService = socketService
         self.mapService = mapService
-        self.mapService.$box
+        self.mapService.$response
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.translateTrackLayoutPoints()
@@ -51,12 +53,12 @@ final class TrackViewModel: ObservableObject {
                 self?.translateTrackLayoutPoints()
             }
             .store(in: &cancellables)
-        self.socketService.$snapshot
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateDrivers()
-            }
-            .store(in: &cancellables)
+//        self.socketService.$snapshot
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] _ in
+//                self?.updateDrivers()
+//            }
+//            .store(in: &cancellables)
         viewSizeSubject
             .removeDuplicates()
             .assign(to: &$viewSize)
@@ -69,11 +71,11 @@ final class TrackViewModel: ObservableObject {
     }
 
     // MARK: - points translation
-    private func translatePoint(_ x: Double, _ y: Double, box: TrackBoundBox) -> CGPoint {
+    private func translatePoint(point: CGPoint, box: TrackBoundBox) -> CGPoint {
         let scale = box.getScale(for: viewSize) * zoom
 
-        let translatedX = (x - box.x_min) * scale
-        let translatedY = (y - box.y_min) * scale
+        let translatedX = (point.x - box.x_min) * scale
+        let translatedY = (point.y - box.y_min) * scale
 
         let xOffset = (viewSize.width - box.trackWidth * scale) / 2
         let yOffset = (viewSize.height - box.trackHeight * scale) / 2
@@ -85,53 +87,106 @@ final class TrackViewModel: ObservableObject {
     }
 
     private func translateTrackLayoutPoints() {
+        isLoaded = false
         guard mapService.isLoaded,
-        let response = mapService.response,
-        let box = mapService.box else {
+        let response = mapService.response else {
             isLoaded = false
             return
         }
-        var points: [CGPoint] = []
+        
+        var defaultPoints: [CGPoint] = []
         for i in 0..<response.x.count {
-            points.append(translatePoint(response.x[i], response.y[i], box: box))
+            defaultPoints.append(CGPoint(x: response.x[i], y: response.y[i]))
+        }
+        defaultPoints.append(CGPoint(x: response.x[0], y: response.y[0]))
+        
+        let defaultBoundBox = getBoundBox(defaultPoints)
+        
+        // theoretically can take some time so better to do it in async dispatch queue
+        self.getRotations(defaultPoints, defaultBoundBox)
+        
+        self.translatePoints(defaultPoints, box: defaultBoundBox)
+        
+    }
+    
+    private func getBoundBox(_ points: [CGPoint]) -> TrackBoundBox {
+        var minX: Double = .greatestFiniteMagnitude
+        var minY: Double = .greatestFiniteMagnitude
+        var maxX: Double = -Double.greatestFiniteMagnitude
+        var maxY: Double = -Double.greatestFiniteMagnitude
+        
+        for point in points {
+            minX = min(minX, point.x)
+            maxX = max(maxX, point.x)
+            minY = min(minY, point.y)
+            maxY = max(maxY, point.y)
         }
 
-        // some tracks have blank spaces around start line
-        points.append(translatePoint(response.x[0], response.y[0], box: box))
-        trackPoints = points
+        return TrackBoundBox(x_min: minX, x_max: maxX, y_min: minY, y_max: maxY)
+    }
+    
+    //  clears any calculated rotations, so should only be called if new track data came through
+    //  translatePoints should always be called after getRotations to update the published trackPoints accordingly.
+    private func getRotations(_ defaultPoints: [CGPoint], _ defaultBoundBox: TrackBoundBox) {
+        let center = defaultBoundBox.getCenterPoint()
+        let rotation = Configuration.rotationAngle
+        rotatedTargetValues = [:]
+        
+        for angle in stride(from: rotation, to: 90, by: rotation) {
+            let rotatedPoints = rotatePoints(defaultPoints, around: center, angle: angle)
+            let rotatedBoundBox = getBoundBox(rotatedPoints)
+            rotatedTargetValues[angle] = rotatedBoundBox
+        }
+    }
+    
+    private func translatePoints(_ points: [CGPoint], box: TrackBoundBox) {
+        var targetRatio = viewSize.height / viewSize.width
+        if targetRatio.isNaN {
+            targetRatio = 1
+        }
+        var bestAngle: Double = 0
+        var bestBox = box
+        var bestDiff = Double.greatestFiniteMagnitude
+        
+        for (angle, bbox) in rotatedTargetValues {
+            let ratio = bbox.trackAspectRatio
+            let diff = abs(ratio - targetRatio)
+            if diff < bestDiff {
+                bestDiff = diff
+                bestAngle = angle
+                bestBox = bbox
+            }
+        }
+        let center = bestBox.getCenterPoint()
+        let rotatedPoints = rotatePoints(points, around: center, angle: bestAngle)
+        let translatedPoints = rotatedPoints.map {
+            translatePoint(point: $0, box: bestBox)
+        }
+        trackPoints = translatedPoints
         isLoaded = true
+    }
+    
+    private func rotatePoints(_ points: [CGPoint], around center: CGPoint, angle: Double) -> [CGPoint] {
+        var result: [CGPoint] = []
+        let cosA = cos(angle * .pi / 180)
+        let sinA = sin(angle * .pi / 180)
+        
+        for point in points {
+            let translatedX = point.x - center.x
+            let translatedY = point.y - center.y
+            
+            let rotatedX = translatedX * cosA - translatedY * sinA
+            let rotatedY = translatedX * sinA + translatedY * cosA
+            
+            result.append(CGPoint(x: rotatedX + center.x, y: rotatedY + center.y))
+        }
+        
+        return result
     }
 
     func sendViewSize(_ viewSize: CGSize) {
         DispatchQueue.main.async {
             self.viewSizeSubject.send(viewSize)
         }
-    }
-
-    private func updateDrivers() {
-        guard socketService.isConnected,
-        let layout = socketService.trackLayout,
-        let snapshot = socketService.snapshot else {
-            return
-        }
-        driverPoints = snapshot.drivers
-            .filter { driver in
-                driver.speed > 0
-            }
-            .map { driver in
-                let point = calculateDriverPosition(driver, layout: layout)
-                let color = socketService.driverColors.first { color in
-                    color.code == driver.code
-                }?.color ?? UIColor.cyan
-                return TrackDriverPosition(name: driver.code, point: point, color: color)
-            }
-    }
-
-    private func calculateDriverPosition(_ driver: DriverState, layout: TrackLayout) -> CGPoint {
-        let distance = driver.dist.truncatingRemainder(dividingBy: layout.distance)
-        let mockPoint = TrackPoint(with: distance)
-        let index = layout.track_points.binarySearch(for: mockPoint)
-        let point = trackPoints[index]
-        return CGPoint(x: point.x - driverPointSize.width / 2, y: point.y - driverPointSize.height / 2)
     }
 }

@@ -11,7 +11,10 @@ import Puppy
 struct Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
     static let debugMode = true
-    static let zoom = 0.95
+    static let zoom = 0.9
+    
+    static let rotationAngle: Double = 1
+    
     private static var socketHost = "localhost"
     private static var socketPath = "/ws"
     static var socketURL: URL {

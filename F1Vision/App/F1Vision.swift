@@ -44,6 +44,7 @@ struct ContentView: View {
     var body: some View {
         HStack {
             TestingView(mapService: mapService)
+                .frame(minWidth: 200)
             TrackView(viewModel: trackViewModel)
         }
 //        HStack {
