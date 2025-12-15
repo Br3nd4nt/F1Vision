@@ -41,7 +41,7 @@ final class TelemetryTableViewController: UIViewController {
         super.viewDidLoad()
         configureCollectionView()
 
-        if ConfigurationParameters.debugMode {
+        if Configuration.debugMode {
             view.layer.borderColor = UIColor.yellow.cgColor
             view.layer.borderWidth = 1
         }

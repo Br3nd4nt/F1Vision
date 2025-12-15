@@ -35,7 +35,7 @@ final class MapRequestService: ObservableObject {
     }
 
     private func createRequestURL() -> URL {
-        ConfigurationParameters.mapRequestBaseURL
+        Configuration.mapRequestBaseURL
             .appendingPathComponent(String(getTrackCode()))
             .appendingPathComponent("2025")
     }

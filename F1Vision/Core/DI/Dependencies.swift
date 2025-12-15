@@ -100,4 +100,3 @@ final class Dependencies {
     }
 // swiftlint: enable force_unwrapping
 }
-// swiftlint:enable force_unwrapping

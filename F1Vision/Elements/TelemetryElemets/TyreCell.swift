@@ -50,7 +50,7 @@ final class TyreCell: UICollectionViewCell {
 
         letterLabel.pinAll(to: circleBaсkgroundView)
 
-        if ConfigurationParameters.debugMode {
+        if Configuration.debugMode {
             layer.borderColor = UIColor.yellow.cgColor
             layer.borderWidth = 1
         }
