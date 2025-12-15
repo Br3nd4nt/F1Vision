@@ -9,25 +9,25 @@ import UIKit
 
 final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     private let viewModel: RaceViewModel
-
+    
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
     }
-
-    func numberOfSections(in _: UICollectionView) -> Int {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         viewModel.drivers.count
     }
-
-    func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         viewModel.tableColumnWidths.count
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         let driver = viewModel.drivers[indexPath.section]
-
+        
         switch indexPath.item {
         case 0:
             guard let cell = collectionView.dequeueReusableCell(

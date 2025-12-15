@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 struct TrackBoundBox: Codable {
     let x_min: Double
@@ -30,5 +31,9 @@ struct TrackBoundBox: Codable {
             return size.width / trackWidth
         }
         return size.height / trackHeight
+    }
+    
+    func getCenterPoint() -> CGPoint {
+        CGPoint(x: x_min + trackWidth / 2, y: y_min + trackHeight / 2)
     }
 }

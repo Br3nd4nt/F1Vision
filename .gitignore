@@ -327,3 +327,4 @@ logs/
 #SwiftFormat
 BuildTools/.build
 BuildTools/.swiftpm
+swiftlint-config

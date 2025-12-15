@@ -14,7 +14,6 @@ final class MapRequestService: ObservableObject {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
 
     @Published var response: MapResponse?
-    @Published var box: TrackBoundBox?
     @Published var isLoaded = true
 
     func fetchMapData() async throws {
@@ -32,7 +31,6 @@ final class MapRequestService: ObservableObject {
         logger.info("Got track for \(message.location)")
         await MainActor.run {
             self.response = message
-            getBoundBox()
         }
     }
 
@@ -40,29 +38,6 @@ final class MapRequestService: ObservableObject {
         ConfigurationParameters.mapRequestBaseURL
             .appendingPathComponent(String(getTrackCode()))
             .appendingPathComponent("2025")
-    }
-
-    private func getBoundBox() {
-        var minX: Double = .greatestFiniteMagnitude
-        var minY: Double = .greatestFiniteMagnitude
-        var maxX: Double = -Double.greatestFiniteMagnitude
-        var maxY: Double = -Double.greatestFiniteMagnitude
-
-        guard let response else {
-            return
-        }
-
-        for x in response.x {
-            maxX = max(maxX, x)
-            minX = min(minX, x)
-        }
-
-        for y in response.y {
-            maxY = max(maxY, y)
-            minY = min(minY, y)
-        }
-
-        box = TrackBoundBox(x_min: minX, x_max: maxX, y_min: minY, y_max: maxY)
     }
 
     private let possibleCodes = [

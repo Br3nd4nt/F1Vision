@@ -98,5 +98,6 @@ final class Dependencies {
     var logger: Puppy {
         resolve(Puppy.self)!
     }
+// swiftlint: enable force_unwrapping
 }
 // swiftlint:enable force_unwrapping

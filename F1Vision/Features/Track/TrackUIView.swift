@@ -127,7 +127,10 @@ final class TrackUIView: UIView {
 //        // Create driver marker (circle)
         let driverLayer = CAShapeLayer()
         driverLayer.path = UIBezierPath(
-            ovalIn: CGRect(origin: driverPosition.point, size: viewModel.driverPointSize)
+            ovalIn: CGRect(
+                origin: driverPosition.point,
+                size: viewModel.driverPointSize
+            )
         ).cgPath
         let color = driverPosition.color
 //        // Use team color or fallback to white

@@ -38,22 +38,25 @@ final class SocketService: WebSocketDelegate, ObservableObject {
 
     func didReceive(event: Starscream.WebSocketEvent, client _: Starscream.WebSocketClient) {
         switch event {
-        case let .connected(headers):
-            handleConnected(headers: headers)
-        case let .disconnected(reason, code):
+        case .connected(let headers):
+            handleConnected(headers)
+        case .disconnected(let reason, let code):
             handleDisconnected(reason: reason, code: code)
-        case let .text(string):
-            handleText(string: string)
+        case .text(let string):
+            handleTextEvent(string)
         case .cancelled:
             handleCancelled()
-        case let .error(error):
+        case .error(let error):
+            isConnected = false
             handleError(error)
-        case .peerClosed, .binary, .pong, .ping, .viabilityChanged, .reconnectSuggested:
+        case .peerClosed:
+            break
+        case .binary, .pong, .ping, .viabilityChanged, .reconnectSuggested:
             break
         }
     }
 
-    private func handleConnected(headers: [String: String]) {
+    private func handleConnected(_ headers: [String: String]) {
         isConnected = true
         logger.info("websocket connected")
         logger.debug("websocket headers: \(headers)")
@@ -64,7 +67,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
         logger.info("websocket is disconnected with code \(code), reason: \(reason)")
     }
 
-    private func handleText(string: String) {
+    private func handleTextEvent(_ string: String) {
         guard let data = string.data(using: .utf8) else {
             logger.error("got incorrect data from websocket")
             logger.debug("websocket data: \(string)")
@@ -73,12 +76,12 @@ final class SocketService: WebSocketDelegate, ObservableObject {
         do {
             let message = try Self.jsonDecoder.decode(WebsocketMessage.self, from: data)
             switch message {
-            case let .raceSnapshot(newSnapshot):
+            case .raceSnapshot(let newSnapshot):
                 snapshot = newSnapshot
-            case let .trackLayout(layout):
+            case .trackLayout(let layout):
                 trackLayout = layout
                 logger.info("got track layout")
-            case let .colors(colors):
+            case .colors(let colors):
                 driverColors = colors.map { color in
                     DriverColor(color)
                 }

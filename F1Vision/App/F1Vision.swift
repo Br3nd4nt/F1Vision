@@ -32,20 +32,19 @@ struct ContentView: View {
         let mapService = MapRequestService()
         _mapService = StateObject(wrappedValue: mapService)
         _socketService = StateObject(wrappedValue: socketService)
-        _trackViewModel = ObservedObject(
-            wrappedValue: TrackViewModel(
-                socketService: socketService,
-                mapService: mapService
-            )
+        _trackViewModel = ObservedObject(wrappedValue:
+                                            TrackViewModel(
+                                                socketService: socketService,
+                                                mapService: mapService
+                                            )
         )
-        _raceViewModel = ObservedObject(
-            wrappedValue: RaceViewModel(socketService: socketService)
-        )
+        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(socketService: socketService))
     }
 
     var body: some View {
         HStack {
             TestingView(mapService: mapService)
+                .frame(minWidth: 200)
             TrackView(viewModel: trackViewModel)
         }
         //        HStack {
