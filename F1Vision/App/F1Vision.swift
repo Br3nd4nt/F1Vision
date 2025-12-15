@@ -1,12 +1,12 @@
 //
-//  F1VisionApp.swift
+//  F1Vision.swift
 //  F1Vision
 //
 //  Created by br3nd4nt on 20.08.2025.
 //
 
-import SwiftUI
 import Puppy
+import SwiftUI
 
 @main
 struct F1Vision: App {
@@ -47,16 +47,16 @@ struct ContentView: View {
                 .frame(minWidth: 200)
             TrackView(viewModel: trackViewModel)
         }
-//        HStack {
-//            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
-//                .frame(minWidth: 300, maxWidth: 400)
-//                .border(Configuration.debugMode ? Color.green : Color.clear)
-////                .layoutPriority(1)
-//            TrackView(viewModel: trackViewModel)
-//                .border(Configuration.debugMode ? Color.cyan : Color.clear)
-////                .layoutPriority(0)
-//        }
-//        .accentColor(.red)
-//        .background(Color(.background))
+        //        HStack {
+        //            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+        //                .frame(minWidth: 300, maxWidth: 400)
+        //                .border(Configuration.debugMode ? Color.green : Color.clear)
+        ////                .layoutPriority(1)
+        //            TrackView(viewModel: trackViewModel)
+        //                .border(Configuration.debugMode ? Color.cyan : Color.clear)
+        ////                .layoutPriority(0)
+        //        }
+        //        .accentColor(.red)
+        //        .background(Color(.background))
     }
 }

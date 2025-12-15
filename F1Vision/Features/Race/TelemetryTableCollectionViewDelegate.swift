@@ -5,8 +5,8 @@
 //  Created by br3nd4nt on 05.12.2025.
 //
 
-import UIKit
 import Puppy
+import UIKit
 
 final class TelemetryTableCollectionViewDelegate: NSObject,
                                                   UICollectionViewDelegate,

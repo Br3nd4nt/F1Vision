@@ -5,9 +5,9 @@
 //  Created by br3nd4nt on 13.12.2025.
 //
 
-import Puppy
 import Combine
 import Foundation
+import Puppy
 
 final class MapRequestService: ObservableObject {
     private let logger: Puppy = Dependencies.shared.logger
@@ -20,7 +20,8 @@ final class MapRequestService: ObservableObject {
         let requestURL = createRequestURL()
         let (data, response) = try await URLSession.shared.data(from: requestURL)
         guard let http = response as? HTTPURLResponse,
-              200..<300 ~= http.statusCode else {
+              200 ..< 300 ~= http.statusCode
+        else {
             logger.error("Got bad server response: \(response.description)")
             logger.error("Initial URL: \(requestURL)")
             throw URLError(.badServerResponse)
@@ -34,7 +35,7 @@ final class MapRequestService: ObservableObject {
     }
 
     private func createRequestURL() -> URL {
-        Configuration.mapRequestBaseURL
+        ConfigurationParameters.mapRequestBaseURL
             .appendingPathComponent(String(getTrackCode()))
             .appendingPathComponent("2025")
     }

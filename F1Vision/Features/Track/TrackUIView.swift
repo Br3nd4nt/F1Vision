@@ -5,9 +5,9 @@
 //  Created by br3nd4nt on 21.08.2025.
 //
 
-import UIKit
 import Combine
 import Puppy
+import UIKit
 
 final class TrackUIView: UIView {
     private let logger: Puppy = Dependencies.shared.logger
@@ -36,21 +36,21 @@ final class TrackUIView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Setup
 
     private func setupUI() {
-        self.backgroundColor = .background
+        backgroundColor = .background
 
         layer.addSublayer(shapeLayer)
         shapeLayer.strokeColor = UIColor.lightGray.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.lineWidth = 5
 
-        if Configuration.debugMode {
+        if ConfigurationParameters.debugMode {
             debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
             debugBoundingBoxLayer.fillColor = UIColor.clear.cgColor
             debugBoundingBoxLayer.lineWidth = 1
@@ -95,7 +95,7 @@ final class TrackUIView: UIView {
         }
 
         shapeLayer.path = bezierPath.cgPath
-        if Configuration.debugMode {
+        if ConfigurationParameters.debugMode {
             let minX = points.map(\.x).min() ?? 0
             let maxX = points.map(\.x).max() ?? 0
             let minY = points.map(\.y).min() ?? 0

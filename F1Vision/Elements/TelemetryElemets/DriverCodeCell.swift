@@ -1,12 +1,12 @@
 //
-//  DriverCodeView.swift
+//  DriverCodeCell.swift
 //  F1Vision
 //
 //  Created by br3nd4nt on 05.12.2025.
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 final class DriverCodeCell: UICollectionViewCell {
     private let backgroundWrapperView = UIView()
@@ -25,7 +25,7 @@ final class DriverCodeCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -41,11 +41,11 @@ final class DriverCodeCell: UICollectionViewCell {
 
     private func configureUI() {
         // background
-        self.configureSubview(backgroundWrapperView)
+        configureSubview(backgroundWrapperView)
         backgroundWrapperView.layer.cornerRadius = cornerRadius
 
         // label
-        self.configureSubview(codeLabel)
+        configureSubview(codeLabel)
         codeLabel.pinCenterX(to: self)
         codeLabel.pinCenterY(to: self)
 
@@ -58,14 +58,15 @@ final class DriverCodeCell: UICollectionViewCell {
         backgroundWrapperView.pinTop(to: codeLabel, -verticalPadding)
         backgroundWrapperView.pinBottom(to: codeLabel, -verticalPadding)
 
-        if Configuration.debugMode {
-            self.layer.borderColor = UIColor.yellow.cgColor
-            self.layer.borderWidth = 1
+        if ConfigurationParameters.debugMode {
+            layer.borderColor = UIColor.yellow.cgColor
+            layer.borderWidth = 1
         }
     }
 }
 
 // MARK: - Preview
+
 #Preview("Dark") {
     let v = DriverCodeCell()
     v.configure(code: "HAM", backgroundColor: UIColor(hex: "#E80020"))

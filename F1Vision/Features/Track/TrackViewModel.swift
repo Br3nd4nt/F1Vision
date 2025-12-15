@@ -5,11 +5,11 @@
 //  Created by br3nd4nt on 21.08.2025.
 //
 
-import Foundation
-import UIKit
 import Combine
+import Foundation
 import Puppy
 import SwiftUI
+import UIKit
 
 // Only manages data for track - track layout, points, point transformation etc.
 @MainActor
@@ -32,7 +32,7 @@ final class TrackViewModel: ObservableObject {
     private var rotatedTargetValues: [Double: TrackBoundBox] = [:]
 
     // Configuration
-    private let zoom: Double = Configuration.zoom
+    private let zoom: Double = ConfigurationParameters.zoom
     let driverPointSize = CGSize(width: 12, height: 12)
 
     // MARK: - Init

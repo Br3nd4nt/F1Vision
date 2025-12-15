@@ -5,8 +5,8 @@
 //  Created by br3nd4nt on 06.12.2025.
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 final class TyreCell: UICollectionViewCell {
     private let circleBaсkgroundView = UIView()
@@ -24,19 +24,19 @@ final class TyreCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     func configure(_ tyreType: TyreType) {
         self.tyreType = tyreType
-        self.letterLabel.text = self.tyreType.letter
-        self.letterLabel.textColor = self.tyreType.fontColor
+        letterLabel.text = self.tyreType.letter
+        letterLabel.textColor = self.tyreType.fontColor
         circleBaсkgroundView.backgroundColor = self.tyreType.UIColor
     }
 
     private func configureUI() {
-        self.configureSubview(circleBaсkgroundView)
+        configureSubview(circleBaсkgroundView)
         circleBaсkgroundView.layer.cornerRadius = circleSize / 2
         circleBaсkgroundView.setWidth(circleSize)
         circleBaсkgroundView.setHeight(circleSize)
@@ -44,41 +44,42 @@ final class TyreCell: UICollectionViewCell {
         circleBaсkgroundView.pinCenterX(to: self)
         circleBaсkgroundView.pinCenterY(to: self)
 
-        self.configureSubview(letterLabel)
+        configureSubview(letterLabel)
         letterLabel.font = .systemFont(ofSize: fontSize, weight: .bold)
         letterLabel.textAlignment = .center
 
         letterLabel.pinAll(to: circleBaсkgroundView)
 
-        if Configuration.debugMode {
-            self.layer.borderColor = UIColor.yellow.cgColor
-            self.layer.borderWidth = 1
+        if ConfigurationParameters.debugMode {
+            layer.borderColor = UIColor.yellow.cgColor
+            layer.borderWidth = 1
         }
     }
 }
 
 // MARK: - Preview
+
 #if DEBUG
 
-struct TyreCellPreviewWrapper: UIViewRepresentable {
-    let tyreType: Int
+    struct TyreCellPreviewWrapper: UIViewRepresentable {
+        let tyreType: Int
 
-    func makeUIView(context: Context) -> TyreCell {
-        let view = TyreCell()
-        view.configure(TyreType(tyreType))
-        return view
-    }
-
-    func updateUIView(_ uiView: TyreCell, context: Context) {}
-}
-
-#Preview {
-    HStack {
-        ForEach(0..<6) { i in
-            TyreCellPreviewWrapper(tyreType: i)
-                .padding()
+        func makeUIView(context _: Context) -> TyreCell {
+            let view = TyreCell()
+            view.configure(TyreType(tyreType))
+            return view
         }
+
+        func updateUIView(_: TyreCell, context _: Context) {}
     }
-    .padding()
-}
+
+    #Preview {
+        HStack {
+            ForEach(0 ..< 6) { i in
+                TyreCellPreviewWrapper(tyreType: i)
+                    .padding()
+            }
+        }
+        .padding()
+    }
 #endif

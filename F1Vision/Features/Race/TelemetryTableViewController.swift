@@ -1,14 +1,14 @@
 //
-//  RaceTableView.swift
+//  TelemetryTableViewController.swift
 //  F1Vision
 //
 //  Created by br3nd4nt on 04.12.2025.
 //
 
-import UIKit
 import Combine
-import SwiftUI
 import Puppy
+import SwiftUI
+import UIKit
 
 final class TelemetryTableViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -21,8 +21,8 @@ final class TelemetryTableViewController: UIViewController {
 
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
-        self.dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
-        self.delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
+        dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
+        delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
         self.viewModel.$drivers
             .receive(on: DispatchQueue.main)
@@ -33,7 +33,7 @@ final class TelemetryTableViewController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -41,7 +41,7 @@ final class TelemetryTableViewController: UIViewController {
         super.viewDidLoad()
         configureCollectionView()
 
-        if Configuration.debugMode {
+        if ConfigurationParameters.debugMode {
             view.layer.borderColor = UIColor.yellow.cgColor
             view.layer.borderWidth = 1
         }
@@ -55,8 +55,8 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
 
         collectionView.backgroundColor = .systemGroupedBackground
-        collectionView.dataSource = self.dataSource
-        collectionView.delegate = self.delegate
+        collectionView.dataSource = dataSource
+        collectionView.delegate = delegate
         collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
         collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)

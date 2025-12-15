@@ -23,7 +23,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
 
     init() {
-        var request = URLRequest(url: Configuration.socketURL)
+        var request = URLRequest(url: ConfigurationParameters.socketURL)
         request.timeoutInterval = 5
         socket = WebSocket(request: request)
         socket.delegate = self
@@ -35,7 +35,8 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     }
 
     // MARK: - WebSocketDelegate
-    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+
+    func didReceive(event: Starscream.WebSocketEvent, client _: Starscream.WebSocketClient) {
         switch event {
         case .connected(let headers):
             handleConnected(headers)

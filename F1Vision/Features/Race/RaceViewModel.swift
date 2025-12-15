@@ -37,7 +37,7 @@ final class RaceViewModel: ObservableObject {
             return
         }
         isLoaded = true
-        drivers = snapshot.drivers.map {driver in
+        drivers = snapshot.drivers.map { driver in
             let color = socketService.driverColors.first { driverColor in
                 driverColor.code == driver.code
             }?.color ?? UIColor.gray
