@@ -47,7 +47,7 @@ final class IntervalTimeCell: UICollectionViewCell {
         codeLabel.font = .systemFont(ofSize: fontSize, weight: .bold)
         codeLabel.textAlignment = .center
 
-        if ConfigurationParameters.debugMode {
+        if Configuration.debugMode {
             layer.borderColor = UIColor.yellow.cgColor
             layer.borderWidth = 1
         }

@@ -32,7 +32,7 @@ final class TrackViewModel: ObservableObject {
     private var rotatedTargetValues: [Double: TrackBoundBox] = [:]
 
     // Configuration
-    private let zoom: Double = ConfigurationParameters.zoom
+    private let zoom: Double = Configuration.zoom
     let driverPointSize = CGSize(width: 12, height: 12)
 
     // MARK: - Init

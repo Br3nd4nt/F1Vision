@@ -13,8 +13,19 @@
 		06CE272E2EE0DBBB005CB293 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 06CE272D2EE0DBBB005CB293 /* Starscream */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		06A186EC2EF0E02800662412 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 06083EE12E567EC400F83348 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 06083EE82E567EC400F83348;
+			remoteInfo = F1Vision;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		06083EE92E567EC400F83348 /* F1Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = F1Vision.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		06A186E82EF0E02800662412 /* F1VisionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = F1VisionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +47,11 @@
 			path = F1Vision;
 			sourceTree = "<group>";
 		};
+		06A186E92EF0E02800662412 /* F1VisionTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = F1VisionTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +66,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		06A186E52EF0E02800662412 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -57,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				06083EEB2E567EC400F83348 /* F1Vision */,
+				06A186E92EF0E02800662412 /* F1VisionTests */,
 				06083EEA2E567EC400F83348 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				06083EE92E567EC400F83348 /* F1Vision.app */,
+				06A186E82EF0E02800662412 /* F1VisionTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,6 +124,29 @@
 			productReference = 06083EE92E567EC400F83348 /* F1Vision.app */;
 			productType = "com.apple.product-type.application";
 		};
+		06A186E72EF0E02800662412 /* F1VisionTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 06A186EE2EF0E02800662412 /* Build configuration list for PBXNativeTarget "F1VisionTests" */;
+			buildPhases = (
+				06A186E42EF0E02800662412 /* Sources */,
+				06A186E52EF0E02800662412 /* Frameworks */,
+				06A186E62EF0E02800662412 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				06A186ED2EF0E02800662412 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				06A186E92EF0E02800662412 /* F1VisionTests */,
+			);
+			name = F1VisionTests;
+			packageProductDependencies = (
+			);
+			productName = F1VisionTests;
+			productReference = 06A186E82EF0E02800662412 /* F1VisionTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -106,11 +154,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					06083EE82E567EC400F83348 = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					06A186E72EF0E02800662412 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 06083EE82E567EC400F83348;
 					};
 				};
 			};
@@ -136,12 +188,20 @@
 			projectRoot = "";
 			targets = (
 				06083EE82E567EC400F83348 /* F1Vision */,
+				06A186E72EF0E02800662412 /* F1VisionTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		06083EE72E567EC400F83348 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		06A186E62EF0E02800662412 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -180,7 +240,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		06A186E42EF0E02800662412 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		06A186ED2EF0E02800662412 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 06083EE82E567EC400F83348 /* F1Vision */;
+			targetProxy = 06A186EC2EF0E02800662412 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		06083EF22E567EC500F83348 /* Debug */ = {
@@ -374,6 +449,50 @@
 			};
 			name = Release;
 		};
+		06A186EF2EF0E02800662412 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LP6FF36MS7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = br3nd4nt.F1VisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/F1Vision.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/F1Vision";
+			};
+			name = Debug;
+		};
+		06A186F02EF0E02800662412 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LP6FF36MS7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = br3nd4nt.F1VisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/F1Vision.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/F1Vision";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -391,6 +510,15 @@
 			buildConfigurations = (
 				06083EF52E567EC500F83348 /* Debug */,
 				06083EF62E567EC500F83348 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		06A186EE2EF0E02800662412 /* Build configuration list for PBXNativeTarget "F1VisionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06A186EF2EF0E02800662412 /* Debug */,
+				06A186F02EF0E02800662412 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

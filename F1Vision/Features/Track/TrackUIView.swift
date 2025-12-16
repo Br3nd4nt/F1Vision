@@ -50,7 +50,7 @@ final class TrackUIView: UIView {
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.lineWidth = 5
 
-        if ConfigurationParameters.debugMode {
+        if Configuration.debugMode {
             debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
             debugBoundingBoxLayer.fillColor = UIColor.clear.cgColor
             debugBoundingBoxLayer.lineWidth = 1
@@ -95,7 +95,7 @@ final class TrackUIView: UIView {
         }
 
         shapeLayer.path = bezierPath.cgPath
-        if ConfigurationParameters.debugMode {
+        if Configuration.debugMode {
             let minX = points.map(\.x).min() ?? 0
             let maxX = points.map(\.x).max() ?? 0
             let minY = points.map(\.y).min() ?? 0

@@ -23,7 +23,7 @@ final class SocketService: WebSocketDelegate, ObservableObject {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
 
     init() {
-        var request = URLRequest(url: ConfigurationParameters.socketURL)
+        var request = URLRequest(url: Configuration.socketURL)
         request.timeoutInterval = 5
         socket = WebSocket(request: request)
         socket.delegate = self
