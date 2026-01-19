@@ -24,12 +24,12 @@ final class TelemetryTableViewController: UIViewController {
         dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
         delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
-        self.viewModel.$drivers
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.collectionView.reloadData()
-            }
-            .store(in: &cancellables)
+//        self.viewModel.$drivers
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] _ in
+//                self?.collectionView.reloadData()
+//            }
+//            .store(in: &cancellables)
     }
 
     @available(*, unavailable)

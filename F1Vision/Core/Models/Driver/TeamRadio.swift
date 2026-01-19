@@ -6,7 +6,7 @@
 //
 
 struct TeamRadio: Codable {
-    let captures: [TeamRadioCapture]
+    let captures: [String: TeamRadioCapture]
 }
 
 struct TeamRadioCapture: Codable {

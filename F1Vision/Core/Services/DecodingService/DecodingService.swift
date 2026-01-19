@@ -17,7 +17,7 @@ final class DecodingService {
         var index = 0
         let bufferSize = input.count
         
-        var inputFilter = try InputFilter(.decompress, using: .zlib) { (length: Int) -> Data? in
+        let inputFilter = try InputFilter(.decompress, using: .zlib) { (length: Int) -> Data? in
             let rangeLength = min(length, bufferSize - index)
             let subdata = input.subdata(in: index ..< index + rangeLength)
             index += rangeLength

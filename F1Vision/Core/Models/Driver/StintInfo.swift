@@ -6,12 +6,12 @@
 //
 
 struct StintInfo: Codable {
-    let compound: String
+    let compound: String?
     let lapFlags: Int
-    let lapNumber: Int
-    let lapTime: String
-    let new: String
-    let startLaps: Int
+    let lapNumber: Int?
+    let lapTime: String?
+    let new: String?
+    let startLaps: Int?
     let totalLaps: Int
-    let tyresNotChanged: String
+    let tyresNotChanged: String?
 }

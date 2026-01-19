@@ -6,24 +6,23 @@
 //
 
 struct TopThree: Codable {
-    let lines: [TopThreeLine]
-    let withheld: Bool
+    let lines: [String: TopThreeLine]
+    let withheld: Bool?
 }
 
-
 struct TopThreeLine: Codable {
-    let broadcastName: String
+    let broadcastName: String?
     let diffToAhead: String
     let diffToLeader: String
-    let fullName: String
+    let fullName: String?
     let lapState: Int
     let lapTime: String
-    let overallFastest: Bool
-    let personalFastest: Bool
-    let position: Int
-    let racingNumber: String
-    let showPosition: Bool
-    let team: String
-    let teamColor: String
-    let tla: String
+    let overallFastest: Bool?
+    let personalFastest: Bool?
+    let position: Int?
+    let racingNumber: String?
+    let showPosition: Bool?
+    let team: String?
+    let teamColor: String?
+    let tla: String?
 }

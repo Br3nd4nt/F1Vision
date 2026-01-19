@@ -7,5 +7,5 @@
 
 struct LapCount: Codable {
     let currentLap: Int
-    let totalLaps: Int
+    let totalLaps: Int?
 }

@@ -9,10 +9,9 @@ struct TimingAppData: Codable {
     let lines: [String: TimingAppDataLine]
 }
 
-
 struct TimingAppDataLine: Codable {
-    let gridPos: String
-    let line: Int
-    let racingNumber: String
-    let stints: [StintInfo]
+    let gridPos: String?
+    let line: Int?
+    let racingNumber: String?
+    let stints: [String: StintInfo]?
 }

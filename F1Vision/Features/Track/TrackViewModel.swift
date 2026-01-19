@@ -19,12 +19,12 @@ final class TrackViewModel: ObservableObject {
     private let logger: Puppy = Dependencies.shared.logger
 
     private var cancellables = Set<AnyCancellable>()
-    private var socketService: SocketService
+    private var sseService: SSEService
     private var mapService: MapRequestService
 
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
-    @Published var driverPoints: [TrackDriverPosition] = []
+//    @Published var driverPoints: [TrackDriverPosition] = []
 
     @Published var viewSize: CGSize = .zero
     private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
@@ -37,8 +37,8 @@ final class TrackViewModel: ObservableObject {
 
     // MARK: - Init
 
-    init(socketService: SocketService, mapService: MapRequestService) {
-        self.socketService = socketService
+    init(sseService: SSEService, mapService: MapRequestService) {
+        self.sseService = sseService
         self.mapService = mapService
         self.mapService.$response
             .receive(on: DispatchQueue.main)
@@ -46,13 +46,13 @@ final class TrackViewModel: ObservableObject {
                 self?.translateTrackLayoutPoints()
             }
             .store(in: &cancellables)
-        self.socketService.$trackLayout
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] layout in
-                self?.logger.debug(String(describing: layout?.world_bounds))
-                self?.translateTrackLayoutPoints()
-            }
-            .store(in: &cancellables)
+//        self.socketService.$trackLayout
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] layout in
+//                self?.logger.debug(String(describing: layout?.world_bounds))
+//                self?.translateTrackLayoutPoints()
+//            }
+//            .store(in: &cancellables)
 //        self.socketService.$snapshot
 //            .receive(on: DispatchQueue.main)
 //            .sink { [weak self] _ in
@@ -93,6 +93,7 @@ final class TrackViewModel: ObservableObject {
             isLoaded = false
             return
         }
+        logger.info("got points")
         
         var defaultPoints: [CGPoint] = []
         for i in 0..<response.x.count {

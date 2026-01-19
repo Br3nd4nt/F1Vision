@@ -11,5 +11,5 @@ struct SessionDataSeries: Codable {
 }
 
 struct SessionData: Codable {
-    let series: [SessionDataSeries]
+    let series: [String: SessionDataSeries]
 }

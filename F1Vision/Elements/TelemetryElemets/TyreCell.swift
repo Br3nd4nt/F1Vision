@@ -15,7 +15,7 @@ final class TyreCell: UICollectionViewCell {
     private let circleSize: Double = 30
     private let fontSize: Double = 15
 
-    private var tyreType: TyreType = .undefined
+//    private var tyreType: TyreType = .undefined
     static let reuseId = "TyreCell"
 
     override init(frame: CGRect) {
@@ -28,12 +28,12 @@ final class TyreCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(_ tyreType: TyreType) {
-        self.tyreType = tyreType
-        letterLabel.text = self.tyreType.letter
-        letterLabel.textColor = self.tyreType.fontColor
-        circleBaсkgroundView.backgroundColor = self.tyreType.UIColor
-    }
+//    func configure(_ tyreType: TyreType) {
+//        self.tyreType = tyreType
+//        letterLabel.text = self.tyreType.letter
+//        letterLabel.textColor = self.tyreType.fontColor
+//        circleBaсkgroundView.backgroundColor = self.tyreType.UIColor
+//    }
 
     private func configureUI() {
         configureSubview(circleBaсkgroundView)
@@ -66,7 +66,7 @@ final class TyreCell: UICollectionViewCell {
 
         func makeUIView(context _: Context) -> TyreCell {
             let view = TyreCell()
-            view.configure(TyreType(tyreType))
+//            view.configure(TyreType(tyreType))
             return view
         }
 

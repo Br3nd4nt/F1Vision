@@ -6,9 +6,9 @@
 //
 
 struct TeamChampionshipPrediction: Codable {
-    let currentPoints: Double
-    let currentPosition: Int
-    let predictedPoints: Double
-    let predictedPosition: Int
-    let teamName: String
+    let currentPoints: Double?
+    let currentPosition: Int?
+    let predictedPoints: Double?
+    let predictedPosition: Int?
+    let teamName: String?
 }
