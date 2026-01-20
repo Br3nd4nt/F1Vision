@@ -59,7 +59,6 @@ final class MapRequestService: ObservableObject {
             logger.error("Initial URL: \(requestURL)")
             throw URLError(.badServerResponse)
         }
-        logger.debug(response.debugDescription)
         let message = try Self.jsonDecoder.decode(MapResponse.self, from: data)
         logger.info("Got track for \(message.location)")
         await MainActor.run {

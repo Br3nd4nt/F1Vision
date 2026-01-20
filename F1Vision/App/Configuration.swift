@@ -14,6 +14,7 @@ enum Configuration {
     static let zoom = 0.9
     
     static let rotationAngle: Double = 1
+    static let driverPointRadius: Double = 10
     
     private static var socketHost = "localhost"
     private static var socketPort = 4_000

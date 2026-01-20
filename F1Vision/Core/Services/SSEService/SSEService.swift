@@ -47,7 +47,6 @@ final class SSEService: ObservableObject {
         case "initial":
             do {
                 let message = try Self.jsonDecoder.decode(InitialResponse.self, from: data)
-                logger.debug("Initial message: \(message)")
                 let state = try State(message)
                 DispatchQueue.main.async { [weak self] in
                     self?.state = state

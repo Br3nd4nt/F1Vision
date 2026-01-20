@@ -21,9 +21,7 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 
-    /// Returns true if the color is considered light
     var isLight: Bool {
-        // Convert to UIColor
         let uiColor = UIColor(self)
         var white: CGFloat = 0
         uiColor.getWhite(&white, alpha: nil)

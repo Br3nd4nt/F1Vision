@@ -37,8 +37,7 @@ final class IntervalTimeCell: UICollectionViewCell {
 
     private func configureUI() {
         // label
-//        self.configureSubview(codeLabel)
-        addSubview(codeLabel)
+        self.configureSubview(codeLabel)
         codeLabel.pinLeft(to: self, horizontalPadding)
         codeLabel.pinRight(to: self, horizontalPadding)
         codeLabel.pinTop(to: self, verticalPadding)
