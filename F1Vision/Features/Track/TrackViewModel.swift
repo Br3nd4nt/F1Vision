@@ -90,10 +90,8 @@ final class TrackViewModel: ObservableObject {
         isLoaded = false
         guard mapService.isLoaded,
         let response = mapService.response else {
-            isLoaded = false
             return
         }
-        logger.info("got points")
         
         var defaultPoints: [CGPoint] = []
         for i in 0..<response.x.count {

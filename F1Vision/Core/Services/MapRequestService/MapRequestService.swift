@@ -22,10 +22,12 @@ final class MapRequestService: ObservableObject {
     
     init(sseService: SSEService) {
         self.sseService = sseService
-        self.sseService.$state
-            .first()
+        self.sseService.$gotInitialResponse
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] value in
+                guard value else {
+                    return
+                }
                 Task(priority: .userInitiated) {
                     do {
                         try await self?.fetchMapData()
@@ -42,6 +44,11 @@ final class MapRequestService: ObservableObject {
     
     func fetchMapData() async throws {
         self.isLoaded = false
+        guard sseService.gotInitialResponse, sseService.state != nil else {
+            logger.warning("no initial")
+            return
+        }
+        logger.info("creating url")
         let requestURL = try createRequestURL()
         logger.info(requestURL.absoluteString)
         let (data, response) = try await URLSession.shared.data(from: requestURL)
@@ -68,9 +75,8 @@ final class MapRequestService: ObservableObject {
     }
     
     private func getTrackCode() throws -> Int {
-        guard let key = sseService.state?.sessionInfo?.key else {
+        guard let key = sseService.state?.sessionInfo?.meeting?.circuit.key else {
             logger.warning("no session info found")
-            return 70
             throw MapRequestServiceError.MissingSessionInfo
         }
         return key

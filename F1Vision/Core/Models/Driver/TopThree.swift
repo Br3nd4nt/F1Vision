@@ -6,7 +6,7 @@
 //
 
 struct TopThree: Codable {
-    let lines: [String: TopThreeLine]
+    let lines: [TopThreeLine]
     let withheld: Bool?
 }
 
@@ -19,7 +19,7 @@ struct TopThreeLine: Codable {
     let lapTime: String
     let overallFastest: Bool?
     let personalFastest: Bool?
-    let position: Int?
+    let position: String?
     let racingNumber: String?
     let showPosition: Bool?
     let team: String?

@@ -34,3 +34,7 @@ final class DecodingService {
         return output
     }
 }
+
+enum ZLibDecodingError: Error {
+    case base64DecodingFailed
+}

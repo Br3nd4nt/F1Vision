@@ -15,7 +15,8 @@ final class SSEService: ObservableObject {
     private let logger: Puppy = Dependencies.shared.logger
     private let urlRequest = URLRequest(url: Configuration.sseURL)
     
-    @Published var state: InitialResponse?
+    @Published var state: State?
+    @Published var gotInitialResponse: Bool = false
     
     func makeConnection() {
         Task {
@@ -47,13 +48,20 @@ final class SSEService: ObservableObject {
             do {
                 let message = try Self.jsonDecoder.decode(InitialResponse.self, from: data)
                 logger.debug("Initial message: \(message)")
-                state = message
+                let state = try State(message)
+                DispatchQueue.main.async { [weak self] in
+                    self?.state = state
+                    self?.gotInitialResponse = true
+                    self?.logger.debug("state was set: \(String(describing: self?.gotInitialResponse))")
+                }
             } catch let DecodingError.keyNotFound(key, context) {
                 logger.error("Missing key: \(key.stringValue)")
                 logger.error(context.debugDescription)
+                logger.debug("Initial json: \(String(decoding: data, as: Unicode.UTF8.self))")
             } catch let DecodingError.typeMismatch(type, context) {
                 logger.error("Type mismatch: \(type)")
                 logger.error(context.debugDescription)
+                logger.debug("Initial json: \(String(decoding: data, as: Unicode.UTF8.self))")
             } catch {
                 logger.error("Other error: \(error)")
             }

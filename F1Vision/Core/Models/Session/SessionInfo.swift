@@ -9,7 +9,7 @@ struct SessionInfo: Codable {
     let archiveStatus: ArchiveStatus
     let endDate: String
     let key: Int
-    
+    let meeting: Meeting?
 }
 
 struct ArchiveStatus: Codable {

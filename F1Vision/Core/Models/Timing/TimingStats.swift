@@ -12,7 +12,7 @@ struct TimingStats: Codable {
 }
 
 struct TimingStatsLine: Codable {
-    let bestSectors: [String: BestSpeedInfo]
+    let bestSectors: [BestSpeedInfo]
     let bestSpeeds: BestSpeeds
     let lap: Int?
     let personalBestLapTime: PersonalBestLapTime?

@@ -52,8 +52,7 @@ struct ContentView: View {
         .accentColor(.red)
         .background(Color(.background))
         .task {
-            let service = SSEService()
-            service.makeConnection()
+            sseService.makeConnection()
         }
     }
 }

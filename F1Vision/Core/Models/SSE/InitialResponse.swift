@@ -11,6 +11,7 @@ struct InitialResponse: Codable {
     var extrapolatedClock: ExtrapolatedClock
     var heartbeat: Heartbeat
     var lapCount: LapCount
+    var carDataZ: String?
     var positionZ: String // zlib encoded
     var raceControlMessages: RaceControlMessages
     var sessionData: SessionData

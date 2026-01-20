@@ -13,5 +13,5 @@ struct RaceControlMessage: Codable {
 }
 
 struct RaceControlMessages: Codable {
-    let messages: [String: RaceControlMessage]
+    let messages: [RaceControlMessage]
 }
