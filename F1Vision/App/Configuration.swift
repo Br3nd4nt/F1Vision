@@ -14,13 +14,16 @@ enum Configuration {
     static let zoom = 0.9
     
     static let rotationAngle: Double = 1
+    static let driverPointRadius: Double = 10
     
     private static var socketHost = "localhost"
-    private static var socketPath = "/ws"
-    static var socketURL: URL {
+    private static var socketPort = 4_000
+    private static var socketPath = "/api/sse"
+    static var sseURL: URL {
         var components = URLComponents()
-        components.scheme = "ws"
+        components.scheme = "http"
         components.host = socketHost
+        components.port = socketPort
         components.path = socketPath
         let url = components.url
         if let url {

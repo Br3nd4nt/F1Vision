@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct F1Vision: App {
     private let logger: Puppy = Dependencies.shared.logger
-
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -21,42 +21,38 @@ struct F1Vision: App {
 
 struct ContentView: View {
     private let logger: Puppy = Dependencies.shared.logger
-
-    @StateObject private var socketService: SocketService
+    
+    @StateObject private var sseService: SSEService
     @StateObject private var mapService: MapRequestService
     @ObservedObject private var trackViewModel: TrackViewModel
     @ObservedObject private var raceViewModel: RaceViewModel
-
+    
     init() {
-        let socketService = SocketService()
-        let mapService = MapRequestService()
+        let sseService = SSEService()
+        _sseService = StateObject(wrappedValue: sseService)
+        let mapService = MapRequestService(sseService: sseService)
         _mapService = StateObject(wrappedValue: mapService)
-        _socketService = StateObject(wrappedValue: socketService)
         _trackViewModel = ObservedObject(wrappedValue:
                                             TrackViewModel(
-                                                socketService: socketService,
+                                                sseService: sseService,
                                                 mapService: mapService
                                             )
         )
-        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(socketService: socketService))
+        _raceViewModel = ObservedObject(wrappedValue: RaceViewModel(sseService: sseService))
     }
-
+    
     var body: some View {
         HStack {
-            TestingView(mapService: mapService)
-                .frame(minWidth: 200)
+            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+                .frame(minWidth: 300, maxWidth: 400)
+                .border(Configuration.debugMode ? Color.green : Color.clear)
             TrackView(viewModel: trackViewModel)
+                .border(Configuration.debugMode ? Color.cyan : Color.clear)
         }
-        //        HStack {
-        //            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
-        //                .frame(minWidth: 300, maxWidth: 400)
-        //                .border(Configuration.debugMode ? Color.green : Color.clear)
-        ////                .layoutPriority(1)
-        //            TrackView(viewModel: trackViewModel)
-        //                .border(Configuration.debugMode ? Color.cyan : Color.clear)
-        ////                .layoutPriority(0)
-        //        }
-        //        .accentColor(.red)
-        //        .background(Color(.background))
+        .accentColor(.red)
+        .background(Color(.background))
+        .task {
+            sseService.makeConnection()
+        }
     }
 }
