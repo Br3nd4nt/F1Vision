@@ -138,7 +138,7 @@ final class TrackUIView: UIView {
                 )
             ).cgPath
             
-            let color = Configuration.driverPointColor
+            let color = viewModel.getDriverColor(driver)
             driverLayer.fillColor = color.cgColor
             driverLayer.lineWidth = 2
             

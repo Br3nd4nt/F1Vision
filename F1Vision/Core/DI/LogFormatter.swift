@@ -23,7 +23,7 @@ struct LogFormatter: LogFormattable {
         if let parentheses = function.firstIndex(of: "(") {
             q = String(function[..<parentheses])
         } else {}
-        return "\(date) [\(level.emoji) \(level)]\t\(message) (\(fileName.replacingOccurrences(of: ".swift", with: "")):\(q):\(line))"
+        return "\(date) [\(level.emoji) \(level)] \(message) (\(fileName.replacingOccurrences(of: ".swift", with: "")):\(q):\(line))"
     }
 }
 

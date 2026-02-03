@@ -14,6 +14,7 @@ struct State: Codable {
     var position: Position
     var carData: CarData
     let sessionInfo: SessionInfo?
+    let drivers: [Int: DriverFullInfo]?
     
     init(_ response: SSEmessage) throws {
         // session info
@@ -21,6 +22,20 @@ struct State: Codable {
             throw StateError.SessionInfoNotFound
         }
         sessionInfo = info
+        
+        // driver info
+        guard let driverList = response.driverList else {
+            throw StateError.DriversInfoNotFound
+        }
+        var infoList = [Int: DriverFullInfo]()
+        for (driver, info) in driverList {
+            guard let number = Int(driver) else {
+                continue // ???
+            }
+            infoList[number] = info
+        }
+        drivers = infoList
+        
         
         // position in space (coordinates)
         guard let positionZ = response.positionZ else {
@@ -83,6 +98,7 @@ struct State: Codable {
 
 enum StateError: Error {
     case SessionInfoNotFound
+    case DriversInfoNotFound
     case UpdateIncorrectSize
     case KeyError([JSONValue])
     case ValueError([JSONValue])

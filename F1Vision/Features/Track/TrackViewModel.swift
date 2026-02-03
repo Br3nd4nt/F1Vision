@@ -36,10 +36,13 @@ final class TrackViewModel: ObservableObject {
     // final track points form drawing
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
+    private static let defaultDriverPointColor: UIColor = .lightGray
     
     // driver points
     private var defaultDriverPoints: [Int: CGPoint] = [:]
     @Published var driverPoints: [Int: CGPoint] = [:]
+    private var driversInfo: [Int: DriverFullInfo]?
+    private var driversColors: [Int: UIColor]?
     
     @Published var viewSize: CGSize = .zero
     private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
@@ -79,9 +82,32 @@ final class TrackViewModel: ObservableObject {
         self.sseService.$state
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
+                self?.saveDriversInfo(state)
                 self?.proccessSSEstate(state)
             }
             .store(in: &cancellables)
+    }
+    
+    private func saveDriversInfo(_ state: State?) {
+        if driversInfo != nil {
+            return
+        }
+        guard let state, let info = state.drivers else {
+            return
+        }
+        driversInfo = info
+        logger.info("driver info saved successfully")
+        
+        var colors = [Int: UIColor]()
+        for (driver, info) in info {
+            guard let hex = info.teamColour else {
+                continue
+            }
+            let color = UIColor(hex: hex)
+            colors[driver] = color
+        }
+        driversColors = colors
+        logger.info(String(describing: colors))
     }
     
     // called when we first get the points data
@@ -125,6 +151,14 @@ final class TrackViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.viewSizeSubject.send(viewSize)
         }
+    }
+    
+    func getDriverColor(_ driver: Int) -> UIColor {
+        guard let driversColors else { return Self.defaultDriverPointColor }
+        if let color = driversColors[driver] {
+            return color
+        }
+        return Self.defaultDriverPointColor
     }
     
     // MARK: - Track Transformation

@@ -15,8 +15,7 @@ enum Configuration {
     static let zoom: Double = 0.9
     
     static let rotationAngle: Double = 0.5
-    static let driverPointRadius: Double = 4
-    static let driverPointColor: UIColor = .green
+    static let driverPointRadius: Double = 7
     
     private static var socketScheme = "http"
     private static var socketHost = "localhost"

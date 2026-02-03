@@ -1,4 +1,3 @@
-
 //
 //  CGPoint+offset.swift
 //  F1Vision
