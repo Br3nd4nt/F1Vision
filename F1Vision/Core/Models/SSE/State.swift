@@ -12,22 +12,80 @@ struct State: Codable {
     private static let decodingService = Dependencies.shared.zlibDecoder
     
     var position: Position
+    var carData: CarData
     let sessionInfo: SessionInfo?
     
-    init(_ response: InitialResponse) throws {
-        let carData = response.positionZ
-        guard let data = Self.decodingService.getBase64Decoded(carData) else {
-            throw ZLibDecodingError.base64DecodingFailed
-        }
-        let inflated = try Self.decodingService.inflate(data)
-        position = try Self.jsonDecoder.decode(Position.self, from: inflated)
+    init(_ response: SSEmessage) throws {
+        // session info
         guard let info = response.sessionInfo else {
             throw StateError.SessionInfoNotFound
         }
         sessionInfo = info
+        
+        // position in space (coordinates)
+        guard let positionZ = response.positionZ else {
+            throw StateError.PositionZNotFound
+        }
+        guard let positionData = Self.decodingService.getBase64Decoded(positionZ) else {
+            throw ZLibDecodingError.base64DecodingFailed
+        }
+        let inflatedPosition = try Self.decodingService.inflate(positionData)
+        
+        position = try Self.jsonDecoder.decode(Position.self, from: inflatedPosition)
+        
+        // car data
+        guard let carDataZ = response.carDataZ else {
+            throw StateError.CarDataZNotFound
+        }
+        
+        guard let carDataData = Self.decodingService.getBase64Decoded(carDataZ) else {
+            throw ZLibDecodingError.base64DecodingFailed
+        }
+        
+        let inflatedCarData = try Self.decodingService.inflate(carDataData)
+        
+        carData = try Self.jsonDecoder.decode(CarData.self, from: inflatedCarData)
+    }
+
+    mutating func update(_ value: [JSONValue]) throws {
+        guard value.count == 2 else {
+            throw StateError.UpdateIncorrectSize
+        }
+        let first = value[0]
+        let second = value[1]
+        guard case .string(let key) = first else {
+            throw StateError.KeyError(value)
+        }
+        switch key {
+        case "positionZ":
+            guard case .string(let positionZ) = second else {
+                throw StateError.ValueError(value)
+            }
+            guard let data = Self.decodingService.getBase64Decoded(positionZ) else {
+                throw ZLibDecodingError.base64DecodingFailed
+            }
+            let inflated = try Self.decodingService.inflate(data)
+            position = try Self.jsonDecoder.decode(Position.self, from: inflated)
+        case "carDataZ":
+            guard case .string(let carDataZ) = second else {
+                throw StateError.ValueError(value)
+            }
+            guard let data = Self.decodingService.getBase64Decoded(carDataZ) else {
+                throw ZLibDecodingError.base64DecodingFailed
+            }
+            let inflated = try Self.decodingService.inflate(data)
+            carData = try Self.jsonDecoder.decode(CarData.self, from: inflated)
+        default:
+            return
+        }
     }
 }
 
 enum StateError: Error {
     case SessionInfoNotFound
+    case UpdateIncorrectSize
+    case KeyError([JSONValue])
+    case ValueError([JSONValue])
+    case PositionZNotFound
+    case CarDataZNotFound
 }
