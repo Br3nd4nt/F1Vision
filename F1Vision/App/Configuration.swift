@@ -10,10 +10,10 @@ import Puppy
 
 enum Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
-    static let debugMode = true
-    static let zoom = 0.9
+    static let debugMode: Bool = true
+    static let zoom: Double = 0.9
     
-    static let rotationAngle: Double = 1
+    static let rotationAngle: Double = 0.5
     static let driverPointRadius: Double = 10
     
     private static var socketHost = "localhost"

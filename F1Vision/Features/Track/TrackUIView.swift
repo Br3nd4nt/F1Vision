@@ -18,6 +18,7 @@ final class TrackUIView: UIView {
     private let bezierPath = UIBezierPath()
 
     private let debugBoundingBoxLayer = CAShapeLayer()
+    private let debugBoundingBoxCenterPointLayer = CAShapeLayer()
 
     private let viewModel: TrackViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -52,6 +53,9 @@ final class TrackUIView: UIView {
             debugBoundingBoxLayer.lineWidth = 1
             debugBoundingBoxLayer.lineDashPattern = [4, 3]
             layer.addSublayer(debugBoundingBoxLayer)
+            
+            debugBoundingBoxCenterPointLayer.fillColor = UIColor.red.cgColor
+            layer.addSublayer(debugBoundingBoxCenterPointLayer)
         }
     }
 
@@ -98,6 +102,17 @@ final class TrackUIView: UIView {
             )
             let bboxPath = UIBezierPath(rect: rect)
             debugBoundingBoxLayer.path = bboxPath.cgPath
+            logger.debug("\(rect)")
+            logger.debug("Bottom right point: \(CGPoint(x: maxX, y: maxY))")
+            let center = CGPoint(x: (maxX + minX) / 2, y: (maxY + minY) / 2)
+            let centerPath = UIBezierPath(
+                arcCenter: center,
+                radius: Configuration.driverPointRadius / 2,
+                startAngle: 0,
+                endAngle: .pi * 2,
+                clockwise: true
+            )
+            debugBoundingBoxCenterPointLayer.path = centerPath.cgPath
         }
     }
 

@@ -6,7 +6,7 @@
 //
 
 struct SessionDataSeries: Codable {
-    let lap: Int
+    let lap: Int?
     let utc: String
 }
 

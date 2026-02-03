@@ -27,7 +27,7 @@ struct BestSpeeds: Codable {
 }
 
 struct PersonalBestLapTime: Codable {
-    let lap: Int
-    let position: Int
-    let value: String
+    let lap: Int?
+    let position: Int?
+    let value: String?
 }

@@ -7,7 +7,7 @@
 
 struct RaceControlMessage: Codable {
     let category: String // TODO: redo to enum
-    let lap: Int
+    let lap: Int?
     let message: String
     let utc: String
 }
