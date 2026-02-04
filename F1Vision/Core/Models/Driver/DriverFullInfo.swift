@@ -15,7 +15,7 @@ struct DriverFullInfo: Codable {
     let line: Int
     let raceNumber: String?
     let reference: String?
-    let teamColor: String?
+    let teamColour: String?
     let teamName: String?
     let tla: String?
 }

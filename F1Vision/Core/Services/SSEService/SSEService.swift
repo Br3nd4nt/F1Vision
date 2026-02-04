@@ -46,7 +46,7 @@ final class SSEService: ObservableObject {
         switch e {
         case "initial":
             do {
-                let message = try Self.jsonDecoder.decode(InitialResponse.self, from: data)
+                let message = try Self.jsonDecoder.decode(SSEmessage.self, from: data)
                 let state = try State(message)
                 DispatchQueue.main.async { [weak self] in
                     self?.state = state
@@ -64,8 +64,29 @@ final class SSEService: ObservableObject {
             } catch {
                 logger.error("Other error: \(error)")
             }
-        case "update":
-            break
+        case "updates":
+            do {
+                let message = try Self.jsonDecoder.decode([[JSONValue]].self, from: data)
+                for update in message {
+                    DispatchQueue.main.async { [weak self] in
+                        do {
+                            try self?.state?.update(update)
+                        } catch {
+                            self?.logger.warning("Error updating state: \(error)")
+                        }
+                    }
+                }
+            } catch let DecodingError.keyNotFound(key, context) {
+                logger.error("Missing key: \(key.stringValue)")
+                logger.error(context.debugDescription)
+                logger.debug("Initial json: \(String(decoding: data, as: Unicode.UTF8.self))")
+            } catch let DecodingError.typeMismatch(type, context) {
+                logger.error("Type mismatch: \(type)")
+                logger.error(context.debugDescription)
+                logger.debug("Initial json: \(String(decoding: data, as: Unicode.UTF8.self))")
+            } catch {
+                logger.error("Other error: \(error)")
+            }
         default:
             return
         }

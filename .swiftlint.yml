@@ -3,3 +3,4 @@ parent_config: swiftlint-config/.swiftlint.yml
 disabled_rules:
  - identifier_name
  - trailing_whitespace
+ - todo

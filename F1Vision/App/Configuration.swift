@@ -6,25 +6,34 @@
 //
 
 import Foundation
+import UIKit
 import Puppy
 
 enum Configuration {
     private static let logger: Puppy = Dependencies.shared.logger
-    static let debugMode = true
-    static let zoom = 0.9
+    static let debugMode: Bool = true
+    static let zoom: Double = 0.9
     
-    static let rotationAngle: Double = 1
-    static let driverPointRadius: Double = 10
+    static let rotationAngle: Double = 0.5
+    static let driverPointRadius: Double = 7
     
+    static let defaultDriverPointColor: UIColor = .lightGray
+    
+    private static var socketScheme = "http"
     private static var socketHost = "localhost"
-    private static var socketPort = 4_000
     private static var socketPath = "/api/sse"
+    private static var socketPort = 4_000
+
+    private static let mapRequestScheme = "https"
+    private static let mapRequestHost = "api.multiviewer.app"
+    private static let mapRequestPath = "/api/v1/circuits"
+    
     static var sseURL: URL {
         var components = URLComponents()
-        components.scheme = "http"
-        components.host = socketHost
-        components.port = socketPort
-        components.path = socketPath
+        components.scheme   = socketScheme
+        components.host     = socketHost
+        components.port     = socketPort
+        components.path     = socketPath
         let url = components.url
         if let url {
             return url
@@ -32,14 +41,12 @@ enum Configuration {
         logger.error("Error creating websocket URL")
         fatalError("Error creating websocket URL")
     }
-
-    private static let mapRequestHost = "api.multiviewer.app"
-    private static let mapRequestPath = "/api/v1/circuits"
+    
     static var mapRequestBaseURL: URL {
         var components = URLComponents()
-        components.scheme = "https"
-        components.host = mapRequestHost
-        components.path = mapRequestPath
+        components.scheme   = mapRequestScheme
+        components.host     = mapRequestHost
+        components.path     = mapRequestPath
         let url = components.url
         if let url {
             return url
