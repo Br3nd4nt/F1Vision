@@ -15,8 +15,7 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        viewModel.drivers.count
-        return 0
+        viewModel.driversOrder.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -27,38 +26,49 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-//        let driver = viewModel.drivers[indexPath.section]
+        guard let driver = viewModel.driversOrder.first(where: { $0.value == indexPath.section + 1 })?.key else {
+            return collectionView.dequeueReusableCell(
+                withReuseIdentifier: viewModel.emptyCellReuseId,
+                for: indexPath
+            )
+        }
         
-//        switch indexPath.item {
-//        case 0:
-//            guard let cell = collectionView.dequeueReusableCell(
-//                withReuseIdentifier: DriverCodeCell.reuseId,
-//                for: indexPath
-//            ) as? DriverCodeCell else {
-//                return UICollectionViewCell()
-//            }
-//            cell.configure(code: "\(driver.position)", backgroundColor: driver.color)
-//            return cell
-//        case 1:
-//            guard let cell = collectionView.dequeueReusableCell(
-//                withReuseIdentifier: DriverCodeCell.reuseId,
-//                for: indexPath
-//            ) as? DriverCodeCell else {
-//                return UICollectionViewCell()
-//            }
-//            cell.configure(code: driver.name, backgroundColor: driver.color)
-//            return cell
-//        case 2:
-//            guard let cell = collectionView.dequeueReusableCell(
-//                withReuseIdentifier: TyreCell.reuseId,
-//                for: indexPath
-//            ) as? TyreCell else {
-//                return UICollectionViewCell()
-//            }
-//            cell.configure(TyreType(driver.tyre))
-//            return cell
-//        default:
-            return UICollectionViewCell()
-//        }
+        switch indexPath.item {
+        case 0:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: DriverCodeCell.reuseId,
+                for: indexPath
+            ) as? DriverCodeCell else {
+                return collectionView.dequeueReusableCell(
+                    withReuseIdentifier: viewModel.emptyCellReuseId,
+                    for: indexPath
+                )
+            }
+            cell.configure(
+                    code: "\(driver)",
+                    backgroundColor: viewModel.getDriverColor(driver)
+                )
+            return cell
+        case 1:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: DriverCodeCell.reuseId,
+                for: indexPath
+            ) as? DriverCodeCell else {
+                return collectionView.dequeueReusableCell(
+                    withReuseIdentifier: viewModel.emptyCellReuseId,
+                    for: indexPath
+                )
+            }
+            cell.configure(
+                    code: "\(viewModel.getDriverName(driver))",
+                    backgroundColor: viewModel.getDriverColor(driver)
+                )
+            return cell
+        default:
+            return collectionView.dequeueReusableCell(
+                withReuseIdentifier: viewModel.emptyCellReuseId,
+                for: indexPath
+            )
+        }
     }
 }

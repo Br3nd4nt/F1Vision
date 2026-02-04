@@ -17,6 +17,8 @@ enum Configuration {
     static let rotationAngle: Double = 0.5
     static let driverPointRadius: Double = 7
     
+    static let defaultDriverPointColor: UIColor = .lightGray
+    
     private static var socketScheme = "http"
     private static var socketHost = "localhost"
     private static var socketPath = "/api/sse"

@@ -24,6 +24,20 @@ final class TelemetryTableViewController: UIViewController {
         dataSource = TelemetryTableCollectionViewDataSource(viewModel: viewModel)
         delegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
+        
+        self.viewModel.$driversTelemetry
+            .receive(on: DispatchQueue.main)
+            .sink {[weak self] _ in
+                self?.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+        
+        self.viewModel.$driversOrder
+            .receive(on: DispatchQueue.main)
+            .sink {[weak self] _ in
+                self?.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 
     @available(*, unavailable)
@@ -54,6 +68,7 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
         collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: viewModel.emptyCellReuseId)
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .background
         collectionView.showsVerticalScrollIndicator = false

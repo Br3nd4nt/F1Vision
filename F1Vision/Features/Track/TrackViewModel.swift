@@ -36,7 +36,7 @@ final class TrackViewModel: ObservableObject {
     // final track points form drawing
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
-    private static let defaultDriverPointColor: UIColor = .lightGray
+    private static let defaultDriverPointColor: UIColor = Configuration.defaultDriverPointColor
     
     // driver points
     private var defaultDriverPoints: [Int: CGPoint] = [:]
@@ -107,7 +107,6 @@ final class TrackViewModel: ObservableObject {
             colors[driver] = color
         }
         driversColors = colors
-        logger.info(String(describing: colors))
     }
     
     // called when we first get the points data

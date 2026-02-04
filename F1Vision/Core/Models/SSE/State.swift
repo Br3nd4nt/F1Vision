@@ -13,6 +13,7 @@ struct State: Codable {
     
     var position: Position
     var carData: CarData
+    var driversOrder: [Int: Int]
     let sessionInfo: SessionInfo?
     let drivers: [Int: DriverFullInfo]?
     
@@ -35,7 +36,6 @@ struct State: Codable {
             infoList[number] = info
         }
         drivers = infoList
-        
         
         // position in space (coordinates)
         guard let positionZ = response.positionZ else {
@@ -60,8 +60,22 @@ struct State: Codable {
         let inflatedCarData = try Self.decodingService.inflate(carDataData)
         
         carData = try Self.jsonDecoder.decode(CarData.self, from: inflatedCarData)
+        
+        // timing app data (drivers order)
+        guard let timingAppData = response.timingAppData else {
+            throw StateError.TimingAppDataNotFound
+        }
+        
+        var order = [Int: Int]()
+        for (key, value) in timingAppData.lines {
+            guard let number = Int(key), let posString = value.gridPos, let pos = Int(posString) else {
+                throw StateError.TimingAppDataNotFound
+            }
+            order[number] = pos
+        }
+        driversOrder = order
     }
-
+    
     mutating func update(_ value: [JSONValue]) throws {
         guard value.count == 2 else {
             throw StateError.UpdateIncorrectSize
@@ -90,6 +104,23 @@ struct State: Codable {
             }
             let inflated = try Self.decodingService.inflate(data)
             carData = try Self.jsonDecoder.decode(CarData.self, from: inflated)
+        case "timingAppData":
+            guard case .object(let timing) = second,
+                  let linesArray = timing["lines"],
+                  case .object(let lines) = linesArray else {
+                throw StateError.ValueError(value)
+            }
+            for (key, value) in lines {
+                guard
+                    let number = Int(key),
+                    case .object(let timing) = value,
+                    let pos = timing["gridPos"],
+                    case .int(let posNumber) = pos
+                else {
+                    continue
+                }
+                driversOrder[number] = posNumber
+            }
         default:
             return
         }
@@ -104,4 +135,5 @@ enum StateError: Error {
     case ValueError([JSONValue])
     case PositionZNotFound
     case CarDataZNotFound
+    case TimingAppDataNotFound
 }
