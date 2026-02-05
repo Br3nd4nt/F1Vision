@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct State: Codable {
+@MainActor
+struct SSEstate: Codable {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
     private static let decodingService = Dependencies.shared.zlibDecoder
     

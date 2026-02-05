@@ -32,11 +32,11 @@ final class DriverCodeCell: UICollectionViewCell {
     func configure(code: String, backgroundColor: UIColor) {
         backgroundWrapperView.backgroundColor = backgroundColor
         codeLabel.text = code
-        if backgroundColor.isLight {
-            codeLabel.textColor = .dark
-        } else {
-            codeLabel.textColor = .light
-        }
+//        if backgroundColor.isLight {
+//            codeLabel.textColor = .dark
+//        } else {
+//            codeLabel.textColor = .light
+//        }
     }
 
     private func configureUI() {

@@ -44,7 +44,7 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
             .store(in: &cancellables)
     }
     
-    private func handleState(_ state: State?) {
+    private func handleState(_ state: SSEstate?) {
         guard let state else {
             return
         }
@@ -64,7 +64,7 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
         driversTelemetry = telemetry
     }
     
-    private func saveDriversInfo(_ state: State?) {
+    private func saveDriversInfo(_ state: SSEstate?) {
         if driversInfo != nil {
             return
         }

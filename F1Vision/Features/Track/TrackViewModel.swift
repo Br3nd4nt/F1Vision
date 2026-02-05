@@ -88,7 +88,7 @@ final class TrackViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    private func saveDriversInfo(_ state: State?) {
+    private func saveDriversInfo(_ state: SSEstate?) {
         if driversInfo != nil {
             return
         }
@@ -134,7 +134,7 @@ final class TrackViewModel: ObservableObject {
     private func getRotations() {
         guard let box = self.defaultBoundBox, !defaultTrackPoints.isEmpty else { return }
         let center = box.getCenterPoint()
-        let rotation = Configuration.rotationAngle
+        let rotation = Configuration.rotationAngleStep
         rotatedTargetValues = [:]
         
         for angle in stride(from: rotation, to: 90, by: rotation) {
@@ -253,7 +253,8 @@ final class TrackViewModel: ObservableObject {
     }
     
     // MARK: SSE Service state proccessing
-    private func proccessSSEstate(_ state: State?) {
+    
+    private func proccessSSEstate(_ state: SSEstate?) {
         guard let state, let snapshot = state.position.Position.last else {
             return
         }

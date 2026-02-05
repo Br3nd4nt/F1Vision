@@ -44,8 +44,6 @@ final class TrackUIView: UIView {
     // MARK: - Setup
 
     private func setupUI() {
-        backgroundColor = .background
-
         layer.addSublayer(trackShapeLayer)
         trackShapeLayer.strokeColor = UIColor.lightGray.cgColor
         trackShapeLayer.fillColor = UIColor.clear.cgColor

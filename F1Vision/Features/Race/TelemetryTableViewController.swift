@@ -18,6 +18,9 @@ final class TelemetryTableViewController: UIViewController {
     private let viewModel: RaceViewModel
     private let dataSource: UICollectionViewDataSource
     private let delegate: TelemetryTableCollectionViewDelegate
+    
+    private let horizontalPadding: Double = 10
+    private let verticalPadding: Double = 5
 
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
@@ -61,8 +64,13 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor)
         collectionView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
-
-        collectionView.backgroundColor = .systemGroupedBackground
+        
+        collectionView.contentInset = UIEdgeInsets(
+            top: verticalPadding,
+            left: horizontalPadding,
+            bottom: -verticalPadding,
+            right: horizontalPadding
+        )
         collectionView.dataSource = dataSource
         collectionView.delegate = delegate
         collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
@@ -70,7 +78,7 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: viewModel.emptyCellReuseId)
         collectionView.isScrollEnabled = false
-        collectionView.backgroundColor = .background
+        collectionView.backgroundColor = UIColor.appBackground
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
     }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum JSONValue: Codable {
+enum JSONValue: Codable, Sendable {
     case string(String)
     case int(Int)
     case double(Double)
