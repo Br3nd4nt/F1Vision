@@ -9,16 +9,13 @@ import Foundation
 import UIKit
 import Puppy
 
+@MainActor
 enum Configuration {
-    private static let logger: Puppy = Dependencies.shared.logger
     static let debugMode: Bool = true
     static let zoom: Double = 0.9
     
-    static let rotationAngle: Double = 0.5
     static let driverPointRadius: Double = 7
-    
-    static let defaultDriverPointColor: UIColor = .lightGray
-    
+
     private static var socketScheme = "http"
     private static var socketHost = "localhost"
     private static var socketPath = "/api/sse"
@@ -54,4 +51,8 @@ enum Configuration {
         logger.error("Error creating map request URL")
         fatalError("Error creating map request URL")
     }
+    
+    private static let logger: Puppy = Dependencies.shared.logger
+    static let defaultDriverPointColor: UIColor = .lightGray
+    static let rotationAngleStep: Double = 0.5
 }

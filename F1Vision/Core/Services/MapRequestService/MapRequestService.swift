@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Puppy
+import SwiftUI
 
 @MainActor
 final class MapRequestService: ObservableObject {
@@ -18,7 +19,9 @@ final class MapRequestService: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     @Published var response: MapResponse?
     @Published var isLoaded = false
+
     @Published var isError = false
+    @Published var errorMessage: String?
     
     init(sseService: SSEService) {
         self.sseService = sseService
@@ -31,11 +34,8 @@ final class MapRequestService: ObservableObject {
                 Task(priority: .userInitiated) {
                     do {
                         try await self?.fetchMapData()
-                    } catch MapRequestServiceError.MissingSessionInfo {
-                        self?.logger.error("No session data")
-                        DispatchQueue.main.async { [weak self] in
-                            self?.isError = true
-                        }
+                    } catch {
+                        self?.handleError(error)
                     }
                 }
             }
@@ -43,7 +43,9 @@ final class MapRequestService: ObservableObject {
     }
     
     func fetchMapData() async throws {
-        self.isLoaded = false
+        withAnimation {
+            self.isLoaded = false
+        }
         guard sseService.gotInitialResponse, sseService.state != nil else {
             logger.warning("no initial")
             return
@@ -62,8 +64,48 @@ final class MapRequestService: ObservableObject {
         let message = try Self.jsonDecoder.decode(MapResponse.self, from: data)
         logger.info("Got track for \(message.location)")
         await MainActor.run {
-            self.isLoaded = true
+            withAnimation {
+                self.isLoaded = true
+            }
             self.response = message
+        }
+    }
+    
+    func retry() {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self else { return }
+            do {
+                try await fetchMapData()
+                await MainActor.run {
+                    withAnimation {
+                        isError = false
+                    }
+                    errorMessage = nil
+                }
+            } catch {
+                handleError(error)
+            }
+        }
+    }
+
+    private func handleError(_ error: Error) {
+        let message: String
+        switch error {
+        case MapRequestServiceError.MissingSessionInfo:
+            logger.error("No session data")
+            message = "Missing session info. Try reconnecting."
+        case let urlError as URLError:
+            logger.error("Network error: \(urlError)")
+            message = urlError.localizedDescription
+        default:
+            logger.error("Map request error: \(error)")
+            message = error.localizedDescription
+        }
+        DispatchQueue.main.async { [weak self] in
+            withAnimation {
+                self?.isError = true
+            }
+            self?.errorMessage = message
         }
     }
 

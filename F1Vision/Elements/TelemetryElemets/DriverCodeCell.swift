@@ -59,7 +59,7 @@ final class DriverCodeCell: UICollectionViewCell {
         backgroundWrapperView.pinBottom(to: codeLabel, -verticalPadding)
 
         if Configuration.debugMode {
-            layer.borderColor = UIColor.yellow.cgColor
+            layer.borderColor = UIColor.systemPink.cgColor
             layer.borderWidth = 1
         }
     }

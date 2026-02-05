@@ -10,7 +10,7 @@ import Puppy
 import Swinject
 
 final class Dependencies {
-    static let shared = Dependencies()
+    @MainActor static let shared = Dependencies()
     private let container = Container()
 
     private init() {

@@ -14,7 +14,10 @@ struct F1Vision: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ZStack {
+                Color.appBackground
+                ContentView()
+            }
         }
     }
 }
@@ -26,6 +29,7 @@ struct ContentView: View {
     @StateObject private var mapService: MapRequestService
     @ObservedObject private var trackViewModel: TrackViewModel
     @ObservedObject private var raceViewModel: RaceViewModel
+    @State private var activeAlert: ServiceAlert?
     
     init() {
         let sseService = SSEService()
@@ -42,17 +46,70 @@ struct ContentView: View {
     }
     
     var body: some View {
-        HStack {
-            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
-                .frame(minWidth: 300, maxWidth: 400)
-                .border(Configuration.debugMode ? Color.green : Color.clear)
-            TrackView(viewModel: trackViewModel)
-                .border(Configuration.debugMode ? Color.cyan : Color.clear)
+        ZStack {
+            if !mapService.isLoaded {
+                VStack {
+                    ProgressView()
+                    Text("Getting stuff ready...")
+                }
+            } else {
+                HStack {
+                    TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+                        .frame(minWidth: 300, maxWidth: 400)
+                        .border(Configuration.debugMode ? Color.green : Color.clear)
+                    TrackView(viewModel: trackViewModel)
+                        .border(Configuration.debugMode ? Color.cyan : Color.clear)
+                }
+            }
         }
-        .accentColor(.red)
-        .background(Color(.background))
         .task {
             sseService.makeConnection()
+        }
+        .onReceive(sseService.$hasError) { hasError in
+            guard hasError else { return }
+            let message = sseService.errorMessage ?? "An error occurred."
+            activeAlert = .sse(message)
+        }
+        .onReceive(mapService.$isError) { isError in
+            guard isError else { return }
+            let message = mapService.errorMessage ?? "An error occurred."
+            activeAlert = .map(message)
+        }
+        .alert(item: $activeAlert) { alert in
+            switch alert {
+            case .sse(let message):
+                return Alert(
+                    title: Text("Live Connection Error"),
+                    message: Text(message),
+                    primaryButton: .default(Text("Reconnect")) {
+                        sseService.reconnect()
+                    },
+                    secondaryButton: .cancel()
+                )
+            case .map(let message):
+                return Alert(
+                    title: Text("Map Data Error"),
+                    message: Text(message),
+                    primaryButton: .default(Text("Retry")) {
+                        mapService.retry()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+        }
+    }
+}
+
+private enum ServiceAlert: Identifiable {
+    case sse(String)
+    case map(String)
+    
+    var id: String {
+        switch self {
+        case .sse(let message):
+            return "sse:\(message)"
+        case .map(let message):
+            return "map:\(message)"
         }
     }
 }
