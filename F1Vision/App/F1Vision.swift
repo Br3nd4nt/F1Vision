@@ -47,20 +47,20 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            if !mapService.isLoaded {
-                VStack {
-                    ProgressView()
-                    Text("Getting stuff ready...")
-                }
-            } else {
+//            if !mapService.isLoaded {
+//                VStack {
+//                    ProgressView()
+//                    Text("Getting stuff ready...")
+//                }
+//            } else {
                 HStack {
                     TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
                         .frame(minWidth: 0, maxWidth: 1000)
                         .border(Configuration.debugMode ? Color.green : Color.clear)
-                    TrackView(viewModel: trackViewModel)
-                        .border(Configuration.debugMode ? Color.cyan : Color.clear)
+//                    TrackView(viewModel: trackViewModel)
+//                        .border(Configuration.debugMode ? Color.cyan : Color.clear)
                 }
-            }
+//            }
         }
         .task {
             sseService.makeConnection()

@@ -33,7 +33,7 @@ final class MapRequestService: ObservableObject {
                 }
                 Task(priority: .userInitiated) {
                     do {
-                        try await self?.fetchMapData()
+//                        try await self?.fetchMapData()
                     } catch {
                         self?.handleError(error)
                     }

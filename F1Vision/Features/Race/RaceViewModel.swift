@@ -20,16 +20,14 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
 
     @Published var isLoaded = false
 
-    let tableColumnWidths: [Double] = [40, 60, 35]
-    
-    @Published var driversTelemetry: [Int: CarDataChannels] = [:]
+//    @Published var driversTelemetry: [Int: CarDataChannels] = [:]
     
     private var driversInfo: [Int: DriverFullInfo]?
     private var driversColors: [Int: UIColor]?
     private static let defaultDriverPointColor: UIColor = Configuration.defaultDriverPointColor
     
     // Driver's number: their position
-    @Published var driversOrder: [Int: Int] = [:]
+    @Published var driversStates: [Int: DriverState] = [:]
 
     init(sseService: SSEService) {
         self.sseService = sseService
@@ -48,27 +46,15 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
         guard let state else {
             return
         }
-        driversOrder = state.driversOrder
-        
-        guard let entry = state.carData.Entries.last else {
-            logger.warning("No car data available")
-            return
-        }
-        var telemetry = [Int: CarDataChannels]()
-        for (driver, info) in entry.Cars {
-            guard let number = Int(driver) else {
-                continue
-            }
-            telemetry[number] = info
-        }
-        driversTelemetry = telemetry
+        driversStates = state.driversStates
+
     }
     
     private func saveDriversInfo(_ state: SSEstate?) {
         if driversInfo != nil {
             return
         }
-        guard let state, let info = state.drivers else {
+        guard let state, let info = state.driversInfo else {
             return
         }
         driversInfo = info

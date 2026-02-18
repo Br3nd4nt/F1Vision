@@ -28,6 +28,8 @@ struct TimingDataLine: Codable { // for testing
     let PitOut: Bool?
     let Position: String
     let BestLapTime: BestLapTime?
+    let TimeDiffToFastest: String?
+    let TimeDiffToPositionAhead: String?
 }
 
 //struct IntervalToPositionAhead: Codable {

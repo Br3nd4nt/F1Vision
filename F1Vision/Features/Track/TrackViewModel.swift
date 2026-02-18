@@ -83,7 +83,7 @@ final class TrackViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.saveDriversInfo(state)
-                self?.proccessSSEstate(state)
+//                self?.proccessSSEstate(state)
             }
             .store(in: &cancellables)
     }
@@ -92,7 +92,7 @@ final class TrackViewModel: ObservableObject {
         if driversInfo != nil {
             return
         }
-        guard let state, let info = state.drivers else {
+        guard let state, let info = state.driversInfo else {
             return
         }
         driversInfo = info
@@ -254,21 +254,21 @@ final class TrackViewModel: ObservableObject {
     
     // MARK: SSE Service state proccessing
     
-    private func proccessSSEstate(_ state: SSEstate?) {
-        guard let state, let snapshot = state.position.Position.last else {
-            return
-        }
-        defaultDriverPoints = [:]
-        for (driver, position) in snapshot.Entries {
-            guard let number = Int(driver) else {
-                continue
-            }
-            let point = CGPoint(x: position.X, y: position.Y)
-            defaultDriverPoints[number] = point
-        }
-        
-        calculateDriverPoints()
-    }
+//    private func proccessSSEstate(_ state: SSEstate?) {
+//        guard let state, let snapshot = state.position.Position.last else {
+//            return
+//        }
+//        defaultDriverPoints = [:]
+//        for (driver, position) in snapshot.Entries {
+//            guard let number = Int(driver) else {
+//                continue
+//            }
+//            let point = CGPoint(x: position.X, y: position.Y)
+//            defaultDriverPoints[number] = point
+//        }
+//        
+//        calculateDriverPoints()
+//    }
     
     private func calculateDriverPoints() {
         guard let currentChosenBox, let defaultBoundBox else {
