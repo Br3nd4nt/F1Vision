@@ -116,7 +116,7 @@ final class MapRequestService: ObservableObject {
     }
     
     private func getTrackCode() throws -> Int {
-        guard let key = sseService.state?.sessionInfo?.meeting?.circuit.key else {
+        guard let key = sseService.state?.sessionInfo?.Meeting?.Circuit.Key else {
             logger.warning("no session info found")
             throw MapRequestServiceError.MissingSessionInfo
         }

@@ -6,22 +6,22 @@
 //
 
 struct Meeting: Codable {
-    let circuit: MeetingCircuitInfo
-    let country: MeetingCountryInfo
-    let key: Int
-    let location: String
-    let name: String
-    let number: Int
-    let officialName: String
+    let Circuit: MeetingCircuitInfo
+    let Country: MeetingCountryInfo
+    let Key: Int
+    let Location: String
+    let Name: String
+    let Number: Int
+    let OfficialName: String
 }
 
 struct MeetingCircuitInfo: Codable {
-    let key: Int
-    let shortName: String
+    let Key: Int
+    let ShortName: String
 }
 
 struct MeetingCountryInfo: Codable {
-    let code: String
-    let key: Int
-    let name: String
+    let Code: String
+    let Key: Int
+    let Name: String
 }

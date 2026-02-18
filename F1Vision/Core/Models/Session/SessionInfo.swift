@@ -6,12 +6,12 @@
 //
 
 struct SessionInfo: Codable {
-    let archiveStatus: ArchiveStatus
-    let endDate: String
-    let key: Int
-    let meeting: Meeting?
+    let ArchiveStatus: ArchiveStatus
+    let EndDate: String
+    let Key: Int
+    let Meeting: Meeting?
 }
 
 struct ArchiveStatus: Codable {
-    let status: String
+    let Status: String
 }

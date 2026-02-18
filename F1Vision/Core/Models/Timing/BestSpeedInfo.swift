@@ -7,5 +7,5 @@
 
 struct BestSpeedInfo: Codable {
     let position: Int?
-    let value: String
+    let value: String?
 }

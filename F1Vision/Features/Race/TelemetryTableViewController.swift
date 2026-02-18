@@ -21,6 +21,7 @@ final class TelemetryTableViewController: UIViewController {
     
     private let horizontalPadding: Double = 10
     private let verticalPadding: Double = 5
+    private var lastCollectionViewSize: CGSize = .zero
 
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
@@ -57,6 +58,11 @@ final class TelemetryTableViewController: UIViewController {
             view.layer.borderWidth = 1
         }
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        recalculateLayoutIfNeeded()
+    }
 
     private func configureCollectionView() {
         view.configureSubview(collectionView)
@@ -75,11 +81,28 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.delegate = delegate
         collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
-        collectionView.register(TyreCell.self, forCellWithReuseIdentifier: TyreCell.reuseId)
+        collectionView.register(TireCell.self, forCellWithReuseIdentifier: TireCell.reuseId)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: viewModel.emptyCellReuseId)
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = UIColor.appBackground
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
+    }
+    
+    // MARK: public methods
+    func configureView() {
+        recalculateLayoutIfNeeded(force: true)
+    }
+    
+    private func recalculateLayoutIfNeeded(force: Bool = false) {
+        let size = collectionView.bounds.size
+        guard force || size != lastCollectionViewSize else {
+            return
+        }
+        lastCollectionViewSize = size
+        
+        // Re-run UICollectionViewDelegateFlowLayout sizing for current bounds.
+        collectionView.collectionViewLayout.invalidateLayout()
+        collectionView.performBatchUpdates(nil)
     }
 }

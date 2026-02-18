@@ -24,7 +24,10 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         let availableHeight = collectionView.bounds.inset(by: collectionView.layoutMargins).height
-        let rowCount = 20.0
+        var rowCount = Double(viewModel.driversOrder.count)
+        if rowCount == 0 {
+            rowCount = 22.0
+        }
         let cellHeight = availableHeight / rowCount
         
         let width = viewModel.tableColumnWidths[indexPath.item]

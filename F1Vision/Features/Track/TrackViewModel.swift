@@ -100,7 +100,7 @@ final class TrackViewModel: ObservableObject {
         
         var colors = [Int: UIColor]()
         for (driver, info) in info {
-            guard let hex = info.teamColour else {
+            guard let hex = info.TeamColour else {
                 continue
             }
             let color = UIColor(hex: hex)

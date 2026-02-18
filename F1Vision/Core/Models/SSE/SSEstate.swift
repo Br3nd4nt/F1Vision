@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import Puppy
 
 @MainActor
 struct SSEstate: Codable {
     private static let jsonDecoder = Dependencies.shared.jsonDecoder
     private static let decodingService = Dependencies.shared.zlibDecoder
+    private static let logger: Puppy = Dependencies.shared.logger
     
     var position: Position
     var carData: CarData
@@ -20,13 +22,14 @@ struct SSEstate: Codable {
     
     init(_ response: SSEmessage) throws {
         // session info
+        Self.logger.debug(String(describing: response))
         guard let info = response.sessionInfo else {
             throw StateError.SessionInfoNotFound
         }
         sessionInfo = info
         
         // driver info
-        guard let driverList = response.driverList else {
+        guard let driverList = response.DriverList else {
             throw StateError.DriversInfoNotFound
         }
         var infoList = [Int: DriverFullInfo]()
@@ -39,38 +42,40 @@ struct SSEstate: Codable {
         drivers = infoList
         
         // position in space (coordinates)
-        guard let positionZ = response.positionZ else {
-            throw StateError.PositionZNotFound
-        }
-        guard let positionData = Self.decodingService.getBase64Decoded(positionZ) else {
-            throw ZLibDecodingError.base64DecodingFailed
-        }
-        let inflatedPosition = try Self.decodingService.inflate(positionData)
-        
-        position = try Self.jsonDecoder.decode(Position.self, from: inflatedPosition)
+        position = Position(Position: [])
+//        guard let positionZ = response.PositionZ else {
+//            throw StateError.PositionZNotFound
+//        }
+//        guard let positionData = Self.decodingService.getBase64Decoded(positionZ) else {
+//            throw ZLibDecodingError.base64DecodingFailed
+//        }
+//        let inflatedPosition = try Self.decodingService.inflate(positionData)
+//        
+//        position = try Self.jsonDecoder.decode(Position.self, from: inflatedPosition)
         
         // car data
-        guard let carDataZ = response.carDataZ else {
-            throw StateError.CarDataZNotFound
-        }
+//        guard let carDataZ = response.CarDataZ else {
+//            throw StateError.CarDataZNotFound
+//        }
+//        
+//        guard let carDataData = Self.decodingService.getBase64Decoded(carDataZ) else {
+//            throw ZLibDecodingError.base64DecodingFailed
+//        }
+//        
+//        let inflatedCarData = try Self.decodingService.inflate(carDataData)
+//        
+//        carData = try Self.jsonDecoder.decode(CarData.self, from: inflatedCarData)
+        carData = CarData(Entries: [])
         
-        guard let carDataData = Self.decodingService.getBase64Decoded(carDataZ) else {
-            throw ZLibDecodingError.base64DecodingFailed
-        }
-        
-        let inflatedCarData = try Self.decodingService.inflate(carDataData)
-        
-        carData = try Self.jsonDecoder.decode(CarData.self, from: inflatedCarData)
-        
-        // timing app data (drivers order)
-        guard let timingAppData = response.timingAppData else {
-            throw StateError.TimingAppDataNotFound
+        // timing data (drivers order)
+        guard let timingData = response.timingData else {
+            throw StateError.TimingDataNotFound
         }
         
         var order = [Int: Int]()
-        for (key, value) in timingAppData.lines {
-            guard let number = Int(key), let posString = value.gridPos, let pos = Int(posString) else {
-                throw StateError.TimingAppDataNotFound
+        for (driver, data) in timingData.Lines {
+            guard let number = Int(driver), let pos = Int(data.Position) else {
+                throw StateError.TimingDataNotFound
             }
             order[number] = pos
         }
@@ -105,7 +110,7 @@ struct SSEstate: Codable {
             }
             let inflated = try Self.decodingService.inflate(data)
             carData = try Self.jsonDecoder.decode(CarData.self, from: inflated)
-        case "timingAppData":
+        case "timingData":
             guard case .object(let timing) = second,
                   let linesArray = timing["lines"],
                   case .object(let lines) = linesArray else {
@@ -115,8 +120,9 @@ struct SSEstate: Codable {
                 guard
                     let number = Int(key),
                     case .object(let timing) = value,
-                    let pos = timing["gridPos"],
-                    case .int(let posNumber) = pos
+                    let pos = timing["position"],
+                    case .string(let posString) = pos,
+                    let posNumber = Int(posString)
                 else {
                     continue
                 }
@@ -136,5 +142,5 @@ enum StateError: Error {
     case ValueError([JSONValue])
     case PositionZNotFound
     case CarDataZNotFound
-    case TimingAppDataNotFound
+    case TimingDataNotFound
 }

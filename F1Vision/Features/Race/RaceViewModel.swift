@@ -76,7 +76,7 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
         
         var colors = [Int: UIColor]()
         for (driver, info) in info {
-            guard let hex = info.teamColour else {
+            guard let hex = info.TeamColour else {
                 continue
             }
             let color = UIColor(hex: hex)
@@ -96,6 +96,6 @@ final class RaceViewModel: ObservableObject { // TODO: add same logic with scree
     
     func getDriverName(_ driver: Int) -> String {
         guard let driversInfo, let d = driversInfo[driver] else { return "-" }
-        return d.tla ?? "-"
+        return d.Tla ?? "-"
     }
 }

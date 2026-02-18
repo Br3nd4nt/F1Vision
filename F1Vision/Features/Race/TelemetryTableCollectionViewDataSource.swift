@@ -45,7 +45,7 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
                 )
             }
             cell.configure(
-                    code: "\(driver)",
+                    code: "\(indexPath.section + 1)",
                     backgroundColor: viewModel.getDriverColor(driver)
                 )
             return cell

@@ -7,9 +7,10 @@
 
 struct SessionDataSeries: Codable {
     let lap: Int?
+    let sessionStatus: String?
     let utc: String
 }
 
 struct SessionData: Codable {
-    let series: [SessionDataSeries]
+    let statusSeries: [String: SessionDataSeries]
 }

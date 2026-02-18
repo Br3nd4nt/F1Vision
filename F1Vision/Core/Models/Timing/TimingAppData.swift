@@ -13,5 +13,5 @@ struct TimingAppDataLine: Codable {
     let gridPos: String?
     let line: Int?
     let racingNumber: String?
-    let stints: [StintInfo]?
+    let stints: [String: StintInfo]?
 }

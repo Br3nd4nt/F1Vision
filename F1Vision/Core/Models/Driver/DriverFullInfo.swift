@@ -6,16 +6,16 @@
 //
 
 struct DriverFullInfo: Codable {
-    let broadcastName: String?
-    let countryCode: String?
-    let firstName: String?
-    let fullName: String?
-    let headshotUrl: String?
-    let lastName: String?
-    let line: Int
-    let raceNumber: String?
-    let reference: String?
-    let teamColour: String?
-    let teamName: String?
-    let tla: String?
+    let BroadcastName: String?
+    let CountryCode: String?
+    let FirstName: String?
+    let FullName: String?
+    let HeadshotUrl: String?
+    let LastName: String?
+    let Line: Int?
+    let RaceNumber: String?
+    let Reference: String?
+    let TeamColour: String?
+    let TeamName: String?
+    let Tla: String?
 }
