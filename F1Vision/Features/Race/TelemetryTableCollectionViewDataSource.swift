@@ -9,7 +9,7 @@ import UIKit
 
 final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     private let viewModel: RaceViewModel
-    private let columnCount = 3
+    private let columnCount = 5
     
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
@@ -76,6 +76,30 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
                 )
             }
             cell.configure(viewModel.driversStates[driver]?.inPit ?? true)
+            return cell
+        case 3:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: IntervalTimeCell.reuseId,
+                for: indexPath
+            ) as? IntervalTimeCell else {
+                return collectionView.dequeueReusableCell(
+                    withReuseIdentifier: viewModel.emptyCellReuseId,
+                    for: indexPath
+                )
+            }
+            cell.configure(interval: viewModel.driversStates[driver]?.diffToAhead)
+            return cell
+        case 4:
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: IntervalTimeCell.reuseId,
+                for: indexPath
+            ) as? IntervalTimeCell else {
+                return collectionView.dequeueReusableCell(
+                    withReuseIdentifier: viewModel.emptyCellReuseId,
+                    for: indexPath
+                )
+            }
+            cell.configure(interval: viewModel.driversStates[driver]?.diffToFastest)
             return cell
         default:
             return collectionView.dequeueReusableCell(

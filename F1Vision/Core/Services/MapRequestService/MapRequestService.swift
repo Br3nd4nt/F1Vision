@@ -33,7 +33,7 @@ final class MapRequestService: ObservableObject {
                 }
                 Task(priority: .userInitiated) {
                     do {
-//                        try await self?.fetchMapData()
+                        try await self?.fetchMapData()
                     } catch {
                         self?.handleError(error)
                     }
@@ -112,7 +112,7 @@ final class MapRequestService: ObservableObject {
     private func createRequestURL() throws -> URL {
         try Configuration.mapRequestBaseURL
             .appendingPathComponent(String(getTrackCode()))
-            .appendingPathComponent("2025")
+            .appendingPathComponent("2026")
     }
     
     private func getTrackCode() throws -> Int {

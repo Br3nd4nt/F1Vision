@@ -38,7 +38,7 @@ struct TrackUIViewRepresentable: UIViewRepresentable {
         return trackView
     }
 
-    func updateUIView(_ uiView: TrackUIView, context _: Context) {
+    func updateUIView(_ uiView: TrackUIView, context : Context) {
         uiView.configureView()
     }
 }

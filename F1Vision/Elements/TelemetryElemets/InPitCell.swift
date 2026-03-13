@@ -72,7 +72,7 @@ final class InPitCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        let inset = strokeWidth / 2
+        let inset = strokeWidth
         let rect = contentView.bounds.insetBy(dx: inset, dy: inset)
 
         borderLayer.frame = contentView.bounds

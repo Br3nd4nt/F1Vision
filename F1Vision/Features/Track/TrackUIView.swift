@@ -17,6 +17,8 @@ final class TrackUIView: UIView {
     // track
     private let trackShapeLayer = CAShapeLayer()
     private let trackBezierPath = UIBezierPath()
+    private let trackStartPointLayer = CAShapeLayer()
+    private let trackStartPointRadius: CGFloat = 4
     
     // drivers
     private var driverLayers: [Int: CAShapeLayer] = [:]
@@ -48,6 +50,10 @@ final class TrackUIView: UIView {
         trackShapeLayer.strokeColor = UIColor.lightGray.cgColor
         trackShapeLayer.fillColor = UIColor.clear.cgColor
         trackShapeLayer.lineWidth = 5
+        
+        layer.addSublayer(trackStartPointLayer)
+        trackStartPointLayer.fillColor = UIColor.systemRed.cgColor
+        trackStartPointLayer.strokeColor = UIColor.clear.cgColor
 
         if Configuration.debugMode {
             debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
@@ -87,6 +93,7 @@ final class TrackUIView: UIView {
 
     private func drawTrack(with points: [CGPoint]) {
         guard !points.isEmpty else {
+            trackStartPointLayer.path = nil
             return
         }
 
@@ -98,6 +105,13 @@ final class TrackUIView: UIView {
         }
 
         trackShapeLayer.path = trackBezierPath.cgPath
+        trackStartPointLayer.path = UIBezierPath(
+            arcCenter: points[0],
+            radius: trackStartPointRadius,
+            startAngle: 0,
+            endAngle: .pi * 2,
+            clockwise: true
+        ).cgPath
         if Configuration.debugMode {
             let minX = points.map(\.x).min() ?? 0
             let maxX = points.map(\.x).max() ?? 0
