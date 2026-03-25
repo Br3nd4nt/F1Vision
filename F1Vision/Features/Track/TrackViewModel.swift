@@ -137,6 +137,11 @@ final class TrackViewModel: ObservableObject {
         let rotation = Configuration.rotationAngleStep
         rotatedTargetValues = [:]
         
+        if !Configuration.enableTrackRotationCalculation {
+            rotatedTargetValues[0] = (defaultTrackPoints, box)
+            return
+        }
+        
         for angle in stride(from: rotation, to: 90, by: rotation) {
             let rotatedPoints = rotatePoints(defaultTrackPoints, around: center, angle: angle)
             let rotatedBoundBox = getBoundBox(rotatedPoints)
