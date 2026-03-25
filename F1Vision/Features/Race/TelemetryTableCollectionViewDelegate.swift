@@ -21,11 +21,10 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     private let inPitCellHorizontalPadding: Double = 16
     
     private enum Column: Int {
-        case position = 0
-        case driverCode = 1
-        case inPit = 2
-        case intervalAhead = 3
-        case internalToFastest = 4
+        case identity = 0
+        case inPit = 1
+        case intervalAhead = 2
+        case internalToFastest = 3
     }
     
     init(viewModel: RaceViewModel) {
@@ -33,15 +32,14 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     }
 
     func totalColumnsWidth() -> Double {
-        widthForPositionColumn()
-            + widthForDriverCodeColumn()
+        widthForIdentityColumn()
             + widthForInPitColumn()
             + widthForIntervalColumn()
             + widthForIntervalColumn()
             + 40
     }
 
-    var columnCount: Int { 5 }
+    var columnCount: Int { 4 }
     
     func collectionView(
         _ collectionView: UICollectionView,
@@ -50,10 +48,8 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     ) -> CGSize {
         let width: Double
         switch Column(rawValue: indexPath.item) {
-        case .position:
-            width = widthForPositionColumn()
-        case .driverCode:
-            width = widthForDriverCodeColumn()
+        case .identity:
+            width = widthForIdentityColumn()
         case .inPit:
             width = widthForInPitColumn()
         case .intervalAhead, .internalToFastest:
@@ -75,18 +71,20 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
         return CGSize(width: width, height: cellHeight)
     }
     
-    private func widthForPositionColumn() -> Double {
+    private func widthForIdentityColumn() -> Double {
         let maxPosition = max(22, viewModel.driversStates.count)
-        let textWidth = textWidth(for: "\(maxPosition)", font: driverCellFont)
-        return max(textWidth + driverCellHorizontalPadding, 40)
-    }
-    
-    private func widthForDriverCodeColumn() -> Double {
+        let positionTextWidth = textWidth(for: "\(maxPosition)", font: driverCellFont)
+
         let driverCodeWidths = viewModel.driversStates.keys.map { driver in
             textWidth(for: viewModel.getDriverName(driver), font: driverCellFont)
         }
-        let longestCodeWidth = driverCodeWidths.max() ?? textWidth(for: "HAM", font: driverCellFont)
-        return max(longestCodeWidth + driverCellHorizontalPadding, 60)
+        let codeTextWidth = driverCodeWidths.max() ?? textWidth(for: "HAM", font: driverCellFont)
+
+        // The cell is split into 2 equal halves (position + code), so the total width
+        // should be 2x the larger of the two text widths, plus padding.
+        let halfTextWidth = max(positionTextWidth, codeTextWidth)
+        let halfWidth = halfTextWidth + (driverCellHorizontalPadding / 2)
+        return max(halfWidth * 2, 120)
     }
     
     private func widthForInPitColumn() -> Double {
@@ -96,10 +94,10 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     }
     
     private func widthForIntervalColumn() -> Double {
-        let intervalWidths = viewModel.driversStates.values.map { state in
-            textWidth(for: formattedInterval(state.diffToAhead), font: intervalCellFont)
-        }
-        let longestIntervalWidth = intervalWidths.max() ?? textWidth(for: "-0.000", font: intervalCellFont)
+//        let intervalWidths = viewModel.driversStates.values.map { state in
+//            textWidth(for: formattedInterval(state.diffToAhead), font: intervalCellFont)
+//        }
+        let longestIntervalWidth = textWidth(for: "-00.000", font: intervalCellFont)
         return max(longestIntervalWidth + intervalCellHorizontalPadding, 40)
     }
     

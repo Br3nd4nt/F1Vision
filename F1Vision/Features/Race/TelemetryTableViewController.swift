@@ -86,7 +86,7 @@ final class TelemetryTableViewController: UIViewController {
         )
         collectionView.dataSource = dataSource
         collectionView.delegate = delegate
-        collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
+        collectionView.register(DriverIdentityCell.self, forCellWithReuseIdentifier: DriverIdentityCell.reuseId)
         collectionView.register(InPitCell.self, forCellWithReuseIdentifier: InPitCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
         collectionView.register(TireCell.self, forCellWithReuseIdentifier: TireCell.reuseId)
