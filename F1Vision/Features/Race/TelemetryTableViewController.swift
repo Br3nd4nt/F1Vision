@@ -33,7 +33,9 @@ final class TelemetryTableViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink {[weak self] _ in
                 guard let self else { return }
-                self.collectionView.reloadData()
+//                UIView.performWithoutAnimation {
+                    self.collectionView.reloadData()
+//                }
             }
             .store(in: &cancellables)
     }

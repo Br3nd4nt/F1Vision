@@ -38,6 +38,7 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
             + widthForInPitColumn()
             + widthForIntervalColumn()
             + widthForIntervalColumn()
+            + 40
     }
 
     var columnCount: Int { 5 }
@@ -102,8 +103,9 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
         return max(longestIntervalWidth + intervalCellHorizontalPadding, 40)
     }
     
-    private func formattedInterval(_ value: Double) -> String {
-        String(format: "%.3f", value)
+    private func formattedInterval(_ value: String?) -> String {
+        guard let value, !value.isEmpty else { return "-" }
+        return value
     }
     
     private func textWidth(for text: String, font: UIFont) -> Double {

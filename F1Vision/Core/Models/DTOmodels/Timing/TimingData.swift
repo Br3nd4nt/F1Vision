@@ -10,18 +10,7 @@ struct TimingData: Codable {
     let Withheld: Bool?
 }
 
-//struct TimingDataLine: Codable { // not full model
-//    let gapToLeader: String
-//    let inPit: Bool
-//    let intervalToPositionAhead: IntervalToPositionAhead
-//    let numberOfLaps: Int?
-//    let numberOfPitStops: Int?
-//    let pitOut: Bool?
-//    let position: String
-//    let retired: Bool
-//}
-
-struct TimingDataLine: Codable { // for testing
+struct TimingDataLine: Codable {
     let InPit: Bool?
     let NumberOfLaps: Int?
     let NumberOfPitStops: Int?
@@ -29,13 +18,25 @@ struct TimingDataLine: Codable { // for testing
     let Position: String
     let BestLapTime: BestLapTime?
     let TimeDiffToFastest: String?
+    let GapToLeader: String?
     let TimeDiffToPositionAhead: String?
+    let IntervalToPositionAhead: TimingInterval?
+    let Sectors: [TimingSector]?
 }
 
-//struct IntervalToPositionAhead: Codable {
-//    let catching: Bool
-//    let value: String
-//}
+struct TimingInterval: Codable {
+    let Catching: Bool
+    let Value: String
+}
+
+struct TimingSector: Codable {
+    let Segments: [TimingSegment]?
+}
+
+struct TimingSegment: Codable {
+    let Status: Int?
+}
+
 
 struct BestLapTime: Codable {
     let Lap: Int?

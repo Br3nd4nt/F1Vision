@@ -4,10 +4,11 @@
 //
 //  Created by br3nd4nt on 05.12.2025.
 //
-
+import Puppy
 import UIKit
 
 final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDataSource {
+    private let logger: Puppy = Dependencies.shared.logger
     private let viewModel: RaceViewModel
     private let columnCount = 5
     

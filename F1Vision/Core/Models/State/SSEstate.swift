@@ -50,30 +50,26 @@ struct SSEstate: Codable {
                 throw StateError.TimingDataNotFound
             }
             let inPit = data.InPit ?? true
-            let diffToAhead = Self.parseTime(data.TimeDiffToPositionAhead)
-            let diffToFastest = Self.parseTime(data.TimeDiffToFastest)
+            let diffToAhead = data.IntervalToPositionAhead?.Value ?? data.TimeDiffToPositionAhead
+            let diffToFastest = data.TimeDiffToFastest ?? data.GapToLeader
+            let miniSegments = Self.extractMiniSegments(from: data.Sectors)
+            let currentMiniSegment = Self.pickCurrentMiniSegment(from: miniSegments)
             let state = DriverState(
                 position: pos,
                 inPit: inPit,
                 diffToFastest: diffToFastest,
-                diffToAhead: diffToAhead
+                diffToAhead: diffToAhead,
+                currentMiniSegment: currentMiniSegment,
+                miniSegments: miniSegments
             )
             driversStates[number] = state
         }
     }
 
-    mutating func update(_ value: [JSONValue]) throws {
-        guard value.count == 2 else {
-            throw StateError.UpdateIncorrectSize
-        }
-        let first = value[0]
-        let second = value[1]
-        guard case .string(let key) = first else {
-            throw StateError.KeyError(value)
-        }
+    mutating func update(key: String, value: JSONValue) throws {
         switch key {
         case "TimingData":
-            guard case .object(let timing) = second,
+            guard case .object(let timing) = value,
                 let linesArray = timing["Lines"],
                 case .object(let lines) = linesArray
             else {
@@ -98,43 +94,142 @@ struct SSEstate: Codable {
                         if case .bool(let boolVal) = newValue {
                             state.inPit = boolVal
                         } else {
-                            throw StateError.ValueError([value])
+                            throw StateError.ValueError(value)
                         }
                     case .Position:
                         if case .string(let posString) = newValue,
                            let posNumber = Int(posString) {
                             state.position = posNumber
+                        } else if case .int(let posNumber) = newValue {
+                            state.position = posNumber
                         } else {
-                            throw StateError.ValueError([value])
+                            throw StateError.ValueError(value)
                         }
-                    case .TimeDiffToFastest:
-                        if case .string(let timeString) = newValue{
-                            let timeValue = Self.parseTime(timeString)
-                            state.diffToFastest = timeValue
-                        } else {
-                            throw StateError.ValueError([value])
-                        }
-                    case .TimeDiffToPositionAhead:
-                        if case .string(let timeString) = newValue{
-                            let timeValue = Self.parseTime(timeString)
-                            state.diffToAhead = timeValue
-                        } else {
-                            throw StateError.ValueError([value])
-                        }
+                    case .TimeDiffToFastest, .GapToLeader:
+                        state.diffToFastest = Self.extractStringValue(from: newValue) ?? state.diffToFastest
+                    case .TimeDiffToPositionAhead, .IntervalToPositionAhead:
+                        state.diffToAhead = Self.extractStringValue(from: newValue) ?? state.diffToAhead
                     }
                 }
+
+                if let sectorsValue = timing["Sectors"] {
+                    let updatedSegments = Self.extractMiniSegmentUpdates(fromSectorsUpdate: sectorsValue)
+                    if !updatedSegments.isEmpty {
+                        for segment in updatedSegments {
+                            var sectorMap = state.miniSegments[segment.sector] ?? [:]
+                            sectorMap[segment.segment] = segment.status
+                            state.miniSegments[segment.sector] = sectorMap
+                        }
+                        state.currentMiniSegment = Self.pickCurrentMiniSegment(from: state.miniSegments)
+                    }
+                }
+
+                driversStates[number] = state
             }
         default:
+            Self.logger.debug("unrecognised update key: \(key)")
             return
         }
     }
 
-    private static func parseTime(_ time: String?) -> Double {  // "+0.234"
-        var timeCopy = time ?? ""
-        if !timeCopy.isEmpty {
-            timeCopy.removeFirst()  // +
+    private static func extractStringValue(from value: JSONValue) -> String? {
+        switch value {
+        case .string(let str):
+            return str
+        case .object(let obj):
+            if let inner = obj["Value"], case .string(let str) = inner {
+                return str
+            }
+            return nil
+        case .null:
+            return nil
+        default:
+            return nil
         }
-        return Double(timeCopy) ?? -1.0
+    }
+
+    private static func extractMiniSegments(from sectors: [TimingSector]?) -> [Int: [Int: Int]] {
+        guard let sectors else { return [:] }
+        var result: [Int: [Int: Int]] = [:]
+        for (sectorIndex, sector) in sectors.enumerated() {
+            guard let segments = sector.Segments else { continue }
+            for (segmentIndex, segment) in segments.enumerated() {
+                guard let status = segment.Status else { continue }
+                var sectorMap = result[sectorIndex] ?? [:]
+                sectorMap[segmentIndex] = status
+                result[sectorIndex] = sectorMap
+            }
+        }
+        return result
+    }
+
+    private static func pickCurrentMiniSegment(from miniSegments: [Int: [Int: Int]]) -> DriverMiniSegment? {
+        var best: DriverMiniSegment?
+        for (sectorIndex, segments) in miniSegments {
+            for (segmentIndex, status) in segments where status != 0 {
+                let candidate = DriverMiniSegment(sector: sectorIndex, segment: segmentIndex, status: status)
+                if let bestVal = best {
+                    if sectorIndex > bestVal.sector || (sectorIndex == bestVal.sector && segmentIndex > bestVal.segment) {
+                        best = candidate
+                    }
+                } else {
+                    best = candidate
+                }
+            }
+        }
+        return best
+    }
+
+    private static func extractMiniSegmentUpdates(fromSectorsUpdate sectorsValue: JSONValue) -> [DriverMiniSegment] {
+        var updates: [DriverMiniSegment] = []
+
+        func handleSegments(_ sectorIndex: Int, _ segmentsValue: JSONValue) {
+            switch segmentsValue {
+            case .object(let segmentsObj):
+                for (segmentKey, segmentVal) in segmentsObj {
+                    guard let segmentIndex = Int(segmentKey),
+                          case .object(let segmentObj) = segmentVal,
+                          let statusValue = segmentObj["Status"]
+                    else { continue }
+                    if case .int(let statusInt) = statusValue {
+                        updates.append(.init(sector: sectorIndex, segment: segmentIndex, status: statusInt))
+                    }
+                }
+            case .array(let segmentsArr):
+                for (segmentIndex, segmentVal) in segmentsArr.enumerated() {
+                    guard case .object(let segmentObj) = segmentVal,
+                          let statusValue = segmentObj["Status"]
+                    else { continue }
+                    if case .int(let statusInt) = statusValue {
+                        updates.append(.init(sector: sectorIndex, segment: segmentIndex, status: statusInt))
+                    }
+                }
+            default:
+                return
+            }
+        }
+
+        switch sectorsValue {
+        case .object(let sectorsObj):
+            for (sectorKey, sectorVal) in sectorsObj {
+                guard let sectorIndex = Int(sectorKey),
+                      case .object(let sectorObj) = sectorVal,
+                      let segmentsValue = sectorObj["Segments"]
+                else { continue }
+                handleSegments(sectorIndex, segmentsValue)
+            }
+        case .array(let sectorsArr):
+            for (sectorIndex, sectorVal) in sectorsArr.enumerated() {
+                guard case .object(let sectorObj) = sectorVal,
+                      let segmentsValue = sectorObj["Segments"]
+                else { continue }
+                handleSegments(sectorIndex, segmentsValue)
+            }
+        default:
+            return []
+        }
+
+        return updates
     }
 }
 
@@ -144,9 +239,7 @@ struct SSEstate: Codable {
 enum StateError: Error {
     case SessionInfoNotFound
     case DriversInfoNotFound
-    case UpdateIncorrectSize
-    case KeyError([JSONValue])
-    case ValueError([JSONValue])
+    case ValueError(JSONValue)
     case PositionZNotFound
     case CarDataZNotFound
     case TimingDataNotFound

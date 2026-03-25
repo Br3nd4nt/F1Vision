@@ -40,8 +40,12 @@ final class InPitCell: UICollectionViewCell {
     }
 
     func configure(_ value: Bool) {
+        guard value != self.value else { return }
         self.value = value
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         borderLayer.strokeColor = color.cgColor
+        CATransaction.commit()
         label.textColor = color
     }
 
