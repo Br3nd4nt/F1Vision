@@ -68,14 +68,14 @@ final class TrackViewModel: ObservableObject {
             .store(in: &cancellables)
         // passthrough object for view to send its size
         viewSizeSubject
-            .removeDuplicates()
+//            .removeDuplicates()
             .assign(to: &$viewSize)
         
         $viewSize
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.translateTrackPoints()
-                self?.calculateDriverPoints()
+//                self?.calculateDriverPoints()
             }
             .store(in: &cancellables)
         
@@ -83,7 +83,7 @@ final class TrackViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.saveDriversInfo(state)
-                self?.proccessSSEstate(state)
+//                self?.proccessSSEstate(state)
             }
             .store(in: &cancellables)
     }
@@ -92,7 +92,7 @@ final class TrackViewModel: ObservableObject {
         if driversInfo != nil {
             return
         }
-        guard let state, let info = state.drivers else {
+        guard let state, let info = state.driversInfo else {
             return
         }
         driversInfo = info
@@ -100,7 +100,7 @@ final class TrackViewModel: ObservableObject {
         
         var colors = [Int: UIColor]()
         for (driver, info) in info {
-            guard let hex = info.teamColour else {
+            guard let hex = info.TeamColour else {
                 continue
             }
             let color = UIColor(hex: hex)
@@ -250,24 +250,6 @@ final class TrackViewModel: ObservableObject {
         
         return CGPoint(x: rotatedX + center.x, y: rotatedY + center.y)
         
-    }
-    
-    // MARK: SSE Service state proccessing
-    
-    private func proccessSSEstate(_ state: SSEstate?) {
-        guard let state, let snapshot = state.position.Position.last else {
-            return
-        }
-        defaultDriverPoints = [:]
-        for (driver, position) in snapshot.Entries {
-            guard let number = Int(driver) else {
-                continue
-            }
-            let point = CGPoint(x: position.X, y: position.Y)
-            defaultDriverPoints[number] = point
-        }
-        
-        calculateDriverPoints()
     }
     
     private func calculateDriverPoints() {

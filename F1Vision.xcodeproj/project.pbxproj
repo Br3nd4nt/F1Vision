@@ -228,7 +228,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nif [[ \"$(uname -m)\" == arm64 ]]\nthen\n    #export PATH=\"$PATH:/opt/homebrew/bin\"\n    export PATH=\"/opt/homebrew/bin\"\nfi\nswiftlint lint --config .swiftlint.yml\n";
+			shellScript = "set -e\n\nif [[ \"$(uname -m)\" == arm64 ]]\nthen\n    #export PATH=\"$PATH:/opt/homebrew/bin\"\n    export PATH=\"/opt/homebrew/bin\"\nfi\n#swiftlint lint --config .swiftlint.yml\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

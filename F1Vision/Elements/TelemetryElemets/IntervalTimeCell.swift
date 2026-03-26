@@ -13,7 +13,7 @@ final class IntervalTimeCell: UICollectionViewCell {
 
     private let verticalPadding: Double = 0
     private let horizontalPadding: Double = 10
-    private let fontSize: Double = 20
+    private let fontSize: Double = 15
 
     static let reuseId = "IntervalTimeCell"
 
@@ -28,11 +28,11 @@ final class IntervalTimeCell: UICollectionViewCell {
     }
 
     func configure(interval: Double?) {
-        guard let interval else {
+        guard let interval, interval > 0 else {
             codeLabel.text = "-"
             return
         }
-        codeLabel.text = String(format: "%.3f", interval)
+        codeLabel.text = String(format: "+%.3f", interval)
     }
 
     private func configureUI() {

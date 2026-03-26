@@ -18,7 +18,9 @@ struct TelemetryTableUIViewRepresentable: UIViewControllerRepresentable {
         TelemetryTableViewController(viewModel: viewModel)
     }
 
-    func updateUIViewController(_: TelemetryTableViewController, context _: Context) {}
+    func updateUIViewController(_ vc: TelemetryTableViewController, context _: Context) {
+        vc.configureView()
+    }
 
     typealias UIViewControllerType = TelemetryTableViewController
 }

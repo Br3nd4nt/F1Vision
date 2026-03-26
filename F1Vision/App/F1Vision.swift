@@ -55,7 +55,8 @@ struct ContentView: View {
             } else {
                 HStack {
                     TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
-                        .frame(minWidth: 300, maxWidth: 400)
+                        .frame(width: TelemetryTableLayoutMetrics.fixedWidth(viewModel: raceViewModel))
+                        .fixedSize(horizontal: true, vertical: false)
                         .border(Configuration.debugMode ? Color.green : Color.clear)
                     TrackView(viewModel: trackViewModel)
                         .border(Configuration.debugMode ? Color.cyan : Color.clear)

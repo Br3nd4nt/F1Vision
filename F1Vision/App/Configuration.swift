@@ -18,7 +18,7 @@ enum Configuration {
 
     private static var socketScheme = "http"
     private static var socketHost = "localhost"
-    private static var socketPath = "/api/sse"
+    private static var socketPath = "/api/realtime"
     private static var socketPort = 4_000
 
     private static let mapRequestScheme = "https"

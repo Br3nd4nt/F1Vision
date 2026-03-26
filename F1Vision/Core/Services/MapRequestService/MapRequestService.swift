@@ -112,11 +112,11 @@ final class MapRequestService: ObservableObject {
     private func createRequestURL() throws -> URL {
         try Configuration.mapRequestBaseURL
             .appendingPathComponent(String(getTrackCode()))
-            .appendingPathComponent("2025")
+            .appendingPathComponent("2026")
     }
     
     private func getTrackCode() throws -> Int {
-        guard let key = sseService.state?.sessionInfo?.meeting?.circuit.key else {
+        guard let key = sseService.state?.sessionInfo?.Meeting?.Circuit.Key else {
             logger.warning("no session info found")
             throw MapRequestServiceError.MissingSessionInfo
         }

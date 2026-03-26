@@ -1,5 +1,5 @@
 //
-//  TyreCell.swift
+//  TireCell.swift
 //  F1Vision
 //
 //  Created by br3nd4nt on 06.12.2025.
@@ -8,15 +8,15 @@
 import SwiftUI
 import UIKit
 
-final class TyreCell: UICollectionViewCell {
+final class TireCell: UICollectionViewCell {
     private let circleBaсkgroundView = UIView()
     private let letterLabel = UILabel()
 
     private let circleSize: Double = 30
     private let fontSize: Double = 15
 
-//    private var tyreType: TyreType = .undefined
-    static let reuseId = "TyreCell"
+//    private var tyreType: TireType = .undefined
+    static let reuseId = "TireCell"
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,8 +28,8 @@ final class TyreCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-//    func configure(_ tyreType: TyreType) {
-//        self.tyreType = tyreType
+//    func configure(_ tireType: TireType) {
+//        self.tireType = tireType
 //        letterLabel.text = self.tyreType.letter
 //        letterLabel.textColor = self.tyreType.fontColor
 //        circleBaсkgroundView.backgroundColor = self.tyreType.UIColor
@@ -64,13 +64,13 @@ final class TyreCell: UICollectionViewCell {
     struct TyreCellPreviewWrapper: UIViewRepresentable {
         let tyreType: Int
 
-        func makeUIView(context _: Context) -> TyreCell {
-            let view = TyreCell()
+        func makeUIView(context _: Context) -> TireCell {
+            let view = TireCell()
 //            view.configure(TyreType(tyreType))
             return view
         }
 
-        func updateUIView(_: TyreCell, context _: Context) {}
+        func updateUIView(_: TireCell, context _: Context) {}
     }
 
     #Preview {
