@@ -27,12 +27,12 @@ final class IntervalTimeCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(interval: Double?) {
-        guard let interval, interval > 0 else {
+    func configure(interval: String?) {
+        guard let interval, !interval.isEmpty else {
             codeLabel.text = "-"
             return
         }
-        codeLabel.text = String(format: "+%.3f", interval)
+        codeLabel.text = interval
     }
 
     private func configureUI() {
@@ -57,6 +57,6 @@ final class IntervalTimeCell: UICollectionViewCell {
 
 #Preview {
     let v = IntervalTimeCell()
-    v.configure(interval: 0.7561234134)
+    v.configure(interval: "+0.756")
     return v
 }

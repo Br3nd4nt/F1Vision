@@ -4,12 +4,13 @@
 //
 //  Created by br3nd4nt on 05.12.2025.
 //
-
+import Puppy
 import UIKit
 
 final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDataSource {
+    private let logger: Puppy = Dependencies.shared.logger
     private let viewModel: RaceViewModel
-    private let columnCount = 5
+    private let columnCount = 4
     
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
@@ -37,35 +38,21 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
         switch indexPath.item {
         case 0:
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: DriverCodeCell.reuseId,
+                withReuseIdentifier: DriverIdentityCell.reuseId,
                 for: indexPath
-            ) as? DriverCodeCell else {
+            ) as? DriverIdentityCell else {
                 return collectionView.dequeueReusableCell(
                     withReuseIdentifier: viewModel.emptyCellReuseId,
                     for: indexPath
                 )
             }
             cell.configure(
-                    code: "\(indexPath.section + 1)",
-                    backgroundColor: viewModel.getDriverColor(driver)
-                )
+                position: "\(indexPath.section + 1)",
+                code: "\(viewModel.getDriverName(driver))",
+                backgroundColor: viewModel.getDriverColor(driver)
+            )
             return cell
         case 1:
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: DriverCodeCell.reuseId,
-                for: indexPath
-            ) as? DriverCodeCell else {
-                return collectionView.dequeueReusableCell(
-                    withReuseIdentifier: viewModel.emptyCellReuseId,
-                    for: indexPath
-                )
-            }
-            cell.configure(
-                    code: "\(viewModel.getDriverName(driver))",
-                    backgroundColor: viewModel.getDriverColor(driver)
-                )
-            return cell
-        case 2:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: InPitCell.reuseId,
                 for: indexPath
@@ -77,7 +64,7 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
             }
             cell.configure(viewModel.driversStates[driver]?.inPit ?? true)
             return cell
-        case 3:
+        case 2:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: IntervalTimeCell.reuseId,
                 for: indexPath
@@ -89,7 +76,7 @@ final class TelemetryTableCollectionViewDataSource: NSObject, UICollectionViewDa
             }
             cell.configure(interval: viewModel.driversStates[driver]?.diffToAhead)
             return cell
-        case 4:
+        case 3:
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: IntervalTimeCell.reuseId,
                 for: indexPath

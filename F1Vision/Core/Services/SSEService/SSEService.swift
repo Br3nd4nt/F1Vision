@@ -70,9 +70,10 @@ final class SSEService: ObservableObject {
         switch e {
         case "initial":
             handleInitial(data)
-        case "updates":
+        case "update":
             handleUpdate(data)
         default:
+            logger.warning("Wrong event: \(e)")
             return
         }
     }
@@ -101,13 +102,20 @@ final class SSEService: ObservableObject {
     
     private func handleUpdate(_ data: Data) {
         do {
-            let message = try Self.jsonDecoder.decode([[JSONValue]].self, from: data)
-            for update in message {
+            let payload = try Self.jsonDecoder.decode(JSONValue.self, from: data)
+            guard case .object(let obj) = payload else {
+                logger.warning("Unexpected updates payload shape.")
+                logger.debug("Updates json: \(String(decoding: data, as: Unicode.UTF8.self))")
+                return
+            }
+            for (key, value) in obj {
                 DispatchQueue.main.async { [weak self] in
+                    guard let self, var current = self.state else { return }
                     do {
-                        try self?.state?.update(update)
+                        try current.update(key: key, value: value)
+                        self.state = current
                     } catch {
-                        self?.logger.warning("Error updating state: \(error)")
+                        self.logger.warning("Error updating state: \(error)")
                     }
                 }
             }

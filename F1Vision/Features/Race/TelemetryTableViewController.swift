@@ -33,7 +33,9 @@ final class TelemetryTableViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink {[weak self] _ in
                 guard let self else { return }
-                self.collectionView.reloadData()
+//                UIView.performWithoutAnimation {
+                    self.collectionView.reloadData()
+//                }
             }
             .store(in: &cancellables)
     }
@@ -84,7 +86,7 @@ final class TelemetryTableViewController: UIViewController {
         )
         collectionView.dataSource = dataSource
         collectionView.delegate = delegate
-        collectionView.register(DriverCodeCell.self, forCellWithReuseIdentifier: DriverCodeCell.reuseId)
+        collectionView.register(DriverIdentityCell.self, forCellWithReuseIdentifier: DriverIdentityCell.reuseId)
         collectionView.register(InPitCell.self, forCellWithReuseIdentifier: InPitCell.reuseId)
         collectionView.register(IntervalTimeCell.self, forCellWithReuseIdentifier: IntervalTimeCell.reuseId)
         collectionView.register(TireCell.self, forCellWithReuseIdentifier: TireCell.reuseId)
