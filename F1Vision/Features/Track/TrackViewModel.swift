@@ -37,10 +37,12 @@ final class TrackViewModel: ObservableObject {
     private static let defaultDriverPointColor: UIColor = Configuration.defaultDriverPointColor
     
     // MARK: - Driver State
-    private var defaultDriverPoints: [Int: CGPoint] = [:]
-    @Published var driverPoints: [Int: CGPoint] = [:]
     private var driversInfo: [Int: DriverFullInfo]?
     private var driversColors: [Int: UIColor]?
+    
+    // MARK: - Driver points
+    private var defaultDriverPoints: [Int: CGPoint] = [:]
+    @Published var driverPoints: [Int: CGPoint] = [:]
     
     // MARK: - View Sizing
     @Published var viewSize: CGSize = .zero
