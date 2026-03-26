@@ -14,40 +14,39 @@ import UIKit
 // Only manages data for track - track layout, points, point transformation etc.
 @MainActor
 final class TrackViewModel: ObservableObject {
-    // MARK: - Properties
-    
+    // MARK: - Dependencies
     private let logger: Puppy = Dependencies.shared.logger
-    
     private var cancellables = Set<AnyCancellable>()
     private var sseService: SSEService
     private var mapService: MapRequestService
     
-    // saving initial unchanged values from map service
+    // MARK: - Track Layout Cache
     private var defaultTrackPoints: [CGPoint] = []
     private var defaultBoundBox: TrackBoundBox?
     
-    // rotation values
+    // MARK: - Rotation Cache
     private var rotatedTargetValues: [Double: ([CGPoint], TrackBoundBox)] = [:]
     private var currentChosenAngle: Double = 0
     private var currentChosenBox: TrackBoundBox?
     private var currentRotatedPoints: [CGPoint] = []
     private let switchEpsilon: Double = 0.1
     
-    // final track points form drawing
+    // MARK: - Published State
     @Published var isLoaded = false
     @Published var trackPoints: [CGPoint] = []
     private static let defaultDriverPointColor: UIColor = Configuration.defaultDriverPointColor
     
-    // driver points
+    // MARK: - Driver State
     private var defaultDriverPoints: [Int: CGPoint] = [:]
     @Published var driverPoints: [Int: CGPoint] = [:]
     private var driversInfo: [Int: DriverFullInfo]?
     private var driversColors: [Int: UIColor]?
     
+    // MARK: - View Sizing
     @Published var viewSize: CGSize = .zero
     private let viewSizeSubject = PassthroughSubject<CGSize, Never>()
     
-    // Configuration
+    // MARK: - Configuration
     private let zoom: Double = Configuration.zoom
     let driverPointSize = CGSize(
         width: Configuration.driverPointRadius * 2,
@@ -66,16 +65,15 @@ final class TrackViewModel: ObservableObject {
                 self?.recieveTrackLayout()
             }
             .store(in: &cancellables)
+
         // passthrough object for view to send its size
         viewSizeSubject
-//            .removeDuplicates()
             .assign(to: &$viewSize)
         
         $viewSize
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.translateTrackPoints()
-//                self?.calculateDriverPoints()
             }
             .store(in: &cancellables)
         
@@ -83,10 +81,28 @@ final class TrackViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.saveDriversInfo(state)
-//                self?.proccessSSEstate(state)
+                self?.updateDriverPointsFromMiniSegments(state)
             }
             .store(in: &cancellables)
     }
+    
+    // MARK: - Public Methods
+    
+    func sendViewSize(_ viewSize: CGSize) {
+        DispatchQueue.main.async {
+            self.viewSizeSubject.send(viewSize)
+        }
+    }
+    
+    func getDriverColor(_ driver: Int) -> UIColor {
+        guard let driversColors else { return Self.defaultDriverPointColor }
+        if let color = driversColors[driver] {
+            return color
+        }
+        return Self.defaultDriverPointColor
+    }
+    
+    // MARK: - Data Handling
     
     private func saveDriversInfo(_ state: SSEstate?) {
         if driversInfo != nil {
@@ -109,7 +125,6 @@ final class TrackViewModel: ObservableObject {
         driversColors = colors
     }
     
-    // called when we first get the points data
     private func recieveTrackLayout() {
         guard mapService.isLoaded,
               let response = mapService.response,
@@ -148,23 +163,7 @@ final class TrackViewModel: ObservableObject {
             rotatedTargetValues[angle] = (rotatedPoints, rotatedBoundBox)
         }
     }
-    
-    // MARK: - Public Methods
-    
-    func sendViewSize(_ viewSize: CGSize) {
-        DispatchQueue.main.async {
-            self.viewSizeSubject.send(viewSize)
-        }
-    }
-    
-    func getDriverColor(_ driver: Int) -> UIColor {
-        guard let driversColors else { return Self.defaultDriverPointColor }
-        if let color = driversColors[driver] {
-            return color
-        }
-        return Self.defaultDriverPointColor
-    }
-    
+
     // MARK: - Track Transformation
     
     private func translateTrackPoints() {
@@ -208,7 +207,25 @@ final class TrackViewModel: ObservableObject {
         currentChosenAngle = bestAngle
         currentChosenBox = bestBox
         currentRotatedPoints = bestPoints
+        
+        updateDriverPointsFromMiniSegments(sseService.state)
     }
+    
+    private func updateDriverPointsFromMiniSegments(_ state: SSEstate?) {
+         guard let state, !trackPoints.isEmpty else { return }
+         let lastIndex = max(0, trackPoints.count - 1)
+         var points: [Int: CGPoint] = [:]
+         points.reserveCapacity(state.driversStates.count)
+
+         for (driver, driverState) in state.driversStates {
+             guard let progress = driverState.trackProgress else { continue }
+             let raw = progress * Double(lastIndex)
+             let index = max(0, min(Int(raw.rounded()), lastIndex))
+             points[driver] = trackPoints[index]
+         }
+
+         driverPoints = points
+     }
     
     private func translatePoint(point: CGPoint, box: TrackBoundBox) -> CGPoint {
         let scale = box.getScale(for: viewSize) * zoom
@@ -224,6 +241,8 @@ final class TrackViewModel: ObservableObject {
         
         return CGPoint(x: centeredX, y: centeredY)
     }
+    
+    // MARK: - Rotation Helpers
     
     private func rotatePoints(_ points: [CGPoint], around center: CGPoint, angle: Double) -> [CGPoint] {
         var result: [CGPoint] = []
@@ -257,21 +276,7 @@ final class TrackViewModel: ObservableObject {
         
     }
     
-    private func calculateDriverPoints() {
-        guard let currentChosenBox, let defaultBoundBox else {
-            return
-        }
-        let center = defaultBoundBox.getCenterPoint()
-        var points: [Int: CGPoint] = [:]
-        for (number, point) in defaultDriverPoints {
-            let rotated = rotatePoint(point, around: center, angle: currentChosenAngle)
-            let translated = translatePoint(point: rotated, box: currentChosenBox)
-            points[number] = translated
-        }
-        driverPoints = points
-    }
-    
-    // MARK: - Bounding Box Helpers
+    // MARK: - Bounding Box Helper
     
     private func getBoundBox(_ points: [CGPoint]) -> TrackBoundBox {
         var minX: Double = .greatestFiniteMagnitude
