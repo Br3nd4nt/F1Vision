@@ -19,6 +19,7 @@ struct DriverState: Codable {
     var diffToFastest: String?
     var diffToAhead: String?
     var currentMiniSegment: DriverMiniSegment?
+    var trackProgress: Double?
     // sectorIndex -> segmentIndex -> status
     var miniSegments: [Int: [Int: Int]]
 }

@@ -15,6 +15,10 @@ struct SSEstate: Codable {
     private static let logger: Puppy = Dependencies.shared.logger
 
     var driversStates: [Int: DriverState]
+    let totalMiniSegments: Int
+    let sectorStartIndex: [Int: Int]
+    let sectorLength: [Int: Int]
+    let sectorOrder: [Int]
     let sessionInfo: SessionInfo?
     let driversInfo: [Int: DriverFullInfo]?
 
@@ -44,6 +48,12 @@ struct SSEstate: Codable {
             throw StateError.TimingDataNotFound
         }
 
+        let topology = Self.computeMiniSegmentTopology(from: timingData)
+        totalMiniSegments = topology.total
+        sectorStartIndex = topology.sectorStartIndex
+        sectorLength = topology.sectorLength
+        sectorOrder = topology.sectorOrder
+
         driversStates = [:]
         for (driver, data) in timingData.Lines {
             guard let number = Int(driver), let pos = Int(data.Position) else {
@@ -53,13 +63,19 @@ struct SSEstate: Codable {
             let diffToAhead = data.IntervalToPositionAhead?.Value ?? data.TimeDiffToPositionAhead
             let diffToFastest = data.TimeDiffToFastest ?? data.GapToLeader
             let miniSegments = Self.extractMiniSegments(from: data.Sectors)
-            let currentMiniSegment = Self.pickCurrentMiniSegment(from: miniSegments)
+            let currentMiniSegment = Self.computeCurrentMiniSegment(from: miniSegments, sectorStartIndex: sectorStartIndex, totalMiniSegments: totalMiniSegments)
+            let trackProgress = Self.computeTrackProgress(
+                currentMiniSegment: currentMiniSegment,
+                sectorStartIndex: sectorStartIndex,
+                totalMiniSegments: totalMiniSegments
+            )
             let state = DriverState(
                 position: pos,
                 inPit: inPit,
                 diffToFastest: diffToFastest,
                 diffToAhead: diffToAhead,
                 currentMiniSegment: currentMiniSegment,
+                trackProgress: trackProgress,
                 miniSegments: miniSegments
             )
             driversStates[number] = state
@@ -120,7 +136,17 @@ struct SSEstate: Codable {
                             sectorMap[segment.segment] = segment.status
                             state.miniSegments[segment.sector] = sectorMap
                         }
-                        state.currentMiniSegment = Self.pickCurrentMiniSegment(from: state.miniSegments)
+                        // "Current" segment is defined as (last non-zero segment) + 1.
+                        state.currentMiniSegment = Self.computeCurrentMiniSegment(
+                            from: state.miniSegments,
+                            sectorStartIndex: sectorStartIndex,
+                            totalMiniSegments: totalMiniSegments
+                        )
+                        state.trackProgress = Self.computeTrackProgress(
+                            currentMiniSegment: state.currentMiniSegment,
+                            sectorStartIndex: sectorStartIndex,
+                            totalMiniSegments: totalMiniSegments
+                        )
                     }
                 }
 
@@ -163,21 +189,103 @@ struct SSEstate: Codable {
         return result
     }
 
-    private static func pickCurrentMiniSegment(from miniSegments: [Int: [Int: Int]]) -> DriverMiniSegment? {
-        var best: DriverMiniSegment?
+    private static func computeCurrentMiniSegment(
+        from miniSegments: [Int: [Int: Int]],
+        sectorStartIndex: [Int: Int],
+        totalMiniSegments: Int
+    ) -> DriverMiniSegment? {
+        guard totalMiniSegments > 0 else { return nil }
+
+        func linearIndex(sector: Int, segment: Int) -> Int {
+            (sectorStartIndex[sector] ?? 0) + segment
+        }
+
+        var lastNonZero: (sector: Int, segment: Int, status: Int, linear: Int)?
         for (sectorIndex, segments) in miniSegments {
             for (segmentIndex, status) in segments where status != 0 {
-                let candidate = DriverMiniSegment(sector: sectorIndex, segment: segmentIndex, status: status)
-                if let bestVal = best {
-                    if sectorIndex > bestVal.sector || (sectorIndex == bestVal.sector && segmentIndex > bestVal.segment) {
-                        best = candidate
+                let lin = linearIndex(sector: sectorIndex, segment: segmentIndex)
+                if let current = lastNonZero {
+                    if lin > current.linear {
+                        lastNonZero = (sectorIndex, segmentIndex, status, lin)
                     }
                 } else {
-                    best = candidate
+                    lastNonZero = (sectorIndex, segmentIndex, status, lin)
                 }
             }
         }
-        return best
+
+        let nextLinear = ((lastNonZero?.linear ?? -1) + 1) % totalMiniSegments
+        guard let (sector, segment) = linearToSectorSegment(nextLinear, sectorStartIndex: sectorStartIndex) else { return nil }
+        let status = miniSegments[sector]?[segment] ?? 0
+        return DriverMiniSegment(sector: sector, segment: segment, status: status)
+    }
+
+    private static func linearToSectorSegment(
+        _ linear: Int,
+        sectorStartIndex: [Int: Int]
+    ) -> (Int, Int)? {
+        let ordered = sectorStartIndex.keys.sorted()
+        guard let lastSector = ordered.last else { return nil }
+        var chosenSector = ordered[0]
+        for sector in ordered {
+            let start = sectorStartIndex[sector] ?? 0
+            if start <= linear {
+                chosenSector = sector
+            } else {
+                break
+            }
+        }
+        let start = sectorStartIndex[chosenSector] ?? 0
+        let segment = linear - start
+        // Defensive: if linear is beyond last sector start (shouldn't happen if topology is correct)
+        if chosenSector == lastSector && segment < 0 { return nil }
+        return (chosenSector, segment)
+    }
+
+    private static func computeMiniSegmentTopology(from timingData: TimingData) -> (total: Int, sectorStartIndex: [Int: Int], sectorLength: [Int: Int], sectorOrder: [Int]) {
+        // Derive a stable "track topology" by taking the maximum segment count per sector
+        // across all drivers. This avoids relying on dictionary iteration order (random driver).
+        var maxSegmentsBySector: [Int: Int] = [:]
+
+        for line in timingData.Lines.values {
+            guard let sectors = line.Sectors else { continue }
+            for (sectorIndex, sector) in sectors.enumerated() {
+                let count = sector.Segments?.count ?? 0
+                if count > (maxSegmentsBySector[sectorIndex] ?? 0) {
+                    maxSegmentsBySector[sectorIndex] = count
+                }
+            }
+        }
+
+        guard !maxSegmentsBySector.isEmpty else { return (0, [:], [:], []) }
+
+        let sortedSectorIndices = maxSegmentsBySector.keys.sorted()
+        var total = 0
+        var sectorStartIndex: [Int: Int] = [:]
+        var sectorLength: [Int: Int] = [:]
+        for sectorIndex in sortedSectorIndices {
+            sectorStartIndex[sectorIndex] = total
+            let len = maxSegmentsBySector[sectorIndex] ?? 0
+            sectorLength[sectorIndex] = len
+            total += len
+        }
+
+        return (total, sectorStartIndex, sectorLength, sortedSectorIndices)
+    }
+
+    private static func computeTrackProgress(
+        currentMiniSegment: DriverMiniSegment?,
+        sectorStartIndex: [Int: Int],
+        totalMiniSegments: Int
+    ) -> Double? {
+        guard let currentMiniSegment,
+              totalMiniSegments > 0,
+              let start = sectorStartIndex[currentMiniSegment.sector]
+        else { return nil }
+
+        let linearIndex = start + currentMiniSegment.segment
+        let clamped = max(0, min(linearIndex, max(0, totalMiniSegments - 1)))
+        return Double(clamped) / Double(max(1, totalMiniSegments - 1))
     }
 
     private static func extractMiniSegmentUpdates(fromSectorsUpdate sectorsValue: JSONValue) -> [DriverMiniSegment] {
