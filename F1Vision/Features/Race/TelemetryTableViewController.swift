@@ -14,14 +14,12 @@ final class TelemetryTableViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 
     private var cancellables = Set<AnyCancellable>()
-    private var widthConstraint: NSLayoutConstraint?
 
     private let viewModel: RaceViewModel
     private let dataSource: UICollectionViewDataSource
     private let delegate: TelemetryTableCollectionViewDelegate
     
     private var lastCollectionViewSize: CGSize = .zero
-    private var trailingConstraint: NSLayoutConstraint?
 
     init(viewModel: RaceViewModel) {
         self.viewModel = viewModel
@@ -72,11 +70,7 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
         collectionView.pinLeft(to: view.safeAreaLayoutGuide.leadingAnchor)
         collectionView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
-        // Do not pin both leading & trailing when using a fixed width constraint.
-        // Keep it within the safe area without forcing it to stretch.
-        let trailingConstraint = collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor, 0, .lsOE)
-        trailingConstraint.priority = .defaultLow
-        self.trailingConstraint = trailingConstraint
+        collectionView.pinRight(to: view.safeAreaLayoutGuide.trailingAnchor)
         
         collectionView.contentInset = UIEdgeInsets(
             top: TelemetryTableLayoutMetrics.verticalPadding,
@@ -96,25 +90,10 @@ final class TelemetryTableViewController: UIViewController {
         collectionView.backgroundColor = UIColor.appBackground
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        
-        // Fix width to the sum of column widths (provided by the delegate), not to `layout.itemSize`.
-        let widthConstraint = collectionView.widthAnchor.constraint(equalToConstant: 0)
-        widthConstraint.isActive = true
-        self.widthConstraint = widthConstraint
-        collectionView.setContentHuggingPriority(.required, for: .horizontal)
-        collectionView.setContentCompressionResistancePriority(.required, for: .horizontal)
-
-        applyFixedCollectionViewSize()
-    }
-
-    private func applyFixedCollectionViewSize() {
-        let contentInsets = collectionView.contentInset.left + collectionView.contentInset.right
-        widthConstraint?.constant = delegate.totalColumnsWidth() + contentInsets
     }
     
     // MARK: public methods
     func configureView() {
-        applyFixedCollectionViewSize()
         recalculateLayoutIfNeeded(force: true)
     }
     

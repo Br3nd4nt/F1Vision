@@ -7,6 +7,7 @@
 
 import Puppy
 import SwiftUI
+import UIKit
 
 @main
 struct F1Vision: App {
@@ -16,9 +17,24 @@ struct F1Vision: App {
         WindowGroup {
             ZStack {
                 Color.appBackground
+                    .ignoresSafeArea(.all)
                 ContentView()
             }
+            .onAppear {
+                configureWindowSizeRestrictions()
+            }
         }
+    }
+
+    private func configureWindowSizeRestrictions() {
+        #if targetEnvironment(macCatalyst)
+        guard let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first
+        else { return }
+        scene.sizeRestrictions?.minimumSize = Configuration.windowMinSize
+        scene.sizeRestrictions?.maximumSize = Configuration.windowMaxSize
+        #endif
     }
 }
 
@@ -53,13 +69,31 @@ struct ContentView: View {
                     Text("Getting stuff ready...")
                 }
             } else {
-                HStack {
-                    TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
-                        .frame(width: TelemetryTableLayoutMetrics.fixedWidth(viewModel: raceViewModel))
-                        .fixedSize(horizontal: true, vertical: false)
-                        .border(Configuration.debugMode ? Color.green : Color.clear)
-                    TrackView(viewModel: trackViewModel)
-                        .border(Configuration.debugMode ? Color.cyan : Color.clear)
+                GeometryReader { proxy in
+                    let tableHeight = TelemetryTableLayoutMetrics.tableHeight(availableHeight: proxy.size.height)
+                    let tableWidth = TelemetryTableLayoutMetrics.tableWidth(tableHeight: tableHeight)
+                    ViewThatFits(in: .horizontal) {
+                        HStack {
+                            TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+                                .frame(width: tableWidth)
+                                .frame(height: tableHeight)
+                                .border(Configuration.debugMode ? Color.green : Color.clear)
+                            TrackView(viewModel: trackViewModel)
+                                .border(Configuration.debugMode ? Color.cyan : Color.clear)
+                                .frame(minWidth: 50)
+                        }
+                        ScrollView(.vertical, showsIndicators: true) {
+                            VStack {
+                                TelemetryTableUIViewRepresentable(viewModel: raceViewModel)
+                                    .frame(width: tableWidth)
+                                    .frame(height: tableHeight)
+                                    .border(Configuration.debugMode ? Color.green : Color.clear)
+                                TrackView(viewModel: trackViewModel)
+                                    .frame(height: proxy.size.height)
+                                    .border(Configuration.debugMode ? Color.cyan : Color.clear)
+                            }
+                        }
+                    }
                 }
             }
         }

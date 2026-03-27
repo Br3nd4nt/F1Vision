@@ -55,6 +55,8 @@ final class TireCell: UICollectionViewCell {
         
         lapsLabel.text = "LAP \(value.totalLaps)"
         pitsLabel.text = "PIT \(value.stintNumber)"
+        lapsLabel.textColor = .appText
+        pitsLabel.textColor = .appText
     }
 
     private func configureUI() {
@@ -99,7 +101,7 @@ final class TireCell: UICollectionViewCell {
         circleHeightConstraint?.constant = circleSide
         circleBaсkgroundView.layer.cornerRadius = circleSide / 2
         circleBaсkgroundView.layer.borderWidth = circleSide * 0.15
-        let scale = min(1.35, max(0.75, Double(side) / 32))
+        let scale = min(Configuration.uiMaxTextScale, max(Configuration.uiMinScale, Double(side) / Configuration.uiReferenceRowHeight))
         letterLabel.font = .systemFont(ofSize: max(10, circleSide * letterFontScale) * scale, weight: .bold)
         lapsLabel.font = .systemFont(ofSize: max(10, circleSide * lapsFontScale) * scale, weight: .bold)
         pitsLabel.font = .systemFont(ofSize: max(10, circleSide * pitsFontScale) * scale, weight: .light)
@@ -132,8 +134,7 @@ private struct TireCellPreviewWrapper: UIViewRepresentable {
         .init(totalLaps: 11, compound: "WET", newCompound: true, stintNumber: 4),
         .init()
     ]
-
-    let side = TelemetryCellPreviewSupport.rowHeight()
+    
     VStack(spacing: 0) {
         ForEach(items) { item in
             TireCellPreviewWrapper(item: item)

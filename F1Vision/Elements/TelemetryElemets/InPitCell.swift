@@ -14,7 +14,7 @@ final class InPitCell: UICollectionViewCell {
 
     private let cornerRadius: Double = 13
     private let fontSize: Double = 15
-    private let referenceRowHeight: Double = 32
+    private let referenceRowHeight: Double = Configuration.uiReferenceRowHeight
 
     private var value: Bool  = false
     
@@ -93,7 +93,7 @@ final class InPitCell: UICollectionViewCell {
         ).cgPath
 
         let rowHeight = Double(bounds.height)
-        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        let scale = min(Configuration.uiMaxTextScale, max(Configuration.uiMinScale, rowHeight / referenceRowHeight))
         label.font = .boldSystemFont(ofSize: fontSize * scale)
         borderLayer.lineWidth = strokeWidth * scale
     }

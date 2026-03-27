@@ -13,8 +13,8 @@ final class IntervalTimeCell: UICollectionViewCell {
 
     private let verticalPadding: Double = 0
     private let horizontalPadding: Double = 10
-    private let fontSize: Double = 15
-    private let referenceRowHeight: Double = 32
+    private let fontSize: Double = 19
+    private let referenceRowHeight: Double = Configuration.uiReferenceRowHeight
 
     static let reuseId = "IntervalTimeCell"
 
@@ -47,6 +47,11 @@ final class IntervalTimeCell: UICollectionViewCell {
 
         codeLabel.font = .systemFont(ofSize: fontSize, weight: .bold)
         codeLabel.textAlignment = .center
+        codeLabel.textColor = .appText
+        codeLabel.numberOfLines = 1
+        codeLabel.lineBreakMode = .byClipping
+        codeLabel.adjustsFontSizeToFitWidth = true
+        codeLabel.minimumScaleFactor = 0.7
 
         if Configuration.debugMode {
             layer.borderColor = UIColor.yellow.cgColor
@@ -57,7 +62,7 @@ final class IntervalTimeCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         let rowHeight = Double(bounds.height)
-        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        let scale = min(Configuration.uiMaxTextScale, max(Configuration.uiMinScale, rowHeight / referenceRowHeight))
         codeLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
     }
 }

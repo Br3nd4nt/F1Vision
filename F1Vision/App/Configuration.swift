@@ -5,22 +5,32 @@
 //  Created by br3nd4nt on 22.08.2025.
 //
 
-import Foundation
 import UIKit
-import Puppy
 
-@MainActor
 enum Configuration {
-    static let debugMode: Bool = true
+    static let debugMode: Bool = false
     static let zoom: Double = 0.9
-    static let enableTrackRotationCalculation: Bool = false
+    static let enableTrackRotationCalculation: Bool = true
+
+    // UI scaling clamps (used by telemetry cells/table sizing)
+    static let uiReferenceRowHeight: Double = 32
+    static let uiMinScale: Double = 0.75
+    // Caps font size scaling inside cells.
+    static let uiMaxTextScale: Double = 1.25
+    // Caps table rowHeight scaling (table can grow beyond text cap).
+    static let uiMaxTableScale: Double = 1.6
+    
+    #if targetEnvironment(macCatalyst)
+    static let windowMinSize = CGSize(width: 980, height: 650)
+    static let windowMaxSize = CGSize(width: 2160, height: 1440)
+    #endif
     
     static let driverPointRadius: Double = 7
 
-    private static var socketScheme = "http"
-    private static var socketHost = "localhost"
-    private static var socketPath = "/api/realtime"
-    private static var socketPort = 4_000
+    private static let socketScheme = "http"
+    private static let socketHost = "192.168.10.104"
+    private static let socketPath = "/api/realtime"
+    private static let socketPort = 4_000
 
     private static let mapRequestScheme = "https"
     private static let mapRequestHost = "api.multiviewer.app"
@@ -36,7 +46,6 @@ enum Configuration {
         if let url {
             return url
         }
-        logger.error("Error creating websocket URL")
         fatalError("Error creating websocket URL")
     }
     
@@ -49,11 +58,9 @@ enum Configuration {
         if let url {
             return url
         }
-        logger.error("Error creating map request URL")
         fatalError("Error creating map request URL")
     }
     
-    private static let logger: Puppy = Dependencies.shared.logger
     static let defaultDriverPointColor: UIColor = .lightGray
     static let rotationAngleStep: Double = 0.5
 }

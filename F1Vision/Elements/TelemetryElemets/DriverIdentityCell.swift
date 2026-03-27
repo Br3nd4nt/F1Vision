@@ -18,7 +18,7 @@ final class DriverIdentityCell: UICollectionViewCell {
     private let verticalPadding: Double = 5
     private let horizontalPadding: Double = 5
     private let fontSize: Double = 20
-    private let referenceRowHeight: Double = 32
+    private let referenceRowHeight: Double = Configuration.uiReferenceRowHeight
 
     static let reuseId = "DriverIdentityCell"
 
@@ -88,7 +88,7 @@ final class DriverIdentityCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         let rowHeight = Double(bounds.height)
-        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        let scale = min(Configuration.uiMaxTextScale, max(Configuration.uiMinScale, rowHeight / referenceRowHeight))
         positionLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
         codeLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
     }
