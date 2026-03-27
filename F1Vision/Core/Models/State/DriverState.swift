@@ -22,6 +22,7 @@ struct DriverState: Codable {
     var trackProgress: Double?
     // sectorIndex -> segmentIndex -> status
     var miniSegments: [Int: [Int: Int]]
+    var stints: [TireStint]
 }
 
 enum DriverStateFields: String, CaseIterable {

@@ -55,8 +55,22 @@ final class IntervalTimeCell: UICollectionViewCell {
 
 // MARK: - Preview
 
-#Preview {
-    let v = IntervalTimeCell()
-    v.configure(interval: "+0.756")
-    return v
+#Preview("+0.756 (Telemetry Size)") {
+    let cell = IntervalTimeCell()
+    cell.configure(interval: "+0.756")
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(2).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(2).height
+        )
+}
+
+#Preview("- (Telemetry Size)") {
+    let cell = IntervalTimeCell()
+    cell.configure(interval: nil)
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(2).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(2).height
+        )
 }

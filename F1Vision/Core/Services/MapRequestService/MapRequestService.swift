@@ -43,9 +43,6 @@ final class MapRequestService: ObservableObject {
     }
     
     func fetchMapData() async throws {
-        withAnimation {
-            self.isLoaded = false
-        }
         guard sseService.gotInitialResponse, sseService.state != nil else {
             logger.warning("no initial")
             return

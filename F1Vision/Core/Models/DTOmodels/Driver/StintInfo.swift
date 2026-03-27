@@ -6,12 +6,12 @@
 //
 
 struct StintInfo: Codable {
-    let compound: String?
-    let lapFlags: Int
-    let lapNumber: Int?
-    let lapTime: String?
-    let new: String?
-    let startLaps: Int?
-    let totalLaps: Int
-    let tyresNotChanged: String?
+    let Compound: String?
+    let LapFlags: Int? // ?
+    let LapNumber: Int?
+    let LapTime: String?
+    let New: String? // "true" | "false"
+    let StartLaps: Int?
+    let TotalLaps: Int?
+    let TyresNotChanged: String? // ??? "0"
 }

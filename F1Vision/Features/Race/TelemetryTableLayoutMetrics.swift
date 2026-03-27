@@ -10,7 +10,7 @@ import UIKit
 enum TelemetryTableLayoutMetrics {
     static let horizontalPadding: Double = 10
     static let verticalPadding: Double = 5
-    static func fixedWidth(viewModel: RaceViewModel) -> Double {
+    @MainActor static func fixedWidth(viewModel: RaceViewModel) -> Double {
         let sizingDelegate = TelemetryTableCollectionViewDelegate(viewModel: viewModel)
         let contentInsets = horizontalPadding * 2
         return sizingDelegate.totalColumnsWidth() + contentInsets

@@ -7,10 +7,11 @@
 
 struct SSEmessage: Codable {
     var DriverList: [String: DriverFullInfo]?
-    var CarDataZ: String?
-    var PositionZ: String? // zlib encoded
+//    var CarDataZ: String?
+//    var PositionZ: String? // zlib encoded
     var sessionInfo: SessionInfo?
     var timingData: TimingData?
+    var timingAppData: TimingAppData?
 //    var ChampionshipPrediction: ChampionshipPrediction?
 //    var ExtrapolatedClock: ExtrapolatedClock?
 //    var Heartbeat: Heartbeat?
@@ -19,7 +20,6 @@ struct SSEmessage: Codable {
 //    var SessionData: SessionData?
 //    var SessionStatus: SessionStatus?
 //    var TeamRadio: TeamRadio?
-//    var TimingAppData: TimingAppData?
 //    var TimingStats: TimingStats?
 //    var TopThree: TopThree?
 //    var TrackStatus: TrackStatus?
@@ -40,10 +40,11 @@ struct SSEmessage: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case DriverList
-        case CarDataZ
-        case PositionZ
+//        case CarDataZ
+//        case PositionZ
         case sessionInfo = "SessionInfo"
         case timingData = "TimingData"
+        case timingAppData = "TimingAppData"
     }
 
     init(from decoder: Decoder) throws {
@@ -67,9 +68,10 @@ struct SSEmessage: Codable {
             DriverList = nil
         }
 
-        CarDataZ = try container.decodeIfPresent(String.self, forKey: .CarDataZ)
-        PositionZ = try container.decodeIfPresent(String.self, forKey: .PositionZ)
+//        CarDataZ = try container.decodeIfPresent(String.self, forKey: .CarDataZ)
+//        PositionZ = try container.decodeIfPresent(String.self, forKey: .PositionZ)
         sessionInfo = try container.decodeIfPresent(SessionInfo.self, forKey: .sessionInfo)
         timingData = try container.decodeIfPresent(TimingData.self, forKey: .timingData)
+        timingAppData = try container.decodeIfPresent(TimingAppData.self, forKey: .timingAppData)
     }
 }

@@ -84,15 +84,22 @@ final class DriverIdentityCell: UICollectionViewCell {
 
 // MARK: - Preview
 
-#Preview("Dark") {
-    let v = DriverIdentityCell()
-    v.configure(position: "11", code: "HAM", backgroundColor: UIColor(hex: "#E80020"))
-    return v
+#Preview("Dark (Telemetry Size)") {
+    let cell = DriverIdentityCell()
+    cell.configure(position: "11", code: "HAM", backgroundColor: UIColor(hex: "#E80020"))
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).height
+        )
 }
 
-#Preview("Light") {
-    let v = DriverIdentityCell()
-    v.configure(position: "1", code: "BEA", backgroundColor: UIColor(hex: "#B6BABD"))
-    return v
+#Preview("Light (Telemetry Size)") {
+    let cell = DriverIdentityCell()
+    cell.configure(position: "1", code: "BEA", backgroundColor: UIColor(hex: "#B6BABD"))
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).height
+        )
 }
-

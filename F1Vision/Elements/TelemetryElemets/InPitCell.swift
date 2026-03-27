@@ -99,14 +99,18 @@ struct InPitCellPreviewWrapper: UIViewRepresentable {
     func updateUIView(_: InPitCell, context _: Context) {}
 }
 
-#Preview {
-    VStack {
-        ForEach(0 ..< 22) { i in
-            InPitCellPreviewWrapper(value: i % 2 == 1)
-//                .padding()
-                .frame(width: 60, height: 44)
-                .border(Color.black.opacity(0.3))
-        }
-    }
-    .padding()
+#Preview("In Pit (Telemetry Size)") {
+    InPitCellPreviewWrapper(value: true)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(1).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(1).height
+        )
+}
+
+#Preview("Not In Pit (Telemetry Size)") {
+    InPitCellPreviewWrapper(value: false)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(1).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(1).height
+        )
 }

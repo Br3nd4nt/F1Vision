@@ -11,7 +11,7 @@ import Puppy
 
 @MainActor
 enum Configuration {
-    static let debugMode: Bool = false
+    static let debugMode: Bool = true
     static let zoom: Double = 0.9
     static let enableTrackRotationCalculation: Bool = false
     
