@@ -99,9 +99,10 @@ final class TireCell: UICollectionViewCell {
         circleHeightConstraint?.constant = circleSide
         circleBaсkgroundView.layer.cornerRadius = circleSide / 2
         circleBaсkgroundView.layer.borderWidth = circleSide * 0.15
-        letterLabel.font = .systemFont(ofSize: max(10, circleSide * letterFontScale), weight: .bold)
-        lapsLabel.font = .systemFont(ofSize: max(10, circleSide * lapsFontScale), weight: .bold)
-        pitsLabel.font = .systemFont(ofSize: max(10, circleSide * pitsFontScale), weight: .light)
+        let scale = min(1.35, max(0.75, Double(side) / 32))
+        letterLabel.font = .systemFont(ofSize: max(10, circleSide * letterFontScale) * scale, weight: .bold)
+        lapsLabel.font = .systemFont(ofSize: max(10, circleSide * lapsFontScale) * scale, weight: .bold)
+        pitsLabel.font = .systemFont(ofSize: max(10, circleSide * pitsFontScale) * scale, weight: .light)
     }
 }
 

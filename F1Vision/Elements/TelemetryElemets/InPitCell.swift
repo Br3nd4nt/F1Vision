@@ -14,6 +14,7 @@ final class InPitCell: UICollectionViewCell {
 
     private let cornerRadius: Double = 13
     private let fontSize: Double = 15
+    private let referenceRowHeight: Double = 32
 
     private var value: Bool  = false
     
@@ -39,14 +40,18 @@ final class InPitCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(_ value: Bool) {
-        guard value != self.value else { return }
+    func configure(_ value: Bool, metrics: TelemetryCellMetrics? = nil) {
+        if value == self.value {
+            setNeedsLayout()
+            return
+        }
         self.value = value
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         borderLayer.strokeColor = color.cgColor
         CATransaction.commit()
         label.textColor = color
+        setNeedsLayout()
     }
 
     private func configureUI() {
@@ -76,7 +81,9 @@ final class InPitCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        let inset = strokeWidth
+        let minSide = min(contentView.bounds.width, contentView.bounds.height)
+        let maxInset = max(0, (minSide / 2) - 1)
+        let inset = min(CGFloat(strokeWidth), maxInset)
         let rect = contentView.bounds.insetBy(dx: inset, dy: inset)
 
         borderLayer.frame = contentView.bounds
@@ -84,6 +91,11 @@ final class InPitCell: UICollectionViewCell {
             roundedRect: rect,
             cornerRadius: cornerRadius
         ).cgPath
+
+        let rowHeight = Double(bounds.height)
+        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        label.font = .boldSystemFont(ofSize: fontSize * scale)
+        borderLayer.lineWidth = strokeWidth * scale
     }
 }
 

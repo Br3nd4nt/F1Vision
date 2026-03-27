@@ -14,6 +14,7 @@ final class IntervalTimeCell: UICollectionViewCell {
     private let verticalPadding: Double = 0
     private let horizontalPadding: Double = 10
     private let fontSize: Double = 15
+    private let referenceRowHeight: Double = 32
 
     static let reuseId = "IntervalTimeCell"
 
@@ -27,7 +28,8 @@ final class IntervalTimeCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(interval: String?) {
+    func configure(interval: String?, metrics: TelemetryCellMetrics? = nil) {
+        // Font scaling happens in `layoutSubviews` so it updates on window/row size changes.
         guard let interval, !interval.isEmpty else {
             codeLabel.text = "-"
             return
@@ -50,6 +52,13 @@ final class IntervalTimeCell: UICollectionViewCell {
             layer.borderColor = UIColor.yellow.cgColor
             layer.borderWidth = 1
         }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let rowHeight = Double(bounds.height)
+        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        codeLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
     }
 }
 

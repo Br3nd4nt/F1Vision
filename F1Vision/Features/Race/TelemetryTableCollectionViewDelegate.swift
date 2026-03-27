@@ -23,8 +23,9 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     private enum Column: Int {
         case identity = 0
         case inPit = 1
-        case intervalAhead = 2
-        case internalToFastest = 3
+        case tire = 2
+        case intervalAhead = 3
+        case internalToFastest = 4
     }
     
     init(viewModel: RaceViewModel) {
@@ -34,12 +35,13 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
     func totalColumnsWidth() -> Double {
         widthForIdentityColumn()
             + widthForInPitColumn()
+            + widthForTireColumn()
             + widthForIntervalColumn()
             + widthForIntervalColumn()
             + 40
     }
 
-    var columnCount: Int { 4 }
+    var columnCount: Int { 5 }
     
     func collectionView(
         _ collectionView: UICollectionView,
@@ -52,6 +54,8 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
             width = widthForIdentityColumn()
         case .inPit:
             width = widthForInPitColumn()
+        case .tire:
+            width = widthForTireColumn()
         case .intervalAhead, .internalToFastest:
             width = widthForIntervalColumn()
         case .none:
@@ -91,6 +95,10 @@ final class TelemetryTableCollectionViewDelegate: NSObject,
         let text = "IN PIT"
         let textWidth = textWidth(for: text, font: inPitCellFont)
         return max(textWidth + inPitCellHorizontalPadding, 75)
+    }
+    
+    private func widthForTireColumn() -> Double {
+        return 100
     }
     
     private func widthForIntervalColumn() -> Double {

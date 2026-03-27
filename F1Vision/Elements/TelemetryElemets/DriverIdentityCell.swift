@@ -18,6 +18,7 @@ final class DriverIdentityCell: UICollectionViewCell {
     private let verticalPadding: Double = 5
     private let horizontalPadding: Double = 5
     private let fontSize: Double = 20
+    private let referenceRowHeight: Double = 32
 
     static let reuseId = "DriverIdentityCell"
 
@@ -31,7 +32,7 @@ final class DriverIdentityCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(position: String, code: String, backgroundColor: UIColor) {
+    func configure(position: String, code: String, backgroundColor: UIColor, metrics: TelemetryCellMetrics? = nil) {
         backgroundWrapperView.backgroundColor = backgroundColor
         positionLabel.text = position
         codeLabel.text = code
@@ -67,8 +68,11 @@ final class DriverIdentityCell: UICollectionViewCell {
         // layout: fixed pill and equally-sized halves inside
         backgroundWrapperView.pinLeft(to: self, horizontalPadding)
         backgroundWrapperView.pinRight(to: self, horizontalPadding)
-        backgroundWrapperView.pinTop(to: self, verticalPadding)
-        backgroundWrapperView.pinBottom(to: self, verticalPadding)
+        let top = backgroundWrapperView.pinTop(to: self, verticalPadding)
+        let bottom = backgroundWrapperView.pinBottom(to: self, verticalPadding)
+        // When the row becomes very small, allow the wrapper to shrink without constraint warnings.
+        top.priority = .defaultLow
+        bottom.priority = .defaultLow
 
         stackView.pinLeft(to: backgroundWrapperView, 0)
         stackView.pinRight(to: backgroundWrapperView, 0)
@@ -79,6 +83,14 @@ final class DriverIdentityCell: UICollectionViewCell {
             layer.borderColor = UIColor.systemPink.cgColor
             layer.borderWidth = 1
         }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let rowHeight = Double(bounds.height)
+        let scale = min(1.35, max(0.75, rowHeight / referenceRowHeight))
+        positionLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
+        codeLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
     }
 }
 
