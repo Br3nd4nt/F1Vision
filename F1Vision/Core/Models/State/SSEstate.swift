@@ -100,7 +100,26 @@ struct SSEstate: Codable {
     mutating func update(key: String, value: JSONValue) throws {
         switch key {
         case "TimingAppData":
-            break
+            guard case .object(let timingApp) = value,
+                  let linesValue = timingApp["Lines"],
+                  case .object(let lines) = linesValue
+            else {
+                throw StateError.ValueError(value)
+            }
+            
+            for (driverKey, driverValue) in lines {
+                guard let number = Int(driverKey),
+                      var state = driversStates[number],
+                      case .object(let driverObj) = driverValue
+                else { continue }
+                
+                guard let stintsValue = driverObj["Stints"] else {
+                    continue
+                }
+                
+                Self.applyStintsUpdate(stintsValue, to: &state.stints)
+                driversStates[number] = state
+            }
         case "TimingData":
             guard case .object(let timing) = value,
                 let linesArray = timing["Lines"],
@@ -171,6 +190,69 @@ struct SSEstate: Codable {
             }
         default:
             Self.logger.debug("unrecognised update key: \(key)")
+            return
+        }
+    }
+
+    private static func applyStintsUpdate(_ stintsValue: JSONValue, to stints: inout [TireStint]) {
+        func ensureIndex(_ index: Int) {
+            if stints.isEmpty {
+                stints = [.init()]
+            }
+            if index >= stints.count {
+                for i in stints.count...index {
+                    stints.append(.init(totalLaps: 0, compound: "UNDEFINED", newCompound: true, stintNumber: i))
+                }
+            }
+        }
+        
+        func applyFields(_ fields: [String: JSONValue], stintIndex: Int) {
+            ensureIndex(stintIndex)
+            var current = stints[stintIndex]
+            
+            if let total = fields["TotalLaps"] {
+                if case .int(let v) = total {
+                    current.totalLaps = v
+                } else if case .string(let s) = total, let v = Int(s) {
+                    current.totalLaps = v
+                }
+            }
+            
+            if let compound = fields["Compound"], case .string(let s) = compound {
+                current.compound = s.uppercased()
+            }
+            
+            if let newVal = fields["New"] {
+                switch newVal {
+                case .bool(let b):
+                    current.newCompound = b
+                case .string(let s):
+                    current.newCompound = (s == "true" || s == "1")
+                case .int(let i):
+                    current.newCompound = (i != 0)
+                default:
+                    break
+                }
+            }
+            
+            current.stintNumber = stintIndex
+            stints[stintIndex] = current
+        }
+        
+        switch stintsValue {
+        case .object(let stintsObj):
+            for (stintKey, stintVal) in stintsObj {
+                guard let stintIndex = Int(stintKey),
+                      case .object(let fields) = stintVal
+                else { continue }
+                applyFields(fields, stintIndex: stintIndex)
+            }
+        case .array(let stintsArr):
+            for (stintIndex, stintVal) in stintsArr.enumerated() {
+                guard case .object(let fields) = stintVal else { continue }
+                applyFields(fields, stintIndex: stintIndex)
+            }
+        default:
             return
         }
     }

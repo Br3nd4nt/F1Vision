@@ -49,12 +49,12 @@ final class TrackUIView: UIView {
         trackShapeLayer.strokeColor = UIColor.lightGray.cgColor
         trackShapeLayer.fillColor = UIColor.clear.cgColor
         trackShapeLayer.lineWidth = 5
-        
-        layer.addSublayer(trackStartPointLayer)
-        trackStartPointLayer.fillColor = UIColor.systemRed.cgColor
-        trackStartPointLayer.strokeColor = UIColor.clear.cgColor
-        
+
         if Configuration.debugMode {
+            layer.addSublayer(trackStartPointLayer)
+            trackStartPointLayer.fillColor = UIColor.systemRed.cgColor
+            trackStartPointLayer.strokeColor = UIColor.clear.cgColor
+    
             debugBoundingBoxLayer.strokeColor = UIColor.red.cgColor
             debugBoundingBoxLayer.fillColor = UIColor.clear.cgColor
             debugBoundingBoxLayer.lineWidth = 1
