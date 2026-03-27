@@ -18,6 +18,7 @@ final class DriverIdentityCell: UICollectionViewCell {
     private let verticalPadding: Double = 5
     private let horizontalPadding: Double = 5
     private let fontSize: Double = 20
+    private let referenceRowHeight: Double = Configuration.uiReferenceRowHeight
 
     static let reuseId = "DriverIdentityCell"
 
@@ -31,7 +32,7 @@ final class DriverIdentityCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(position: String, code: String, backgroundColor: UIColor) {
+    func configure(position: String, code: String, backgroundColor: UIColor, metrics: TelemetryCellMetrics? = nil) {
         backgroundWrapperView.backgroundColor = backgroundColor
         positionLabel.text = position
         codeLabel.text = code
@@ -67,8 +68,11 @@ final class DriverIdentityCell: UICollectionViewCell {
         // layout: fixed pill and equally-sized halves inside
         backgroundWrapperView.pinLeft(to: self, horizontalPadding)
         backgroundWrapperView.pinRight(to: self, horizontalPadding)
-        backgroundWrapperView.pinTop(to: self, verticalPadding)
-        backgroundWrapperView.pinBottom(to: self, verticalPadding)
+        let top = backgroundWrapperView.pinTop(to: self, verticalPadding)
+        let bottom = backgroundWrapperView.pinBottom(to: self, verticalPadding)
+        // When the row becomes very small, allow the wrapper to shrink without constraint warnings.
+        top.priority = .defaultLow
+        bottom.priority = .defaultLow
 
         stackView.pinLeft(to: backgroundWrapperView, 0)
         stackView.pinRight(to: backgroundWrapperView, 0)
@@ -80,19 +84,34 @@ final class DriverIdentityCell: UICollectionViewCell {
             layer.borderWidth = 1
         }
     }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let rowHeight = Double(bounds.height)
+        let scale = min(Configuration.uiMaxTextScale, max(Configuration.uiMinScale, rowHeight / referenceRowHeight))
+        positionLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
+        codeLabel.font = .systemFont(ofSize: fontSize * scale, weight: .bold)
+    }
 }
 
 // MARK: - Preview
 
-#Preview("Dark") {
-    let v = DriverIdentityCell()
-    v.configure(position: "11", code: "HAM", backgroundColor: UIColor(hex: "#E80020"))
-    return v
+#Preview("Dark (Telemetry Size)") {
+    let cell = DriverIdentityCell()
+    cell.configure(position: "11", code: "HAM", backgroundColor: UIColor(hex: "#E80020"))
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).height
+        )
 }
 
-#Preview("Light") {
-    let v = DriverIdentityCell()
-    v.configure(position: "1", code: "BEA", backgroundColor: UIColor(hex: "#B6BABD"))
-    return v
+#Preview("Light (Telemetry Size)") {
+    let cell = DriverIdentityCell()
+    cell.configure(position: "1", code: "BEA", backgroundColor: UIColor(hex: "#B6BABD"))
+    return UIKitViewPreview(view: cell)
+        .frame(
+            width: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).width,
+            height: TelemetryCellPreviewSupport.sizeForTelemetryColumn(0).height
+        )
 }
-

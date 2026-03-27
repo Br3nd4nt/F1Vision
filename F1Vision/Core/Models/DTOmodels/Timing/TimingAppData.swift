@@ -6,12 +6,12 @@
 //
 
 struct TimingAppData: Codable {
-    let lines: [String: TimingAppDataLine]
+    let Lines: [String: TimingAppDataLine]
 }
 
 struct TimingAppDataLine: Codable {
-    let gridPos: String?
-    let line: Int?
-    let racingNumber: String?
-    let stints: [String: StintInfo]?
+    let GridPos: String?
+    let Line: Int?
+    let RacingNumber: String?
+    let Stints: [StintInfo]?
 }

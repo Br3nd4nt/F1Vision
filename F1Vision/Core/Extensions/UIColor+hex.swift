@@ -20,10 +20,4 @@ extension UIColor {
         let blue = Double(rgb & 0xFF) / 255.0
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
-
-    var isLight: Bool {
-        var white: CGFloat = 0
-        self.getWhite(&white, alpha: nil)
-        return white > 0.7
-    }
 }

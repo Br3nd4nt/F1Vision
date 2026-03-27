@@ -47,6 +47,11 @@ struct SSEstate: Codable {
         guard let timingData = response.timingData else {
             throw StateError.TimingDataNotFound
         }
+        
+        // timing app data - tires
+        guard let timingAppData = response.timingAppData else {
+            throw StateError.TimingAppDataNotFound
+        }
 
         let topology = Self.computeMiniSegmentTopology(from: timingData)
         totalMiniSegments = topology.total
@@ -69,6 +74,15 @@ struct SSEstate: Codable {
                 sectorStartIndex: sectorStartIndex,
                 totalMiniSegments: totalMiniSegments
             )
+            var stints: [TireStint] = []
+            if let stintsInfo = timingAppData.Lines[driver]?.Stints {
+                for (index, s) in stintsInfo.enumerated() {
+                    stints.append(.init(s, stintNumber: index))
+                }
+            } else {
+                stints = [.init()]
+            }
+            
             let state = DriverState(
                 position: pos,
                 inPit: inPit,
@@ -76,7 +90,8 @@ struct SSEstate: Codable {
                 diffToAhead: diffToAhead,
                 currentMiniSegment: currentMiniSegment,
                 trackProgress: trackProgress,
-                miniSegments: miniSegments
+                miniSegments: miniSegments,
+                stints: stints
             )
             driversStates[number] = state
         }
@@ -84,6 +99,8 @@ struct SSEstate: Codable {
 
     mutating func update(key: String, value: JSONValue) throws {
         switch key {
+        case "TimingAppData":
+            break
         case "TimingData":
             guard case .object(let timing) = value,
                 let linesArray = timing["Lines"],
@@ -351,4 +368,5 @@ enum StateError: Error {
     case PositionZNotFound
     case CarDataZNotFound
     case TimingDataNotFound
+    case TimingAppDataNotFound
 }

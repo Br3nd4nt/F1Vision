@@ -19,7 +19,7 @@ struct TelemetryTableUIViewRepresentable: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: TelemetryTableViewController, context _: Context) {
-        vc.configureView()
+        // Layout is driven by UIKit (`viewDidLayoutSubviews`) and data updates.
     }
 
     typealias UIViewControllerType = TelemetryTableViewController
