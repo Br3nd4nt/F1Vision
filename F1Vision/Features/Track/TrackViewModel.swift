@@ -220,6 +220,9 @@ final class TrackViewModel: ObservableObject {
          points.reserveCapacity(state.driversStates.count)
 
          for (driver, driverState) in state.driversStates {
+             if driverState.inPit {
+                 continue
+             }
              guard let progress = driverState.trackProgress else { continue }
              let raw = progress * Double(lastIndex)
              let index = max(0, min(Int(raw.rounded()), lastIndex))
