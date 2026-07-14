@@ -28,7 +28,7 @@ enum Configuration {
     static let driverPointRadius: Double = 7
 
     private static let socketScheme = "http"
-    private static let socketHost = "192.168.10.104"
+    private static let socketHost = "127.0.0.1"
     private static let socketPath = "/api/realtime"
     private static let socketPort = 4_000
 

@@ -1,6 +1,9 @@
 # 🏎️ F1Vision
 > [!CAUTION]
 > Since may 2026 Formula 1 been implementing wide-range IP bans, this renders project unusable. **For now!**
+
+![demo](demo.gif)
+
 <!-- ## Project Structure
 ```
 └── F1Vision
